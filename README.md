@@ -10,6 +10,7 @@ ScrollToZoom converts the mouse wheel events into gesture events. You can custom
 
 - [ ] App icon
 - [ ] Open at login
+- [ ] Localization (Traditional Chinese and Japanese)
 
 ## License
 
