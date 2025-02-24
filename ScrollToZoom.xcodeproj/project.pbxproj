@@ -1,0 +1,498 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZEventTap.c */; };
+		DE394C682D4688B90064598B /* StatusMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE394C672D4688B90064598B /* StatusMenu.xib */; };
+		DE70F1592D44B5D20034F3F6 /* STZHandlers.m in Sources */ = {isa = PBXBuildFile; fileRef = DE70F1582D44B5D20034F3F6 /* STZHandlers.m */; };
+		DE70F15D2D44FABF0034F3F6 /* STZControls.m in Sources */ = {isa = PBXBuildFile; fileRef = DE70F15C2D44FABF0034F3F6 /* STZControls.m */; };
+		DE70F1602D44FC1B0034F3F6 /* STZWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */; };
+		DE70F1622D4532270034F3F6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE70F1612D4532270034F3F6 /* Localizable.xcstrings */; };
+		DE70F1642D4553330034F3F6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE70F1632D4553330034F3F6 /* MainMenu.xib */; };
+		DE9B152C2D43948E00E92ECE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DE9B152B2D43948E00E92ECE /* AppDelegate.m */; };
+		DE9B152E2D43948F00E92ECE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9B152D2D43948F00E92ECE /* Assets.xcassets */; };
+		DE9B15332D43948F00E92ECE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DE9B15322D43948F00E92ECE /* main.m */; };
+		DED131A12D5CD9FB00F13760 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DED131A02D5CD9FB00F13760 /* main.m */; };
+		DED131A62D5CE01B00F13760 /* ScrollToZoomHelper.app in CopyFiles */ = {isa = PBXBuildFile; fileRef = DED131962D5CD9FA00F13760 /* ScrollToZoomHelper.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DE394C702D48DADB0064598B /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = Contents/Library/Loginitems;
+			dstSubfolderSpec = 1;
+			files = (
+				DED131A62D5CE01B00F13760 /* ScrollToZoomHelper.app in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		DE265C862D43EAA100EC1A07 /* STZEventTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZEventTap.h; sourceTree = "<group>"; };
+		DE265C872D43EAA100EC1A07 /* STZEventTap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZEventTap.c; sourceTree = "<group>"; };
+		DE394C672D4688B90064598B /* StatusMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = StatusMenu.xib; sourceTree = "<group>"; };
+		DE70F1572D44B5D20034F3F6 /* STZHandlers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZHandlers.h; sourceTree = "<group>"; };
+		DE70F1582D44B5D20034F3F6 /* STZHandlers.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZHandlers.m; sourceTree = "<group>"; };
+		DE70F15B2D44FABF0034F3F6 /* STZControls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZControls.h; sourceTree = "<group>"; };
+		DE70F15C2D44FABF0034F3F6 /* STZControls.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZControls.m; sourceTree = "<group>"; };
+		DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZWindow.h; sourceTree = "<group>"; };
+		DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZWindow.m; sourceTree = "<group>"; };
+		DE70F1612D4532270034F3F6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
+		DE70F1632D4553330034F3F6 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		DE9B15272D43948E00E92ECE /* ScrollToZoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollToZoom.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DE9B152A2D43948E00E92ECE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		DE9B152B2D43948E00E92ECE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		DE9B152D2D43948F00E92ECE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		DE9B15322D43948F00E92ECE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ScrollToZoom.entitlements; sourceTree = "<group>"; };
+		DED131962D5CD9FA00F13760 /* ScrollToZoomHelper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollToZoomHelper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DED131A02D5CD9FB00F13760 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		DED131A22D5CD9FB00F13760 /* ScrollToZoomHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ScrollToZoomHelper.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		DE9B15242D43948E00E92ECE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED131932D5CD9FA00F13760 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		DE9B151E2D43948E00E92ECE = {
+			isa = PBXGroup;
+			children = (
+				DE9B15292D43948E00E92ECE /* ScrollToZoom */,
+				DED131972D5CD9FA00F13760 /* ScrollToZoomHelper */,
+				DE9B15282D43948E00E92ECE /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		DE9B15282D43948E00E92ECE /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				DE9B15272D43948E00E92ECE /* ScrollToZoom.app */,
+				DED131962D5CD9FA00F13760 /* ScrollToZoomHelper.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		DE9B15292D43948E00E92ECE /* ScrollToZoom */ = {
+			isa = PBXGroup;
+			children = (
+				DE9B15322D43948F00E92ECE /* main.m */,
+				DE9B152A2D43948E00E92ECE /* AppDelegate.h */,
+				DE9B152B2D43948E00E92ECE /* AppDelegate.m */,
+				DE70F1572D44B5D20034F3F6 /* STZHandlers.h */,
+				DE70F1582D44B5D20034F3F6 /* STZHandlers.m */,
+				DE265C862D43EAA100EC1A07 /* STZEventTap.h */,
+				DE265C872D43EAA100EC1A07 /* STZEventTap.c */,
+				DE70F15B2D44FABF0034F3F6 /* STZControls.h */,
+				DE70F15C2D44FABF0034F3F6 /* STZControls.m */,
+				DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */,
+				DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */,
+				DE70F1632D4553330034F3F6 /* MainMenu.xib */,
+				DE394C672D4688B90064598B /* StatusMenu.xib */,
+				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
+				DE9B152D2D43948F00E92ECE /* Assets.xcassets */,
+				DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */,
+			);
+			path = ScrollToZoom;
+			sourceTree = "<group>";
+		};
+		DED131972D5CD9FA00F13760 /* ScrollToZoomHelper */ = {
+			isa = PBXGroup;
+			children = (
+				DED131A02D5CD9FB00F13760 /* main.m */,
+				DED131A22D5CD9FB00F13760 /* ScrollToZoomHelper.entitlements */,
+			);
+			path = ScrollToZoomHelper;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		DE9B15262D43948E00E92ECE /* ScrollToZoom */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DE9B15372D43948F00E92ECE /* Build configuration list for PBXNativeTarget "ScrollToZoom" */;
+			buildPhases = (
+				DE9B15232D43948E00E92ECE /* Sources */,
+				DE9B15242D43948E00E92ECE /* Frameworks */,
+				DE9B15252D43948E00E92ECE /* Resources */,
+				DE394C702D48DADB0064598B /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScrollToZoom;
+			productName = "Scroll to Zoom";
+			productReference = DE9B15272D43948E00E92ECE /* ScrollToZoom.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DED131952D5CD9FA00F13760 /* ScrollToZoomHelper */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DED131A32D5CD9FB00F13760 /* Build configuration list for PBXNativeTarget "ScrollToZoomHelper" */;
+			buildPhases = (
+				DED131922D5CD9FA00F13760 /* Sources */,
+				DED131932D5CD9FA00F13760 /* Frameworks */,
+				DED131942D5CD9FA00F13760 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ScrollToZoomHelper;
+			productName = ScrollToZoomHelper;
+			productReference = DED131962D5CD9FA00F13760 /* ScrollToZoomHelper.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		DE9B151F2D43948E00E92ECE /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					DE9B15262D43948E00E92ECE = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					DED131952D5CD9FA00F13760 = {
+						CreatedOnToolsVersion = 15.3;
+					};
+				};
+			};
+			buildConfigurationList = DE9B15222D43948E00E92ECE /* Build configuration list for PBXProject "ScrollToZoom" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				"zh-Hans",
+				"zh-Hant",
+				Base,
+			);
+			mainGroup = DE9B151E2D43948E00E92ECE;
+			productRefGroup = DE9B15282D43948E00E92ECE /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DE9B15262D43948E00E92ECE /* ScrollToZoom */,
+				DED131952D5CD9FA00F13760 /* ScrollToZoomHelper */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		DE9B15252D43948E00E92ECE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE394C682D4688B90064598B /* StatusMenu.xib in Resources */,
+				DE70F1622D4532270034F3F6 /* Localizable.xcstrings in Resources */,
+				DE9B152E2D43948F00E92ECE /* Assets.xcassets in Resources */,
+				DE70F1642D4553330034F3F6 /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED131942D5CD9FA00F13760 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		DE9B15232D43948E00E92ECE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DE9B15332D43948F00E92ECE /* main.m in Sources */,
+				DE9B152C2D43948E00E92ECE /* AppDelegate.m in Sources */,
+				DE70F15D2D44FABF0034F3F6 /* STZControls.m in Sources */,
+				DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */,
+				DE70F1592D44B5D20034F3F6 /* STZHandlers.m in Sources */,
+				DE70F1602D44FC1B0034F3F6 /* STZWindow.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DED131922D5CD9FA00F13760 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DED131A12D5CD9FB00F13760 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		DE9B15352D43948F00E92ECE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		DE9B15362D43948F00E92ECE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		DE9B15382D43948F00E92ECE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainNibFile = MainMenu;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		DE9B15392D43948F00E92ECE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSUIElement = YES;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				INFOPLIST_KEY_NSMainNibFile = MainMenu;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+		DED131A42D5CD9FB00F13760 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScrollToZoomHelper/ScrollToZoomHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSBackgroundOnly = NO;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Debug;
+		};
+		DED131A52D5CD9FB00F13760 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ScrollToZoomHelper/ScrollToZoomHelper.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSBackgroundOnly = NO;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom.helper;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		DE9B15222D43948E00E92ECE /* Build configuration list for PBXProject "ScrollToZoom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE9B15352D43948F00E92ECE /* Debug */,
+				DE9B15362D43948F00E92ECE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DE9B15372D43948F00E92ECE /* Build configuration list for PBXNativeTarget "ScrollToZoom" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DE9B15382D43948F00E92ECE /* Debug */,
+				DE9B15392D43948F00E92ECE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		DED131A32D5CD9FB00F13760 /* Build configuration list for PBXNativeTarget "ScrollToZoomHelper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DED131A42D5CD9FB00F13760 /* Debug */,
+				DED131A52D5CD9FB00F13760 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = DE9B151F2D43948E00E92ECE /* Project object */;
+}
