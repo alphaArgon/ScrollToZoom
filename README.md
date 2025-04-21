@@ -12,7 +12,7 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 
 With the specified modifier keys held, you can perform precise zooming in any app with your mouse. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
 
-<img src="images/window.png" width="475" title="Screenshot of the main window">
+<img src="images/window.png" width="447" title="Screenshot of the main window">
 
 Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/Caldis/Mos), [LinearMouse](https://github.com/linearmouse/linearmouse), or others you love. If that tool provides a smooth scrolling experience, Scroll to Zoom will benefit from it, giving a smooth zooming experience.
 
