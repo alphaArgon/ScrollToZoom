@@ -9,12 +9,21 @@
 #import <CoreGraphics/CGEvent.h>
 
 CF_IMPLICIT_BRIDGING_ENABLED
+CF_ASSUME_NONNULL_BEGIN
 
 
-extern CGEventFlags STZScrollToZoomFlags;
+/// Returns a valid set of modifier flags for the given flags. If `getDescription` is provided, a
+/// textual representation of the valid flags will be indirectly returned. This description is not
+/// retained.
+CGEventFlags STZValidateModifierFlags(CGEventFlags flags, CFStringRef __nonnull CF_RETURNS_NOT_RETAINED *__nullable outDescription);
 
-/// The factor to calculate the relative magnification factor from the scroll wheel delta.
-extern double STZScrollToZoomMagnifier;
+
+CGEventFlags STZGetScrollToZoomFlags(void);
+void STZSetScrollToZoomFlags(CGEventFlags);
+
+/// The factor to calculate the relative magnification from the scroll wheel delta.
+double STZGetScrollToZoomMagnifier(void);
+void STZSetScrollToZoomMagnifier(double);
 
 /// A factor to reduce relative magnification during the inertia phase.
 ///
@@ -23,7 +32,8 @@ extern double STZScrollToZoomMagnifier;
 /// the beginning of the inertia phase (i.e., when the user lifts their fingers).
 ///
 /// If this value is set to `1`, the inertia effect has no effect.
-extern double STZScrollMomentumToZoomAttenuation;
+double STZGetScrollMomentumToZoomAttenuation(void);
+void STZSetScrollMomentumToZoomAttenuation(double);
 
 /// The minimum magnification threshold during the inertia phase.
 ///
@@ -35,53 +45,27 @@ extern double STZScrollMomentumToZoomAttenuation;
 /// inertia phase will be ignored by AppKit if needed (when reaching the boundary of the document).
 /// However, for zoom events converted from scroll events, if the inertia phase is ignored, the zoom
 /// will be stopped abruptly; if the inertia phase is too long, the final effect will be too sloppy.
-extern double STZScrollMinMomentumMagnification;
+double STZGetScrollMinMomentumMagnification(void);
+void STZSetScrollMinMomentumMagnification(double);
 
+typedef enum __attribute__((flag_enum)): uint32_t {
+    kSTZEventTapDefaultOptions  = 0,
+    kSTZEventTapDisabled        = 1 << 0,
+    kSTZEventTapExcludeFlags      = 1 << 1,
+} STZEventTapOptions;
+
+STZEventTapOptions STZGetEventTapOptionsForBundleIdentifier(CFStringRef __nullable bundleID);
+void STZSetEventTapOptionsForBundleIdentifier(CFStringRef bundleID, STZEventTapOptions);
+
+/// Returns all tap options keyed by the bundle identifier. The value is a raw pointer whose bit
+/// pattern represents the options.
+CFDictionaryRef STZCopyAllEventTapOptions(void);
+
+void STZLoadArgumentsFromUserDefaults(void);
 
 bool STZGetEventTapEnabled(void);
-bool STZSetEventTapEnabled(bool);
+bool STZSetEventTapEnabled(bool);  ///< Returns the same value as the getting function.
 
 
-//  MARK: - SPI
-
-
-enum {
-    kCGEventGesture = 29,  //  NSEventTypeGesture
-};
-
-enum {
-    kCGGestureEventHIDType = 110,
-    kCGGestureEventZoomValue = 113,
-    kCGGestureEventSwipeValue = 115,
-    kCGGestureEventPhase = 132,
-};
-
-
-typedef struct CF_BRIDGED_TYPE(id) __IOHIDEvent *IOHIDEventRef;
-IOHIDEventRef CGEventCopyIOHIDEvent(CGEventRef);
-
-
-typedef CF_ENUM(uint32_t, IOHIDEventType) {
-    kIOHIDEventTypeNULL,
-    kIOHIDEventTypeVendorDefined,
-    kIOHIDEventTypeKeyboard = 3,
-    kIOHIDEventTypeRotation = 5,
-    kIOHIDEventTypeScroll = 6,
-    kIOHIDEventTypeZoom = 8,
-    kIOHIDEventTypeDigitizer = 11,
-    kIOHIDEventTypeNavigationSwipe = 16,
-    kIOHIDEventTypeForce = 32,
-};
-
-IOHIDEventType IOHIDEventGetType(IOHIDEventRef);
-
-
-typedef CF_ENUM(uint32_t, IOHIDEventField) {
-    kIOHIDEventFieldScrollX = (kIOHIDEventTypeScroll << 16) | 0,
-    kIOHIDEventFieldScrollY = (kIOHIDEventTypeScroll << 16) | 1,
-};
-
-double IOHIDEventGetFloatValue(IOHIDEventRef, IOHIDEventField);
-void IOHIDEventSetFloatValue(IOHIDEventRef, IOHIDEventField, double);
-
+CF_ASSUME_NONNULL_END
 CF_IMPLICIT_BRIDGING_DISABLED

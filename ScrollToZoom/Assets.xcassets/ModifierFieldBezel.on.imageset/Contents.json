@@ -1,0 +1,204 @@
+{
+  "images" : [
+    {
+      "filename" : "ModifierFieldBezel.on@1x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 9,
+          "left" : 9,
+          "right" : 9,
+          "top" : 9
+        },
+        "center" : {
+          "height" : 1,
+          "mode" : "stretch",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.dark@1x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 9,
+          "left" : 9,
+          "right" : 9,
+          "top" : 9
+        },
+        "center" : {
+          "height" : 1,
+          "mode" : "stretch",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "contrast",
+          "value" : "high"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.ax@1x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 9,
+          "left" : 9,
+          "right" : 9,
+          "top" : 9
+        },
+        "center" : {
+          "height" : 1,
+          "mode" : "stretch",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "1x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        },
+        {
+          "appearance" : "contrast",
+          "value" : "high"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.dark.ax@1x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 9,
+          "left" : 9,
+          "right" : 9,
+          "top" : 9
+        },
+        "center" : {
+          "height" : 1,
+          "mode" : "stretch",
+          "width" : 1
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "1x"
+    },
+    {
+      "filename" : "ModifierFieldBezel.on@2x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 18,
+          "left" : 18,
+          "right" : 18,
+          "top" : 18
+        },
+        "center" : {
+          "height" : 2,
+          "mode" : "stretch",
+          "width" : 2
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.dark@2x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 18,
+          "left" : 18,
+          "right" : 18,
+          "top" : 18
+        },
+        "center" : {
+          "height" : 2,
+          "mode" : "stretch",
+          "width" : 2
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "contrast",
+          "value" : "high"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.ax@2x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 18,
+          "left" : 18,
+          "right" : 18,
+          "top" : 18
+        },
+        "center" : {
+          "height" : 2,
+          "mode" : "stretch",
+          "width" : 2
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "2x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        },
+        {
+          "appearance" : "contrast",
+          "value" : "high"
+        }
+      ],
+      "filename" : "ModifierFieldBezel.on.dark.ax@2x.png",
+      "idiom" : "mac",
+      "resizing" : {
+        "cap-insets" : {
+          "bottom" : 18,
+          "left" : 18,
+          "right" : 18,
+          "top" : 18
+        },
+        "center" : {
+          "height" : 2,
+          "mode" : "stretch",
+          "width" : 2
+        },
+        "mode" : "9-part"
+      },
+      "scale" : "2x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

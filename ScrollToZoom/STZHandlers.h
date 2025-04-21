@@ -6,8 +6,9 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import <stdint.h>
+#import <CoreFoundation/CFString.h>
 
 
-void STZDebugLog(char const *message, ...) __printflike(1, 2);
+bool STZIsLoggingEnabled(void);
+void STZDebugLog(char const *message, ...) CF_FORMAT_FUNCTION(1, 2);
 void STZUnknownEnumCase(char const *type, int64_t value);

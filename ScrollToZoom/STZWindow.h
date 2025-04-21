@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, class, readonly) STZWindow *sharedWindow;
 
 + (void)orderFrontSharedWindow;
-+ (void)orderFrontSharedWindowIfNeeded;
 
 @end
 

@@ -16,8 +16,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "DE9B15262D43948E00E92ECE"
-               BuildableName = "ScrollToZoom.app"
-               BlueprintName = "ScrollToZoom"
+               BuildableName = "Scroll to Zoom.app"
+               BlueprintName = "Scroll to Zoom"
                ReferencedContainer = "container:ScrollToZoom.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -45,8 +45,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DE9B15262D43948E00E92ECE"
-            BuildableName = "ScrollToZoom.app"
-            BlueprintName = "ScrollToZoom"
+            BuildableName = "Scroll to Zoom.app"
+            BlueprintName = "Scroll to Zoom"
             ReferencedContainer = "container:ScrollToZoom.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -62,8 +62,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "DE9B15262D43948E00E92ECE"
-            BuildableName = "ScrollToZoom.app"
-            BlueprintName = "ScrollToZoom"
+            BuildableName = "Scroll to Zoom.app"
+            BlueprintName = "Scroll to Zoom"
             ReferencedContainer = "container:ScrollToZoom.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

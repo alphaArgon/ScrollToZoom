@@ -15,5 +15,5 @@ int main(int argc, char const **argv) {
     NSApplication *application = [NSApplication sharedApplication];
     AppDelegate *delegate = [[AppDelegate alloc] init];
     [application setDelegate:delegate];
-    NSApplicationMain(argc, argv);
+    return NSApplicationMain(argc, argv);
 }

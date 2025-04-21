@@ -9,21 +9,23 @@
 #import "AppDelegate.h"
 #import "STZEventTap.h"
 #import "STZWindow.h"
+#import "STZOptionsPanel.h"
+#import "STZProcessManager.h"
+#import "GeneratedAssetSymbols.h"
+
+
+static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZoom";
 
 
 @implementation AppDelegate {
     NSStatusItem *_statusItem;
 }
 
-- (void)orderFrontSharedWindow:(id)sender {
-    [STZWindow orderFrontSharedWindow];
-}
-
 - (void)applicationDidFinishLaunching:(NSNotification *)notification {
     [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyAccessory];
 
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    [[_statusItem button] setImage:[NSImage imageNamed:@"StatusIcon"]];
+    [[_statusItem button] setImage:[NSImage imageNamed:ACImageNameStatusIcon]];
 
     NSArray *nibObjects;
     [[NSBundle mainBundle] loadNibNamed:@"StatusMenu" owner:self topLevelObjects:&nibObjects];
@@ -35,7 +37,10 @@
         }
     }
 
-    [STZWindow orderFrontSharedWindowIfNeeded];
+    STZLoadArgumentsFromUserDefaults();
+    if (!STZSetEventTapEnabled(true)) {
+        [STZWindow orderFrontSharedWindow];
+    }
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
@@ -45,6 +50,67 @@
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
     return !STZGetEventTapEnabled();
+}
+
+- (void)orderFrontAboutPanel:(id)sender {
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+    [[NSApplication sharedApplication] orderFrontStandardAboutPanelWithOptions:@{
+        NSAboutPanelOptionCredits: [[NSAttributedString alloc] initWithString:NSLocalizedString(@"view-source-on-github", nil)
+                                                                   attributes:@{
+            NSLinkAttributeName: [NSURL URLWithString:REPO_URL_PATH],
+            NSFontAttributeName: [NSFont toolTipsFontOfSize:12]
+        }]
+    }];
+}
+
+- (void)orderFrontSharedWindow:(id)sender {
+    [STZWindow orderFrontSharedWindow];
+}
+
+static NSRunningApplication *keyApplication(void) {
+    return [[NSWorkspace sharedWorkspace] frontmostApplication] ?: [NSRunningApplication currentApplication];
+}
+
+static void toggleSTZEventTapOptionsForKeyApplication(STZEventTapOptions flag) {
+    NSRunningApplication *app = keyApplication();
+    CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
+    STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
+    if (options & flag) {
+        options &= ~flag;
+    } else {
+        options |= flag;
+    }
+    STZSetEventTapOptionsForBundleIdentifier(bundleID, options);
+    [STZOptionsPanel noteChangeForBundleIdentifier:(__bridge id)bundleID];
+}
+
+- (void)toggleEnabledForKeyApplication:(id)sender {
+    toggleSTZEventTapOptionsForKeyApplication(kSTZEventTapDisabled);
+}
+
+- (void)toggleExcludingFlagsForKeyApplication:(id)sender {
+    toggleSTZEventTapOptionsForKeyApplication(kSTZEventTapExcludeFlags);
+}
+
+- (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
+    if ([menuItem action] == @selector(toggleEnabledForKeyApplication:)) {
+        NSRunningApplication *app = keyApplication();
+        [menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-%@", nil), [app localizedName]]];
+        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
+        STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
+        [menuItem setState:!(options & kSTZEventTapDisabled)];
+        return YES;
+    }
+
+    if ([menuItem action] == @selector(toggleExcludingFlagsForKeyApplication:)) {
+        NSRunningApplication *app = keyApplication();
+        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
+        STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
+        [menuItem setState:!!(options & kSTZEventTapExcludeFlags)];
+        return !(options & kSTZEventTapDisabled);
+    }
+
+    return YES;
 }
 
 @end

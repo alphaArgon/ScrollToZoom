@@ -7,59 +7,38 @@
  */
 
 #import "STZControls.h"
-
-
-static NSEventModifierFlags checkModifiers(NSEventModifierFlags flags, NSString **description) {
-    static struct {
-        uint16_t                symbol;
-        CFStringRef             name;
-        NSEventModifierFlags    flag;
-    } const items[] = {
-        {u'⌃', CFSTR("Control"), NSEventModifierFlagControl},
-        {u'⌥', CFSTR("Option"), NSEventModifierFlagOption},
-        {u'⇧', CFSTR("Shift"), NSEventModifierFlagShift},
-        {u'⌘', CFSTR("Command"), NSEventModifierFlagCommand}
-    };
-
-    static const size_t itemCount = sizeof(items) / sizeof(*items);
-
-    NSEventModifierFlags checked = 0;
-    uint16_t characters[itemCount];
-    size_t characterCount = 0;
-
-    for (size_t i = 0; i < sizeof(items) / sizeof(*items); ++i) {
-        if (flags & items[i].flag) {
-            checked |= items[i].flag;
-            characters[characterCount] = items[i].symbol;
-            characterCount += 1;
-        }
-    }
-
-    if (description) {
-        *description = [NSString stringWithCharacters:characters length:characterCount];
-    }
-
-    return checked;
-}
+#import "STZEventTap.h"
+#import "GeneratedAssetSymbols.h"
+#import <Carbon/Carbon.h>
 
 
 @implementation STZModifierField {
-    CGFloat                 _maxWidth;
-    NSEventModifierFlags    _prevFlags;
+    BOOL                    _editing;
+    BOOL                    _highlighted;
+    NSEventModifierFlags    _accumulatedFlags;
+    NSTextField            *_symbolLabel;
+    CGFloat                 _symbolMaxWidth;
 }
 
 - (instancetype)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
-    
-    [self setEditable:NO];
-    [self setSelectable:NO];
-    [self setAlignment:NSTextAlignmentCenter];
-    [self setBezelStyle:NSTextFieldRoundedBezel];
-    [self setTextColor:[NSColor controlTextColor]];
-    [self setFont:[NSFont systemFontOfSize:0]];
 
-    [self setModifiers:~0];
-    _maxWidth = [super intrinsicContentSize].width;
+    CFStringRef description;
+    STZValidateModifierFlags(~0, &description);
+    _symbolLabel = [NSTextField labelWithString:(__bridge id)description];
+    [_symbolLabel setRefusesFirstResponder:YES];
+    [_symbolLabel setEditable:NO];
+    [_symbolLabel setSelectable:NO];
+
+    _symbolMaxWidth = [_symbolLabel intrinsicContentSize].width;
+
+    [self addSubview:_symbolLabel];
+    [_symbolLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
+
+    [NSLayoutConstraint activateConstraints:@[
+        [[self centerXAnchor] constraintEqualToAnchor:[_symbolLabel centerXAnchor]],
+        [[self centerYAnchor] constraintEqualToAnchor:[_symbolLabel centerYAnchor] constant:1],
+    ]];
 
     return self;
 }
@@ -73,60 +52,174 @@ static NSEventModifierFlags checkModifiers(NSEventModifierFlags flags, NSString 
     return field;
 }
 
-+ (NSEventModifierFlags)validateModifiers:(NSEventModifierFlags)modifiers {
-    return checkModifiers(modifiers, NULL);
+- (BOOL)needsPanelToBecomeKey {
+    return YES;
+}
+
+- (BOOL)acceptsFirstResponder {
+    return [self isEnabled] && [[NSApplication sharedApplication] isFullKeyboardAccessEnabled];
+}
+
+- (BOOL)becomeFirstResponder {
+    return [super becomeFirstResponder];
+}
+
+- (BOOL)resignFirstResponder {
+    [self setEditing:NO];
+    return [super resignFirstResponder];
+}
+
+- (void)mouseDown:(NSEvent *)event {
+    if (![self isEnabled]) {
+        return [super mouseDown:event];
+    }
+
+    if (!STZValidateModifierFlags((CGEventFlags)[event modifierFlags], NULL)) {
+        [self setEditing:!_editing];
+        [[self window] makeFirstResponder:self];
+    }
+}
+
+- (void)keyDown:(NSEvent *)event {
+    if (![self isEnabled]) {
+        return [super keyDown:event];
+    }
+
+    [self setDisplayedSymbols:[self modifiers]];
+
+    if ([[event characters] isEqualToString:@"\r"]) {
+        [self setEditing:!_editing];
+    } else if ([[event characters] isEqualToString:@" "]) {
+        [self setEditing:YES];
+    } else {
+        [self setEditing:NO];
+        [super keyDown:event];
+    }
+}
+
+- (void)flagsChanged:(NSEvent *)event {
+    if (!_editing || ![self isEnabled]) {
+        return [super flagsChanged:event];
+    }
+
+    NSEventModifierFlags flags = (NSEventModifierFlags)STZValidateModifierFlags((CGEventFlags)[event modifierFlags], NULL);
+
+    if (flags) {
+        _accumulatedFlags |= flags;
+        [self setDisplayedSymbols:_accumulatedFlags];
+
+    } else if (_accumulatedFlags) {
+        _modifiers = _accumulatedFlags;
+        [self setEditing:NO];
+
+        if ([self action]) {
+            [self sendAction:[self action] to:[self target]];
+        }
+    }
+}
+
+- (void)setModifiers:(NSEventModifierFlags)modifiers {
+    if (modifiers == _modifiers) {return;}
+    CFStringRef description;
+    _modifiers = (NSEventModifierFlags)STZValidateModifierFlags((CGEventFlags)modifiers, &description);
+    [_symbolLabel setStringValue:(__bridge id)description];
+}
+
+- (void)setDisplayedSymbols:(NSEventModifierFlags)modifiers {
+    CFStringRef description;
+    STZValidateModifierFlags((CGEventFlags)modifiers, &description);
+    [_symbolLabel setStringValue:(__bridge id)description];
+}
+
+- (void)setEditing:(BOOL)editing {
+    [self setModifiers:_modifiers];
+    [self setHighlighted:(_editing = editing)];
+    _accumulatedFlags = 0;
+}
+
+- (void)setEnabled:(BOOL)enabled {
+    [super setEnabled:enabled];
+    [_symbolLabel setTextColor:enabled ? [NSColor labelColor] : [NSColor disabledControlTextColor]];
+}
+
+- (BOOL)isHighlighted {
+    return _highlighted;
+}
+
+- (void)setHighlighted:(BOOL)highlighted {
+    [super setHighlighted:highlighted];
+    [self setNeedsDisplay];
+    _highlighted = highlighted;
 }
 
 - (NSRect)focusRingMaskBounds {
     return [self bounds];
 }
 
-- (BOOL)needsPanelToBecomeKey {
-    return YES;
+- (void)drawFocusRingMask {
+    [[NSImage imageNamed:ACImageNameModifierFieldBezelMask] drawInRect:[self bounds]];
 }
 
-- (BOOL)acceptsFirstResponder {
-    return [self isEnabled];
+- (void)viewWillDraw {
+    BOOL emphasized = [self isHighlighted] && [[self window] isKeyWindow];
+    [_symbolLabel setTextColor:emphasized ? [NSColor alternateSelectedControlTextColor] : [NSColor labelColor]];
 }
 
-- (BOOL)becomeFirstResponder {
-    _prevFlags = 0;
-    return [super becomeFirstResponder];
-}
+- (void)drawRect:(NSRect)dirtyRect {
+    BOOL emphasized = [self isHighlighted] && [[self window] isKeyWindow];
 
-- (BOOL)resignFirstResponder {
-    _prevFlags = 0;
-    return [super resignFirstResponder];
-}
+    if (!emphasized) {
+        NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOff];
+        [bezel drawInRect:[self bounds]
+                 fromRect:(NSRect){NSZeroPoint, [bezel size]}
+                operation:NSCompositingOperationSourceOver
+                 fraction:[self isEnabled] ? 1 : 0.5];
 
-- (void)flagsChanged:(NSEvent *)event {
-    if (![self isEnabled]) {
-        return [super flagsChanged:event];
-    }
-
-    NSEventModifierFlags flags = checkModifiers([event modifierFlags], NULL);
-
-    if (flags == 0) {
-        _prevFlags = 0;
     } else {
-        _prevFlags |= flags;
-        [self setModifiers:_prevFlags];
-        [self sendAction:[self action] to:[self target]];
+        NSImage *backingImage = nil;
+
+        BOOL hasOwnBacking = [self layer] != nil;
+        if (!hasOwnBacking) {
+            backingImage = [[NSImage alloc] initWithSize:[self bounds].size];
+            [backingImage lockFocus];
+        }
+
+        NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOn];
+        [bezel drawInRect:[self bounds]
+                 fromRect:(NSRect){NSZeroPoint, [bezel size]}
+                operation:NSCompositingOperationSourceOver
+                 fraction:1];
+
+        if (@available(macOS 10.14, *)) {
+            [[NSColor controlAccentColor] setFill];
+        } else {
+            [[NSColor colorForControlTint:[NSColor currentControlTint]] setFill];
+        }
+        NSRectFillUsingOperation([self bounds], NSCompositingOperationColor);
+
+        NSImage *mask = [NSImage imageNamed:ACImageNameModifierFieldBezelMask];
+        [mask drawInRect:[self bounds]
+                 fromRect:(NSRect){NSZeroPoint, [mask size]}
+                operation:NSCompositingOperationDestinationIn
+                 fraction:1];
+
+        if (backingImage) {
+            [backingImage unlockFocus];
+            [backingImage drawInRect:[self bounds]];
+        }
     }
 }
 
-- (void)setModifiers:(NSEventModifierFlags)modifiers {
-    if (modifiers == _modifiers) {return;}
+- (NSLayoutYAxisAnchor *)firstBaselineAnchor {
+    return [_symbolLabel firstBaselineAnchor];
+}
 
-    NSString *description = nil;
-    _modifiers = checkModifiers(modifiers, &description);
-    [self setStringValue:description];
+- (NSLayoutYAxisAnchor *)lastBaselineAnchor {
+    return [_symbolLabel lastBaselineAnchor];
 }
 
 - (NSSize)intrinsicContentSize {
-    NSSize size = [super intrinsicContentSize];
-    size.width = _maxWidth;
-    return size;
+    return NSMakeSize(_symbolMaxWidth + 8, 19);
 }
 
 @end

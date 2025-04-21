@@ -11,9 +11,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 
-@interface STZModifierField : NSTextField
-
-+ (NSEventModifierFlags)validateModifiers:(NSEventModifierFlags)modifiers;
+@interface STZModifierField : NSControl
 
 + (instancetype)fieldWithModifiers:(NSEventModifierFlags)modifiers target:(nullable id)target action:(nullable SEL)action;
 @property(nonatomic) NSEventModifierFlags modifiers;

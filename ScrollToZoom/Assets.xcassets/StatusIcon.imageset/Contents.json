@@ -2,7 +2,7 @@
   "images" : [
     {
       "filename" : "StatusIcon.pdf",
-      "idiom" : "mac"
+      "idiom" : "universal"
     }
   ],
   "info" : {

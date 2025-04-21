@@ -14,6 +14,34 @@
             "state" : "translated",
             "value" : "取消"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "configured" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configured"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已配置"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已配置"
+          }
         }
       }
     },
@@ -29,6 +57,78 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "按下#时，使用滚动手势来缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "按下#時，使用捲動手勢來縮放"
+          }
+        }
+      }
+    },
+    "enabled-for-%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enable for %@"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "作用于 “%@”"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "為「%@」啟用"
+          }
+        }
+      }
+    },
+    "exclude-flags" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erase Modifier Keys"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "擦除修饰键"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "擦除變更鍵"
+          }
+        }
+      }
+    },
+    "exclude-flags-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Some applications behave differently when modifier keys are pressed. Enable this option to wipe out the modifier flags from the simulated zooming events."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一些应用程序在按下修饰键时会有不同的行为。启用该项将从模拟的缩放事件中抹去修饰键标记。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "一些應用程序在按下變更鍵時會有不同的動作。選取該項將從模擬的縮放事件中抹掉變更鍵標記。"
           }
         }
       }
@@ -46,6 +146,12 @@
             "state" : "translated",
             "value" : "授予权限"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予權限"
+          }
         }
       }
     },
@@ -59,8 +165,146 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "惯性"
+            "state" : "translated",
+            "value" : "惯性："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性："
+          }
+        }
+      }
+    },
+    "inertia-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inertia setting applies to built-in trackpads, Magic Trackpads, and Apple mice."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "惯性设置适用于 MacBook 内置触控板、妙控板和 Apple 鼠标。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性設定適用於 MacBook 內建觸控式軌跡板、巧控板和 Apple 滑鼠。"
+          }
+        }
+      }
+    },
+    "launch-at-login" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Scroll to Zoom at login"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录时启动滚动来缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入時開啟捲動來縮放"
+          }
+        }
+      }
+    },
+    "message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "信息"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "訊息"
+          }
+        }
+      }
+    },
+    "open-console" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open Console…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开控制台…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開主控台⋯"
+          }
+        }
+      }
+    },
+    "open-options-for-apps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options for Apps…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各应用选项…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各應用選項⋯"
+          }
+        }
+      }
+    },
+    "options-for-apps" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options for Apps"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各应用选项"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各應用選項"
           }
         }
       }
@@ -70,13 +314,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open “System Settings” and allow this application’s control. If the item for the application is already turned on in the list, please remove it first."
+            "value" : "Open System Settings and allow this application’s control. If the item for the application is already presented in the list, please remove it and retry."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "打开系统设置并允许此应用程序的控制。如果该应用程序项已在列表中启用，请先将其移除。"
+            "state" : "translated",
+            "value" : "打开 “系统设置” 并允许此应用程序的控制。如果该应用程序项已在列表中，请将其移除后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開「系統設定」並允許此應用程式的控制。如果該應用程式項已在列表中啟用，請將其移除後再試一次。"
           }
         }
       }
@@ -86,13 +336,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The “Accessibility” permission is required to enable “scroll to zoom”."
+            "value" : "The Accessibility permission is required to enable “scroll to zoom”."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要“辅助功能”权限以启用“滚动来缩放”。"
+            "value" : "需要 “辅助功能” 权限以启用 “滚动来缩放”。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要「輔助使用」權限以啟用「捲動來縮放」。"
           }
         }
       }
@@ -107,8 +363,58 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "当“滚动来缩放”启用时，移除权限可能会导致电脑不能响应。"
+            "state" : "translated",
+            "value" : "当 “滚动来缩放” 启用时，移除权限可能会导致电脑不能响应。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "當「捲動來縮放」啟用時，移除權限可能會導致電腦不能回應。"
+          }
+        }
+      }
+    },
+    "recommended-for-this-app" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommend for this app."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "建议为此应用启用。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "推薦為此應用選取。"
+          }
+        }
+      }
+    },
+    "running" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opened"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已打开"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已打開"
           }
         }
       }
@@ -126,31 +432,55 @@
             "state" : "translated",
             "value" : "滚动来缩放"
           }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "捲動來縮放"
+          }
         }
       }
     },
-    "scroll-up-to" : {
+    "scroll-to-zoom-console" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fingers up to"
+            "value" : "Scroll to Zoom Console"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "手指向上滑来"
+            "value" : "滚动来缩放控制台"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "捲動來縮放主控台"
           }
         }
       }
     },
-    "set-launch-at-login" : {
+    "should-not-launch-at-login-message" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open at Login..."
+            "value" : "To enable automatic launch, quit and move this app to the Applications folder."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允许自动启动，请退出此应用，再将其移动至 “应用程序” 文件夹。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允許自動啟動，請結束此應用，然後將其移動至「應用程序」檔案夾。"
           }
         }
       }
@@ -165,8 +495,80 @@
         },
         "zh-Hans" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "速度"
+            "state" : "translated",
+            "value" : "速度："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "速度："
+          }
+        }
+      }
+    },
+    "swipe-up-to" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fingers up to"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手指向上滑来"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "手指向上滑來"
+          }
+        }
+      }
+    },
+    "time" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        }
+      }
+    },
+    "view-source-on-github" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source on GitHub"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "托管于 GitHub"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發佈於 GitHub"
           }
         }
       }
@@ -180,6 +582,12 @@
           }
         },
         "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放大"
+          }
+        },
+        "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "放大"
@@ -199,6 +607,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "缩小"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "縮小"
           }
         }
       }

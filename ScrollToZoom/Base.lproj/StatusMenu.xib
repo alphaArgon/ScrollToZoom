@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner"/>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <menu title="Scroll to Zoom" systemMenu="apple" id="WnT-oQ-Vh6">
+            <items>
+                <menuItem title="Scroll to Zoom Settings…" id="g3T-d6-Nba">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="orderFrontSharedWindow:" target="-1" id="NcZ-Nx-OWu"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="PGh-Av-fCS"/>
+                <menuItem title="Options for App:" enabled="NO" id="XMk-VA-xDX">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="Enable for App Name" id="fWp-hF-hiz">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="toggleEnabledForKeyApplication:" target="-1" id="3g2-Wa-7Xr"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Erase Modifiers Keys" id="ZYs-BC-JC3">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="toggleExcludingFlagsForKeyApplication:" target="-1" id="cjw-Lx-QdN"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="i47-VC-lqf"/>
+                <menuItem title="About" id="d9u-sO-yUM">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="orderFrontAboutPanel:" target="-1" id="na0-lN-c3V"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Quit" id="RAd-0e-aat">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="terminate:" target="-1" id="Ewv-jw-Hbz"/>
+                    </connections>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="-82" y="36"/>
+        </menu>
+    </objects>
+</document>
