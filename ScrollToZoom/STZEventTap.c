@@ -618,9 +618,15 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
     STZTrivalent hasSuccessor = false;
 
     if (globalContext()->activated) {
-        STZConvertPhaseFromScrollWheelEvent(event, context->deltaSignum, &context->momentumStart,
+        bool accepted;
+        STZConvertPhaseFromScrollWheelEvent(event, context->deltaSignum, &accepted,
+                                            &context->momentumStart,
                                             &phase, &data, &hasSuccessor);
         type = kSTZWheelToZoom;
+
+        if (accepted) {
+            STZDebugLog("\tEvent is from unknown source");
+        }
 
     } else {
         bool byMomentum;

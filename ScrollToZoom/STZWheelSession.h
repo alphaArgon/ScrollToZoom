@@ -109,7 +109,7 @@ int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event);
 ///
 /// If the event is previously marked with a signum, the marked value will be used, rather than the
 /// passed value. the signum is used to override the sign of the magnificant.
-void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum,
+void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum, bool *outAccepped,
                                          CGEventTimestamp *momentumStart,
                                          STZPhase *outPhase, double *outScale,
                                          STZTrivalent *outEventHasSuccessor);

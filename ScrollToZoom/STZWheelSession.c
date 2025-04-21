@@ -301,26 +301,27 @@ int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event) {
 
     if (CGEventGetIntegerValueField(event, kSTZSignumField) == 0) {
         CGEventSetIntegerValueField(event, kSTZSignumField, userData);
-        STZDebugLog("Mark %p %lld", event, CGEventGetIntegerValueField(event, kSTZSignumField));
     }
 
     return signum;
 }
 
 
-void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int signum, CGEventTimestamp *momentumStart,
+void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum, bool *outAccepped,
+                                         CGEventTimestamp *momentumStart,
                                          STZPhase *outPhase, double *outScale,
                                          STZTrivalent *outEventHasSuccessor) {
-    assert(signum == 0 || abs(signum) == 1);
+    assert(suggestedSigum == 0 || abs(suggestedSigum) == 1);
 
-    bool caughtUserData = false;
+    int signum;
     switch (CGEventGetIntegerValueField(event, kSTZSignumField)) {
-    case kSTZZeroSignum:        signum = 0; caughtUserData = true; break;
-    case kSTZPositiveSignum:    signum = +1; caughtUserData = true; break;
-    case kSTZNegativeSignum:    signum = -1; caughtUserData = true; break;
+    case kSTZZeroSignum:        signum = 0; *outAccepped = false; break;
+    case kSTZPositiveSignum:    signum = +1; *outAccepped = false; break;
+    case kSTZNegativeSignum:    signum = -1; *outAccepped = false; break;
+    default:                    signum = suggestedSigum; *outAccepped = true; break;
     }
 
-    if (caughtUserData) {
+    if (!*outAccepped) {
         CGEventSetIntegerValueField(event, kSTZSignumField, 0);
     }
 
