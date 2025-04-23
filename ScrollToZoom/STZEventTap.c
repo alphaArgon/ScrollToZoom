@@ -265,73 +265,106 @@ void STZLoadArgumentsFromUserDefaults(void) {
 //  It’s known that *LinearMouse* intercepts events hard-ly and *Mos* intercepts soft-ly.
 
 
+static CGEventTimestamp CGEventTimestampNow(void) {
+    return clock_gettime_nsec_np(CLOCK_UPTIME_RAW_APPROX);
+}
+
+
 typedef struct {
-    bool enabled;
-    CFMachPortRef port;
-    CFRunLoopSourceRef source;
+    CFMachPortRef       port;
+    CFRunLoopSourceRef  source;
+    bool                enabled;
+
+    struct {
+        CGEventMask         events;
+        CGEventTapLocation  location;
+        CGEventTapPlacement placement;
+        CGEventTapOptions   options;
+        CGEventTapCallBack  callback;
+        bool                initialEnabled;
+    } const;
 } STZEventTap;
 
-#define kSTZEventTapEmpty (STZEventTap){false, NULL, NULL}
 
+#define DECLARE_EVENT_TAP(prefix, events, location, placement, options, initialEnabled)             \
+static CGEventRef prefix##Callback(CGEventTapProxy, CGEventType, CGEventRef, void *);               \
+static STZEventTap prefix##Tap = {NULL, NULL, false,                                                \
+                                  events, location, placement, options,                             \
+                                  prefix##Callback, initialEnabled};                                \
 
-static STZEventTap hardEventTap = kSTZEventTapEmpty;
-static STZEventTap softEventTap = kSTZEventTapEmpty;
+DECLARE_EVENT_TAP(hardFlagsChanged, 1 << kCGEventFlagsChanged,
+                  kCGHIDEventTap, kCGHeadInsertEventTap,
+                  kCGEventTapOptionListenOnly, true);
 
+DECLARE_EVENT_TAP(hardScrollWheel, 1 << kCGEventScrollWheel,
+                  kCGHIDEventTap, kCGHeadInsertEventTap,
+                  kCGEventTapOptionDefault, false);
 
-static CGEventRef hardEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *userInfo);
-static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *userInfo);
+//  One and only one of the following two should be enabled.
 
+DECLARE_EVENT_TAP(passiveScrollWheel, 1 << kCGEventScrollWheel,
+                  kCGHIDEventTap, kCGHeadInsertEventTap,
+                  kCGEventTapOptionListenOnly, true);
 
-#define DECLARE_EVENT_TAP_ENABLED(name, eventTap, location, placement, option, events, callback)    \
-static bool name(bool enabled) {                                                                    \
-    if (enabled == eventTap.enabled) {return true;}                                                 \
-                                                                                                    \
-    if (!enabled) {                                                                                 \
-        CFRunLoopRemoveSource(CFRunLoopGetMain(), eventTap.source, kCFRunLoopCommonModes);          \
-        CGEventTapEnable(eventTap.port, false);                                                     \
-                                                                                                    \
-        CFRelease(eventTap.source);                                                                 \
-        CFRelease(eventTap.port);                                                                   \
-        eventTap = kSTZEventTapEmpty;                                                               \
-        return true;                                                                                \
-    }                                                                                               \
-                                                                                                    \
-    if (eventTap.source == NULL) {                                                                  \
-        if (!AXIsProcessTrusted()) {return false;}                                                  \
-                                                                                                    \
-        CFMachPortRef port = CGEventTapCreate(location, placement, option, events, callback, NULL); \
-        if (port == NULL) {return false;}                                                           \
-                                                                                                    \
-        eventTap.port = port;                                                                       \
-        eventTap.source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0);              \
-    }                                                                                               \
-                                                                                                    \
-    CGEventTapEnable(eventTap.port, true);                                                          \
-    CFRunLoopAddSource(CFRunLoopGetMain(), eventTap.source, kCFRunLoopCommonModes);                 \
-    eventTap.enabled = true;                                                                        \
-    return true;                                                                                    \
-}                                                                                                   \
+DECLARE_EVENT_TAP(mutatingScrollWheel, 1 << kCGEventScrollWheel,
+                  kCGAnnotatedSessionEventTap, kCGTailAppendEventTap,
+                  kCGEventTapOptionDefault, false);
 
-DECLARE_EVENT_TAP_ENABLED(setHardEventTapEnabled, hardEventTap,
-                          kCGHIDEventTap, kCGHeadInsertEventTap, kCGEventTapOptionDefault,
-                          (1 << kCGEventScrollWheel) | (1 << kCGEventFlagsChanged), hardEventCallback);
+#undef DECLARE_EVENT_TAP
 
-DECLARE_EVENT_TAP_ENABLED(setSoftEventTapEnabled, softEventTap,
-                          kCGAnnotatedSessionEventTap, kCGTailAppendEventTap, kCGEventTapOptionDefault,
-                          (1 << kCGEventScrollWheel), softEventCallback);
+static bool eventTapGetRegistered(STZEventTap *eventTap) {
+    return eventTap->port != NULL;
+}
 
-#undef DECLARE_EVENT_TAP_ENABLED
+static bool eventTapSetRegistered(STZEventTap *eventTap, bool flag) {
+    if (flag == (eventTap->port != NULL)) {return true;}
+
+    if (!flag) {
+        CFRunLoopRemoveSource(CFRunLoopGetMain(), eventTap->source, kCFRunLoopCommonModes);
+        CGEventTapEnable(eventTap->port, false);
+        CFRelease(eventTap->source);
+        CFRelease(eventTap->port);
+
+        eventTap->port = NULL;
+        eventTap->source = NULL;
+
+    } else {
+        if (!AXIsProcessTrusted()) {return false;}
+
+        CFMachPortRef port = CGEventTapCreate(eventTap->location, eventTap->placement,
+                                              eventTap->options, eventTap->events,
+                                              eventTap->callback, NULL);
+        if (port == NULL) {return false;}
+
+        eventTap->port = port;
+        eventTap->source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, port, 0);
+        eventTap->enabled = eventTap->initialEnabled;
+
+        CGEventTapEnable(eventTap->port, eventTap->enabled);
+        CFRunLoopAddSource(CFRunLoopGetMain(), eventTap->source, kCFRunLoopCommonModes);
+    }
+
+    return true;
+}
+
+static bool eventTapGetEnabled(STZEventTap *eventTap) {
+    return eventTap->enabled;
+}
+
+static void eventTapSetEnabled(STZEventTap *eventTap, bool flag) {
+    if (flag == eventTap->enabled) {return;}
+    eventTap->enabled = flag;
+    CGEventTapEnable(eventTap->port, flag);
+}
 
 
 typedef struct {
-    bool                activated;  //  Computed from `flagsIn` and `options`.
     bool                flagsIn;
-    STZEventTapOptions  options;
     bool                needsReinsertTaps;
     signed int          supposedTapCount;
 } STZGlobalContext;
 
-#define kSTZGlobalContextEmpty (STZGlobalContext) {false, false, 0, false, 0}
+#define kSTZGlobalContextEmpty (STZGlobalContext) {false, false, 0}
 
 STZGlobalContext _globalContext = kSTZGlobalContextEmpty;
 
@@ -343,68 +376,111 @@ static STZGlobalContext *globalContext(void) {
 
 typedef struct {
     STZWheelSession     session;
+
+    /// Whether a hard scroll wheel is received after the last modifier flags in. This flag will be
+    /// automatically reset by the flags changes tap.
+    bool                anyReceived;
+    bool                activated;
+    bool                excludesFlags;
+    bool                lastEventChanged;
     int                 deltaSignum;
     CGEventTimestamp    momentumStart;
     uint64_t            timerToken;
 } STZWheelContext;
 
-#define kSTZWheelContextEmpty (STZWheelContext){kSTZWheelSessionEmpty, 0, 0, 0}
+#define kSTZWheelContextEmpty (STZWheelContext){kSTZWheelSessionEmpty, false, false, false, false, 0, 0, 0}
 
 
 static struct {
-    int             capacity;
-    int             count;
-    int             hotIndex;
+    int                 count;
+    int                 hotIndex;
+    CGEventTimestamp    checkedAt;
     struct {
-        uint64_t        senderID;
-        STZWheelContext context;
+        uint64_t            senderID;
+        CGEventTimestamp    accessedAt;  ///< 0 for spare.
+        STZWheelContext     context;
     }              *entries;
 } _wheelContexts = {0, 0, 0, NULL};
+
+
+static void _checkExpiredWheelContexts(CGEventTimestamp now) {
+    CGEventTimestamp const CHECK_INTERVAL = 60 * NSEC_PER_SEC;  //  1 minute.
+    CGEventTimestamp const LIFETIME = 300 * NSEC_PER_SEC;  //  5 minutes.
+
+    if (now - _wheelContexts.checkedAt < CHECK_INTERVAL) {return;}
+    _wheelContexts.checkedAt = now;
+
+    for (int i = 0; i < _wheelContexts.count; ++i) {
+        if (_wheelContexts.entries[i].accessedAt == 0) {continue;}
+        if (now - _wheelContexts.entries[i].accessedAt > LIFETIME) {
+            _wheelContexts.entries[i].accessedAt = 0;
+            STZDebugLog("Marked context expired for [%llx]", _wheelContexts.entries[i].senderID);
+        }
+    }
+}
 
 
 /// Returns the pointer to the context for the given sender. If no context is found, a new one will
 /// be allocated and returned.
 static STZWheelContext *wheelContextFor(CGEventRef event) {
-    uint64_t senderID;
-    IOHIDEventRef hidEvent = CGEventCopyIOHIDEvent(event);
-    if (hidEvent) {
-        senderID = IOHIDEventGetSenderID(hidEvent);
-        CFRelease(hidEvent);
-    } else {
-        senderID = 0;
-    }
+    uint64_t senderID = STZSenderIDForEvent(event);
+    CGEventTimestamp now = CGEventTimestampNow();
+    _checkExpiredWheelContexts(now);
 
-    if (_wheelContexts.count && _wheelContexts.entries[_wheelContexts.hotIndex].senderID == senderID) {
-        return &_wheelContexts.entries[_wheelContexts.hotIndex].context;
-    }
+    int spareIndex = -1;
 
-    for (int i = 0; i < _wheelContexts.count; ++i) {
+    for (int h = 0; h < _wheelContexts.count; ++h) {
+        int i = (_wheelContexts.hotIndex + h) % _wheelContexts.count;
         if (_wheelContexts.entries[i].senderID == senderID) {
+            if (_wheelContexts.entries[i].accessedAt == 0) {
+                STZDebugLog("Recovered expired context for [%llx]", senderID);
+            }
+
             _wheelContexts.hotIndex = i;
+            _wheelContexts.entries[i].accessedAt = now;
             return &_wheelContexts.entries[i].context;
+        }
+
+        if (spareIndex == -1 && _wheelContexts.entries[i].accessedAt == 0) {
+            spareIndex = i;
         }
     }
 
-    int i = _wheelContexts.count;
-    if (i >= _wheelContexts.capacity) {
-        int newCapacity = _wheelContexts.capacity ? _wheelContexts.capacity * 2 : 2;
-        _wheelContexts.entries = reallocf(_wheelContexts.entries, newCapacity * sizeof(*_wheelContexts.entries));
-        _wheelContexts.capacity = newCapacity;
+    if (spareIndex == -1) {
+        //  Reallocate the entries array.
+        int newCount = _wheelContexts.count ? _wheelContexts.count * 2 : 2;
+        _wheelContexts.entries = realloc(_wheelContexts.entries, newCount * sizeof(*_wheelContexts.entries));
+
+        for (int j = _wheelContexts.count; j < newCount; ++j) {
+            _wheelContexts.entries[j].accessedAt = 0;
+        }
+
+        spareIndex = _wheelContexts.count;
+        _wheelContexts.count = newCount;
     }
 
+    int i = spareIndex;
     _wheelContexts.hotIndex = i;
     _wheelContexts.entries[i].senderID = senderID;
+    _wheelContexts.entries[i].accessedAt = now;
     _wheelContexts.entries[i].context = kSTZWheelContextEmpty;
     _wheelContexts.count = i + 1;
+
+    STZDebugLog("Created context for [%llx]", senderID);
     return &_wheelContexts.entries[i].context;
 }
 
 
 /// Enumerates all wheel contexts.
-#define forEachWheelContext(var, body)                                                              \
-for (int i = 0; i < _wheelContexts.count; ++i) {                                                    \
-    STZWheelContext *var = &_wheelContexts.entries[i].context;                                      \
-    body;                                                                                           \
+#define forEachWheelContext(var, body) {                                                            \
+    CGEventTimestamp now = CGEventTimestampNow();                                                   \
+    _checkExpiredWheelContexts(now);                                                                \
+                                                                                                    \
+    for (int i = 0; i < _wheelContexts.count; ++i) {                                                \
+        if (_wheelContexts.entries[i].accessedAt == 0) {continue;}                                  \
+        STZWheelContext *var = &_wheelContexts.entries[i].context;                                  \
+        body;                                                                                       \
+    }                                                                                               \
 }                                                                                                   \
 
 
@@ -435,24 +511,30 @@ static void resetNeedsReinsertTaps(void) {
 }
 
 
+static bool setAllEventTapsRegistered(bool flag) {
+    return eventTapSetRegistered(&hardFlagsChangedTap, flag)
+        && eventTapSetRegistered(&hardScrollWheelTap, flag)
+        && eventTapSetRegistered(&passiveScrollWheelTap, flag)
+        && eventTapSetRegistered(&mutatingScrollWheelTap, flag);
+}
+
+
 bool STZGetEventTapEnabled(void) {
-    return hardEventTap.enabled;
+    return eventTapGetRegistered(&hardFlagsChangedTap);
 }
 
 
 bool STZSetEventTapEnabled(bool enable) {
-    if (enable == hardEventTap.enabled) {return true;}
+    if (enable == eventTapGetRegistered(&hardFlagsChangedTap)) {return true;}
 
     if (!enable) {
-        setHardEventTapEnabled(false);
-        setSoftEventTapEnabled(false);
-        STZDebugLog("Event tap disabled");
+        setAllEventTapsRegistered(false);
+        STZDebugLog("Event tap unregistered");
         return true;
 
-    } else if (!setHardEventTapEnabled(true) || !setSoftEventTapEnabled(true)) {
-        setHardEventTapEnabled(false);
-        setSoftEventTapEnabled(false);
-        STZDebugLog("Event tap failed to enable.");
+    } else if (!setAllEventTapsRegistered(true)) {
+        setAllEventTapsRegistered(false);
+        STZDebugLog("Event tap failed to register.");
         return false;
 
     } else {
@@ -469,7 +551,7 @@ bool STZSetEventTapEnabled(bool enable) {
                                             0 /* ignored for Darwin center */);
         });
         resetNeedsReinsertTaps();
-        STZDebugLog("Event tap enabled");
+        STZDebugLog("Event tap registered");
         return true;
     }
 }
@@ -479,12 +561,10 @@ static void reinsertTapsIfNeeded(void) {
     if (!globalContext()->needsReinsertTaps) {return;}
 
     STZDebugLog("Re-inset event tap due to environment change");
-    setHardEventTapEnabled(false);
-    setSoftEventTapEnabled(false);
+    setAllEventTapsRegistered(false);
 
-    if (!setHardEventTapEnabled(true) || !setSoftEventTapEnabled(true)) {
-        setHardEventTapEnabled(false);
-        setSoftEventTapEnabled(false);
+    if (!setAllEventTapsRegistered(true)) {
+        setAllEventTapsRegistered(false);
         STZDebugLog("Event tap failed to re-enable.");
     } else {
         resetNeedsReinsertTaps();
@@ -493,8 +573,7 @@ static void reinsertTapsIfNeeded(void) {
 
 
 static void eventTapTimeout(void) {
-    setHardEventTapEnabled(false);
-    setSoftEventTapEnabled(false);
+    setAllEventTapsRegistered(false);
     STZDebugLog("Event tap disabled due to timeout");
 }
 
@@ -508,7 +587,7 @@ static void postAndReleaseEvent(CGEventRef CF_CONSUMED event, CGEventTapLocation
 
     //  This delay is not elegant. However, without this WebKit may ignore the evnt.
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.02 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        CGEventSetTimestamp(event, clock_gettime_nsec_np(CLOCK_UPTIME_RAW_APPROX));
+        CGEventSetTimestamp(event, CGEventTimestampNow());
         CGEventPost(location, event);
         CFRelease(event);
     });
@@ -543,71 +622,145 @@ static void releaseSessionFromEvent(STZWheelSession *__nonnull session, CGEventR
 }
 
 
-static CGEventRef hardEventCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
+static void switchToMutatingScrollWheelTap(void) {
+    if (eventTapGetEnabled(&mutatingScrollWheelTap)) {return;}
+
+    eventTapSetEnabled(&passiveScrollWheelTap, false);
+    eventTapSetEnabled(&mutatingScrollWheelTap, true);
+    STZDebugLog("Switch to mutating scroll wheel tap");
+}
+
+
+static bool tryToSwitchToPassiveScrollWheelTap(void) {
+    if (eventTapGetEnabled(&passiveScrollWheelTap)) {return true;}
+    if (globalContext()->flagsIn) {return false;}
+
+    bool canBePassive = true;
+    forEachWheelContext(context, {
+        if (context->activated || context->session.state || context->lastEventChanged) {
+            canBePassive = false;
+            break;
+        }
+    });
+
+    if (!canBePassive) {return false;}
+
+    eventTapSetEnabled(&passiveScrollWheelTap, true);
+    eventTapSetEnabled(&mutatingScrollWheelTap, false);
+    STZDebugLog("Switch to passive scroll wheel tap");
+    return true;
+}
+
+
+static CGEventRef hardFlagsChangedCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
     switch (eventType) {
-    case kCGEventTapDisabledByTimeout:
-        eventTapTimeout();
-        return NULL;
+    case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
+    case kCGEventTapDisabledByUserInput:    return NULL;
+    default: assert(eventType == kCGEventFlagsChanged); break;
+    }
 
-    case kCGEventTapDisabledByUserInput:
-        return NULL;
+    STZDebugLogEvent("Received hard", event);
 
-    case kCGEventScrollWheel:
-        STZDebugLogEvent("Received hard", event);
-
-        //  TODO: We should find a unique identifier for an event.
-        //  This function breaks `kCGEventTapOptionListenOnly`, which may increase the CPU usage.
-
-        //  On computers with lower performace, newer hard wheel events might be sent to the tap
-        //  before the older soft events. We can’t use an accumulated value to record the signum.
-        wheelContextFor(event)->deltaSignum = STZMarkDeltaSignumForScrollWheelEvent(event);
-        break;
-
-    case kCGEventFlagsChanged:
-        STZDebugLogEvent("Received hard", event);
-
-        bool flagsIn = STZValidateModifierFlags(CGEventGetFlags(event), NULL) == _scrollToZoomFlags;
-        if (flagsIn == globalContext()->flagsIn) {break;}
-
-        pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
-        CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
-        STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
-
-        bool activated = flagsIn && !(options & kSTZEventTapDisabled);
+    bool flagsIn = STZValidateModifierFlags(CGEventGetFlags(event), NULL) == _scrollToZoomFlags;
+    if (globalContext()->flagsIn != flagsIn) {
         globalContext()->flagsIn = flagsIn;
-        globalContext()->options = options;
-        globalContext()->activated = activated;
 
         forEachWheelContext(context, {
-            context->timerToken += 1;
-            if (!activated) {
+            if (!flagsIn && context->activated) {
                 releaseSessionFromEvent(&context->session, event);
             }
+
+            context->anyReceived = false;
+            context->activated = false;
+            context->timerToken += 1;
         });
 
         reinsertTapsIfNeeded();
-        break;
+
+        if (flagsIn) {
+            eventTapSetEnabled(&hardScrollWheelTap, true);
+            STZDebugLog("Activate hard scroll wheel listening");
+            switchToMutatingScrollWheelTap();
+
+        } else {
+            eventTapSetEnabled(&hardScrollWheelTap, false);
+            STZDebugLog("Deactivate hard scroll wheel listening");
+            tryToSwitchToPassiveScrollWheelTap();
+        }
     }
 
     return event;
 }
 
 
-static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
+static CGEventRef hardScrollWheelCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
     switch (eventType) {
-    case kCGEventTapDisabledByTimeout:
-        eventTapTimeout();
-        return NULL;
-
-    case kCGEventTapDisabledByUserInput:
-        return NULL;
-
-    default:
-        assert(eventType == kCGEventScrollWheel);
-        break;
+    case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
+    case kCGEventTapDisabledByUserInput:    return NULL;
+    default: assert(eventType == kCGEventScrollWheel); break;
     }
 
-    STZDebugLogEvent("Received soft", event);
+    STZDebugLogEvent("Received hard", event);
+
+    //  TODO: We should find a unique identifier for an event.
+    //  This function breaks `kCGEventTapOptionListenOnly`, which may increase the CPU usage.
+
+    //  On computers with lower performace, newer hard wheel events might be sent to the tap
+    //  before the older soft events. We can’t use an accumulated value to record the signum.
+    if (globalContext()->flagsIn) {
+        STZWheelContext *context = wheelContextFor(event);
+
+        if (!context->anyReceived) {
+            pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
+            CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
+            STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
+
+            context->anyReceived = true;
+            context->activated = !(options & kSTZEventTapDisabled);
+            context->excludesFlags = !!(options & kSTZEventTapExcludeFlags);
+        }
+
+        if (context->activated) {
+            context->deltaSignum = STZMarkDeltaSignumForScrollWheelEvent(event);
+        }
+    }
+
+    return event;
+}
+
+
+static CGEventRef passiveScrollWheelCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
+    switch (eventType) {
+    case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
+    case kCGEventTapDisabledByUserInput:    return NULL;
+    default: assert(eventType == kCGEventScrollWheel); break;
+    }
+
+    STZDebugLogEvent("Received readonly", event);
+
+    STZWheelContext *context = wheelContextFor(event);
+    context->timerToken += 1;
+
+    STZPhase phase;
+    bool byMomentum;
+    STZGetPhaseFromScrollWheelEvent(event, &phase, &byMomentum);
+
+    STZWheelType type;
+    type = byMomentum ? kSTZWheelToScrollMomentum : kSTZWheelToScroll;
+
+    STZWheelSessionAssign(&context->session, type, phase);
+    return event;
+}
+
+
+static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
+    switch (eventType) {
+    case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
+    case kCGEventTapDisabledByUserInput:    return NULL;
+    default: assert(eventType == kCGEventScrollWheel); break;
+    }
+
+    STZDebugLogEvent("Received mutable", event);
 
     STZWheelContext *context = wheelContextFor(event);
     context->timerToken += 1;
@@ -617,7 +770,7 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
     double data = 0;
     STZTrivalent hasSuccessor = false;
 
-    if (globalContext()->activated) {
+    if (context->activated) {
         bool accepted;
         STZConvertPhaseFromScrollWheelEvent(event, context->deltaSignum, &accepted,
                                             &context->momentumStart,
@@ -641,22 +794,27 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
 
     switch (action) {
     case kSTZEventUnchanged:
+        context->lastEventChanged = false;
         STZDebugLogSessionChange("\tSession changed", oldSession, context->session);
+        tryToSwitchToPassiveScrollWheelTap();
         return event;
 
     case kSTZEventAdapted:
+        context->lastEventChanged = true;
         STZDebugLogSessionChange("\tSession changed", oldSession, context->session);
         STZDebugLogEvent("\tEvent modified to", event);
+        tryToSwitchToPassiveScrollWheelTap();
         return event;
 
     case kSTZEventReplaced:
+        context->lastEventChanged = true;
         break;
     }
 
     //  The event is annotated; returning a different event may have no effect. Therefore all
     //  the out events will be newly posted and `NULL` is returnrd.
 
-    if (globalContext()->options & kSTZEventTapExcludeFlags) {
+    if (context->excludesFlags) {
         for (int i = 0; i < 2; ++i) {
             CGEventRef event = outEvents[i];
             if (event) {
@@ -670,6 +828,7 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
     if (hasSuccessor != kSTZMaybe) {
         STZDebugLogSessionChange("\tSession changed", oldSession, context->session);
         replaceEventByConsumingEvents(outEvents);
+        tryToSwitchToPassiveScrollWheelTap();
 
     } else if (context->session.state != kSTZWheelFree) {
         STZDebugLogSessionChange("\tSession changed", oldSession, context->session);
@@ -687,6 +846,7 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
             STZDebugLog("\tNo events received while awaiting");
 
             releaseSessionFromEvent(&context->session, event);
+            tryToSwitchToPassiveScrollWheelTap();
             CFRelease(event);
         });
 
@@ -713,6 +873,7 @@ static CGEventRef softEventCallback(CGEventTapProxy proxy, CGEventType eventType
             context->session = newSession;
             STZDebugLogSessionChange("\tSession changed", oldSession, context->session);
             replaceEventByConsumingEvents((CGEventRef const *)&tupleEvents);
+            tryToSwitchToPassiveScrollWheelTap();
         });
     }
 

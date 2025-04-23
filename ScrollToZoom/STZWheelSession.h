@@ -65,6 +65,10 @@ typedef struct {
 #define kSTZWheelSessionEmpty (STZWheelSession){kSTZWheelFree, kSTZWheelToScroll}
 
 
+/// Returns a unique identifier for the sender of the event, or 0 if not available.
+uint64_t STZSenderIDForEvent(CGEventRef event);
+
+
 void STZDebugLogEvent(char const *prefix, CGEventRef event);
 void STZDebugLogSessionChange(char const *prefix, STZWheelSession from, STZWheelSession to);
 
@@ -136,6 +140,9 @@ void STZWheelSessionDiscard(STZWheelSession *session, CGEventRef byEvent,
 void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase phase, double data,
                            CGEventRef wheelEvent, CGEventRef __nonnull outEvents[__nullable CF_RETURNS_RETAINED 2],
                            STZEventAction *action);
+
+
+void STZWheelSessionAssign(STZWheelSession *session, STZWheelType type, STZPhase phase);
 
 
 CF_ASSUME_NONNULL_END

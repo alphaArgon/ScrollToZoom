@@ -32,9 +32,22 @@ static char const *nameOfPhase(STZPhase phase) {
 }
 
 
+uint64_t STZSenderIDForEvent(CGEventRef event) {
+    IOHIDEventRef hidEvent = CGEventCopyIOHIDEvent(event);
+    if (hidEvent) {
+        uint64_t senderID = IOHIDEventGetSenderID(hidEvent);
+        CFRelease(hidEvent);
+        return senderID;
+    } else {
+        return 0;
+    }
+}
+
+
 void STZDebugLogEvent(char const *prefix, CGEventRef event) {
     if (!STZIsLoggingEnabled()) {return;}
 
+    uint64_t senderID = STZSenderIDForEvent(event);
     CFStringRef flagDesc;
     STZValidateModifierFlags(CGEventGetFlags(event), &flagDesc);
 
@@ -48,7 +61,7 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 
     switch (CGEventGetType(event)) {
     case kCGEventFlagsChanged:
-        STZDebugLog("%s flags changed with %@", prefix, flagDesc);
+        STZDebugLog("%s flags changed from [%llx] with %@", prefix, senderID, flagDesc);
         break;
 
     case kCGEventScrollWheel:
@@ -56,19 +69,19 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
         STZGetPhaseFromScrollWheelEvent(event, &phase, &byMomentum);
         char const *phaseTag = byMomentum ? "momentum" : "smooth";
         char const *tail = STZIsScrollWheelFlipped(event) ? ", flipped" : "";
-        STZDebugLog("%s scroll wheel with %@, %s %s, moved %0.2fpx%s",
-                    prefix, flagDesc, phaseTag, nameOfPhase(phase), data, tail);
+        STZDebugLog("%s scroll wheel from [%llx] with %@, %s %s, moved %0.2fpx%s",
+                    prefix, senderID, flagDesc, phaseTag, nameOfPhase(phase), data, tail);
         break;
 
     case kCGEventGesture:
         data = CGEventGetDoubleValueField(event, kCGGestureEventZoomValue);
         STZGetPhaseFromGestureEvent(event, &phase);
-        STZDebugLog("%s zoom gesture with %@, gesture %s, scaled %0.02f%%",
-                    prefix, flagDesc, nameOfPhase(phase), (1 + data) * 100);
+        STZDebugLog("%s zoom gesture from [%llx] with %@, gesture %s, scaled %0.02f%%",
+                    prefix, senderID, flagDesc, nameOfPhase(phase), (1 + data) * 100);
         break;
 
     default:
-        STZDebugLog("%s unexpected event with %@", prefix, flagDesc);
+        STZDebugLog("%s unexpected event from [%llx] with %@", prefix, senderID, flagDesc);
         break;
     }
 }
@@ -561,6 +574,26 @@ void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase
             STZAdaptGestureEvent(outEvents[0], phase, data);
         }
         *action = kSTZEventReplaced;
+        break;
+    }
+}
+
+
+void STZWheelSessionAssign(STZWheelSession *session, STZWheelType type, STZPhase phase) {
+    session->type = type;
+
+    switch (phase) {
+    case kSTZPhaseMayBegin:
+        session->state = kSTZWheelWillBegin;
+        break;
+    case kSTZPhaseBegan:
+    case kSTZPhaseChanged:
+        session->state = kSTZWheelDidBegin;
+        break;
+    case kSTZPhaseNone:
+    case kSTZPhaseEnded:
+    case kSTZPhaseCancelled:
+        session->state = kSTZWheelFree;
         break;
     }
 }

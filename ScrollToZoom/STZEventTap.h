@@ -64,7 +64,7 @@ CFDictionaryRef STZCopyAllEventTapOptions(void);
 void STZLoadArgumentsFromUserDefaults(void);
 
 bool STZGetEventTapEnabled(void);
-bool STZSetEventTapEnabled(bool);  ///< Returns the same value as the getting function.
+bool STZSetEventTapEnabled(bool);  ///< Returns whether the given value equals the state after calling this function.
 
 
 CF_ASSUME_NONNULL_END

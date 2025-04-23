@@ -12,4 +12,4 @@
 bool STZShouldEnableLaunchAtLogin(void);
 
 bool STZGetLaunchAtLoginEnabled(void);
-bool STZSetLaunchAtLoginEnabled(bool);  ///< Returns the same value as the getting function.
+bool STZSetLaunchAtLoginEnabled(bool);  ///< Returns whether the given value equals the state after calling this function.
