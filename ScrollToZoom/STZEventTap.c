@@ -254,7 +254,7 @@ static STZEventTap prefix##Tap = {NULL, NULL, false,                            
                                   events, location, placement, options,                             \
                                   prefix##Callback, initialEnabled};                                \
 
-DECLARE_EVENT_TAP(hardFlagsChanged, 1 << kCGEventFlagsChanged,
+DECLARE_EVENT_TAP(hardFlagsChanged, (1 << kCGEventFlagsChanged) | (1 << kCGEventOtherMouseDown) | (1 << kCGEventOtherMouseUp),
                   kCGHIDEventTap, kCGHeadInsertEventTap,
                   kCGEventTapOptionListenOnly, true);
 
@@ -615,15 +615,34 @@ static bool tryToSwitchToPassiveScrollWheelTap(void) {
 
 
 static CGEventRef hardFlagsChangedCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
+    bool flagsIn;
+
     switch (eventType) {
     case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
     case kCGEventTapDisabledByUserInput:    return NULL;
-    default: assert(eventType == kCGEventFlagsChanged); break;
+
+    case kCGEventFlagsChanged:
+        if (!(_scrollToZoomFlags & kSTZModifiersMask)) {return event;}
+        flagsIn = STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, NULL) == _scrollToZoomFlags;
+        break;
+
+    case kCGEventOtherMouseDown:
+        if (!(_scrollToZoomFlags & kSTZMouseButtonsMask)) {return event;}
+        if (CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber) != _scrollToZoomFlags) {return event;}
+        flagsIn = true;
+        break;
+
+    case kCGEventOtherMouseUp:
+        if (!(_scrollToZoomFlags & kSTZMouseButtonsMask)) {return event;}
+        if (CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber) != _scrollToZoomFlags) {return event;}
+        flagsIn = false;
+        break;
+
+    default: assert(false); break;
     }
 
     STZDebugLogEvent("Received hard", event);
 
-    bool flagsIn = STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, NULL) == _scrollToZoomFlags;
     if (globalContext()->flagsIn != flagsIn) {
         globalContext()->flagsIn = flagsIn;
 

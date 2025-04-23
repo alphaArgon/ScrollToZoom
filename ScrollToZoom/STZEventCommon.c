@@ -24,13 +24,17 @@ static char const *nameOfPhase(STZPhase phase) {
 
 STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef *outDescription) {
     if (dirtyFlags & kSTZMouseButtonsMask) {
-       STZFlags flags = dirtyFlags & ~kSTZMouseButtonsMask;
+       STZFlags flags = dirtyFlags & kSTZMouseButtonsMask;
        if (flags == 1) {flags = 0;}
 
        if (outDescription) {
-           static CFStringRef const format = CFSTR("\U0001f5b1%u");
-           CFStringRef desc = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, format, flags);
-           *outDescription = CFAutorelease(desc);
+           if (flags == kSTZMouseButtonMiddle) {
+               *outDescription = CFSTR("\U0001f5b1 Mid");
+           } else {
+               static CFStringRef const format = CFSTR("\U0001f5b1 %u");
+               CFStringRef desc = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, format, flags);
+               *outDescription = CFAutorelease(desc);
+           }
        }
 
        return flags;
@@ -96,6 +100,7 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
     CGFloat data;
     STZPhase phase;
     bool byMomentum;
+    CFStringRef desc;
 
     switch (CGEventGetType(event)) {
     case kCGEventFlagsChanged:
@@ -117,6 +122,16 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
         STZDebugLog("%s zoom gesture from [%llx] with %@, gesture %s, scaled %0.02f%%",
                     prefix, senderID, flagDesc, nameOfPhase(phase), (1 + data) * 100);
         break;
+
+    case kCGEventOtherMouseDown:
+        STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
+        STZDebugLog("%s mouse down from [%llx] of %@ button",
+                    prefix, senderID, desc);
+
+    case kCGEventOtherMouseUp:
+        STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
+        STZDebugLog("%s mouse up from [%llx] of %@ button",
+                    prefix, senderID, desc);
 
     default:
         STZDebugLog("%s unexpected event from [%llx] with %@", prefix, senderID, flagDesc);

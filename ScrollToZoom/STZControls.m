@@ -140,17 +140,34 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
     }
 }
 
+- (void)otherMouseDown:(NSEvent *)event {
+    if (!_editing || ![self isEnabled]) {
+        return [super otherMouseDown:event];
+    }
+
+    STZFlags flags = STZValidateFlags([event buttonNumber] & kSTZMouseButtonsMask, NULL);
+
+    if (flags) {
+        _flags = flags;
+        [self setEditing:NO];
+
+        if ([self action]) {
+            [self sendAction:[self action] to:[self target]];
+        }
+    }
+}
+
 - (void)setFlags:(STZFlags)flags {
     if (flags == _flags) {return;}
     CFStringRef description;
     _flags = STZValidateFlags(flags, &description);
-    [_symbolLabel setStringValue:(__bridge id)description];
+    [_symbolLabel setStringValue:NSLocalizedString((__bridge id)description, nil)];
 }
 
 - (void)setDisplayedSymbols:(STZFlags)flags {
     CFStringRef description;
     STZValidateFlags(flags, &description);
-    [_symbolLabel setStringValue:(__bridge id)description];
+    [_symbolLabel setStringValue:NSLocalizedString((__bridge id)description, nil)];
 }
 
 - (void)setEditing:(BOOL)editing {
