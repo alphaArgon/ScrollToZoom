@@ -7,7 +7,7 @@
  */
 
 #import <AppKit/AppKit.h>
-#import "STZWheelSession.h"
+#import "STZEventCommon.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

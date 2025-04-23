@@ -7,7 +7,7 @@
  */
 
 #import <CoreGraphics/CGEvent.h>
-#import "STZWheelSession.h"
+#import "STZEventCommon.h"
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN
