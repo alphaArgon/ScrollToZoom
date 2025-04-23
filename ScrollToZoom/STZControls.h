@@ -7,14 +7,18 @@
  */
 
 #import <AppKit/AppKit.h>
+#import "STZWheelSession.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 
+NSFont *STZSymbolsFontOfSize(CGFloat size);
+
+
 @interface STZModifierField : NSControl
 
-+ (instancetype)fieldWithModifiers:(NSEventModifierFlags)modifiers target:(nullable id)target action:(nullable SEL)action;
-@property(nonatomic) NSEventModifierFlags modifiers;
++ (instancetype)fieldWithModifiers:(STZFlags)flags target:(nullable id)target action:(nullable SEL)action;
+@property(nonatomic) STZFlags flags;
 
 @end
 

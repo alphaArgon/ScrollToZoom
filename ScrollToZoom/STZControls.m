@@ -7,15 +7,36 @@
  */
 
 #import "STZControls.h"
-#import "STZEventTap.h"
 #import "GeneratedAssetSymbols.h"
-#import <Carbon/Carbon.h>
+
+
+NSFont *STZSymbolsFontOfSize(CGFloat size) {
+    CTFontDescriptorRef desc = NULL;
+    if (!desc) {
+        NSURL *fontURL = [[NSBundle mainBundle] URLForResource:@"STZSymbols" withExtension:@".ttf"];
+        CFArrayRef descs = CTFontManagerCreateFontDescriptorsFromURL((__bridge void *)fontURL);
+        CTFontDescriptorRef desc0 = CFArrayGetValueAtIndex(descs, 0);
+
+        CTFontRef systemFont = CTFontCreateUIFontForLanguage(kCTFontUIFontSystem, 0, nil);
+        CTFontDescriptorRef systemDesc = CTFontCopyFontDescriptor(systemFont);
+
+        desc = CTFontDescriptorCreateCopyWithAttributes(systemDesc, (__bridge void *)@{
+            (__bridge id)kCTFontCascadeListAttribute: @[(__bridge id)desc0]
+        });
+
+        CFRelease(systemDesc);
+        CFRelease(systemFont);
+        CFRelease(descs);
+    }
+
+    return [NSFont fontWithDescriptor:(__bridge id)desc size:size];
+}
 
 
 @implementation STZModifierField {
     BOOL                    _editing;
     BOOL                    _highlighted;
-    NSEventModifierFlags    _accumulatedFlags;
+    STZFlags                _accumulatedFlags;
     NSTextField            *_symbolLabel;
     CGFloat                 _symbolMaxWidth;
 }
@@ -24,11 +45,12 @@
     self = [super initWithFrame:frame];
 
     CFStringRef description;
-    STZValidateModifierFlags(~0, &description);
+    STZValidateFlags(kSTZModifiersMask, &description);
     _symbolLabel = [NSTextField labelWithString:(__bridge id)description];
     [_symbolLabel setRefusesFirstResponder:YES];
     [_symbolLabel setEditable:NO];
     [_symbolLabel setSelectable:NO];
+    [_symbolLabel setFont:STZSymbolsFontOfSize(0)];
 
     _symbolMaxWidth = [_symbolLabel intrinsicContentSize].width;
 
@@ -43,9 +65,9 @@
     return self;
 }
 
-+ (instancetype)fieldWithModifiers:(NSEventModifierFlags)modifiers target:(id)target action:(SEL)action {
++ (instancetype)fieldWithModifiers:(STZFlags)flags target:(id)target action:(SEL)action {
     STZModifierField *field = [[self alloc] init];
-    [field setModifiers:modifiers];
+    [field setFlags:flags];
     [field setTarget:target];
     [field setAction:action];
     [field sizeToFit];
@@ -74,7 +96,7 @@
         return [super mouseDown:event];
     }
 
-    if (!STZValidateModifierFlags((CGEventFlags)[event modifierFlags], NULL)) {
+    if (!STZValidateFlags([event modifierFlags] & kSTZModifiersMask, NULL)) {
         [self setEditing:!_editing];
         [[self window] makeFirstResponder:self];
     }
@@ -85,7 +107,7 @@
         return [super keyDown:event];
     }
 
-    [self setDisplayedSymbols:[self modifiers]];
+    [self setDisplayedSymbols:_flags];
 
     if ([[event characters] isEqualToString:@"\r"]) {
         [self setEditing:!_editing];
@@ -102,14 +124,14 @@
         return [super flagsChanged:event];
     }
 
-    NSEventModifierFlags flags = (NSEventModifierFlags)STZValidateModifierFlags((CGEventFlags)[event modifierFlags], NULL);
+    STZFlags flags = STZValidateFlags([event modifierFlags] & kSTZModifiersMask, NULL);
 
     if (flags) {
         _accumulatedFlags |= flags;
         [self setDisplayedSymbols:_accumulatedFlags];
 
     } else if (_accumulatedFlags) {
-        _modifiers = _accumulatedFlags;
+        _flags = _accumulatedFlags;
         [self setEditing:NO];
 
         if ([self action]) {
@@ -118,21 +140,21 @@
     }
 }
 
-- (void)setModifiers:(NSEventModifierFlags)modifiers {
-    if (modifiers == _modifiers) {return;}
+- (void)setFlags:(STZFlags)flags {
+    if (flags == _flags) {return;}
     CFStringRef description;
-    _modifiers = (NSEventModifierFlags)STZValidateModifierFlags((CGEventFlags)modifiers, &description);
+    _flags = STZValidateFlags(flags, &description);
     [_symbolLabel setStringValue:(__bridge id)description];
 }
 
-- (void)setDisplayedSymbols:(NSEventModifierFlags)modifiers {
+- (void)setDisplayedSymbols:(STZFlags)flags {
     CFStringRef description;
-    STZValidateModifierFlags((CGEventFlags)modifiers, &description);
+    STZValidateFlags(flags, &description);
     [_symbolLabel setStringValue:(__bridge id)description];
 }
 
 - (void)setEditing:(BOOL)editing {
-    [self setModifiers:_modifiers];
+    [self setDisplayedSymbols:_flags];
     [self setHighlighted:(_editing = editing)];
     _accumulatedFlags = 0;
 }

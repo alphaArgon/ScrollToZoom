@@ -1,5 +1,5 @@
 /*
- *  STZService.c
+ *  STZEventTap.c
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/1/24.
@@ -13,45 +13,7 @@
 #import "CGEventSPI.h"
 
 
-CGEventFlags STZValidateModifierFlags(CGEventFlags flags, CFStringRef *outDescription) {
-    static struct {
-        uint16_t        symbol;
-        CFStringRef     name;
-        CGEventFlags    flag;
-    } const items[] = {
-        {u'⌃', CFSTR("Control"), kCGEventFlagMaskControl},
-        {u'⌥', CFSTR("Option"), kCGEventFlagMaskAlternate},
-        {u'⇧', CFSTR("Shift"), kCGEventFlagMaskShift},
-        {u'⌘', CFSTR("Command"), kCGEventFlagMaskCommand},
-    };
-
-    static const CGEventFlags allowedFlags = kCGEventFlagMaskControl | kCGEventFlagMaskAlternate | kCGEventFlagMaskShift | kCGEventFlagMaskCommand;
-
-    if (!outDescription) {
-        return flags & allowedFlags;
-    }
-
-    static const size_t itemCount = sizeof(items) / sizeof(*items);
-
-    CGEventFlags checked = 0;
-    uint16_t characters[itemCount];
-    size_t characterCount = 0;
-
-    for (size_t i = 0; i < sizeof(items) / sizeof(*items); ++i) {
-        if (flags & items[i].flag) {
-            checked |= items[i].flag;
-            characters[characterCount] = items[i].symbol;
-            characterCount += 1;
-        }
-    }
-
-    CFStringRef desc = CFStringCreateWithCharacters(kCFAllocatorDefault, characters, characterCount);
-    *outDescription = CFAutorelease(desc);
-    return checked;
-}
-
-
-CGEventFlags _scrollToZoomFlags = kCGEventFlagMaskAlternate;
+STZFlags _scrollToZoomFlags = kSTZModifierOption;
 double _scrollToZoomMagnifier = 0.0025;
 double _scrollMomentumToZoomAttenuation = 0.8;
 double _scrollMinMomentumMagnification = 0.001;
@@ -73,13 +35,13 @@ static double clamp(double x, double lo, double hi) {
 }
 
 
-CGEventFlags STZGetScrollToZoomFlags(void) {
+STZFlags STZGetScrollToZoomFlags(void) {
     return _scrollToZoomFlags;
 }
 
-void STZSetScrollToZoomFlags(CGEventFlags flags) {
+void STZSetScrollToZoomFlags(STZFlags flags) {
     CFStringRef desc;
-    _scrollToZoomFlags = STZValidateModifierFlags(flags, &desc);
+    _scrollToZoomFlags = STZValidateFlags(flags, &desc);
 
     CFStringRef appID = CFBundleGetIdentifier(CFBundleGetMainBundle());
     CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberCFIndexType, &flags);
@@ -179,11 +141,11 @@ void STZLoadArgumentsFromUserDefaults(void) {
 
     CFIndex flags = CFPreferencesGetAppIntegerValue(STZScrollToZoomFlagsKey, appID, NULL);
     if (flags != 0) {
-        _scrollToZoomFlags = flags;
+        _scrollToZoomFlags = (STZFlags)flags;  //  Validated later.
     }
 
     CFStringRef desc;
-    _scrollToZoomFlags = STZValidateModifierFlags(_scrollToZoomFlags, &desc);
+    _scrollToZoomFlags = STZValidateFlags(_scrollToZoomFlags, &desc);
 
     CFTypeRef magnifier = CFPreferencesCopyAppValue(STZScrollToZoomMagnifierKey, appID);
     if (magnifier) {
@@ -661,7 +623,7 @@ static CGEventRef hardFlagsChangedCallback(CGEventTapProxy proxy, CGEventType ev
 
     STZDebugLogEvent("Received hard", event);
 
-    bool flagsIn = STZValidateModifierFlags(CGEventGetFlags(event), NULL) == _scrollToZoomFlags;
+    bool flagsIn = STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, NULL) == _scrollToZoomFlags;
     if (globalContext()->flagsIn != flagsIn) {
         globalContext()->flagsIn = flagsIn;
 

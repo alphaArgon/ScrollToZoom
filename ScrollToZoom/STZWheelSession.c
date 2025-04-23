@@ -32,6 +32,54 @@ static char const *nameOfPhase(STZPhase phase) {
 }
 
 
+STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef *outDescription) {
+    if (dirtyFlags & kSTZMouseButtonsMask) {
+       STZFlags flags = dirtyFlags & ~kSTZMouseButtonsMask;
+       if (flags == 1) {flags = 0;}
+
+       if (outDescription) {
+           static CFStringRef const format = CFSTR("\U0001f5b1%u");
+           CFStringRef desc = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, format, flags);
+           *outDescription = CFAutorelease(desc);
+       }
+
+       return flags;
+
+    } else {
+        STZFlags flags = dirtyFlags & ~kSTZMouseButtonsMask;
+
+        if (outDescription) {
+            static struct {
+                uint16_t        symbol;
+                STZFlags        flag;
+            } const items[] = {
+                {u'⌃', kSTZModifierControl},
+                {u'⌥', kSTZModifierOption},
+                {u'⇧', kSTZModifierShift},
+                {u'⌘', kSTZModifierCommand},
+            };
+
+            static const size_t itemCount = sizeof(items) / sizeof(*items);
+
+            uint16_t characters[itemCount];
+            size_t characterCount = 0;
+
+            for (size_t i = 0; i < itemCount; ++i) {
+                if (flags & items[i].flag) {
+                    characters[characterCount] = items[i].symbol;
+                    characterCount += 1;
+                }
+            }
+
+            CFStringRef desc = CFStringCreateWithCharacters(kCFAllocatorDefault, characters, characterCount);
+            *outDescription = CFAutorelease(desc);
+        }
+
+        return flags;
+    }
+}
+
+
 uint64_t STZSenderIDForEvent(CGEventRef event) {
     IOHIDEventRef hidEvent = CGEventCopyIOHIDEvent(event);
     if (hidEvent) {
@@ -49,7 +97,7 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 
     uint64_t senderID = STZSenderIDForEvent(event);
     CFStringRef flagDesc;
-    STZValidateModifierFlags(CGEventGetFlags(event), &flagDesc);
+    STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, &flagDesc);
 
     if (CFStringGetLength(flagDesc) == 0) {
         flagDesc = CFSTR("no flags");

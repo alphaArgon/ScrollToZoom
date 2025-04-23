@@ -10,6 +10,7 @@
 		DE14D3032DB2BBE100CA3032 /* STZLaunchAtLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3022DB2BBE100CA3032 /* STZLaunchAtLogin.m */; };
 		DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.c */; };
 		DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZEventTap.c */; };
+		DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */; };
 		DE5EEF902DA5081400FAC19A /* STZConsolePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */; };
 		DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */; };
 		DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */; };
@@ -32,6 +33,7 @@
 		DE14D3062DB600CE00CA3032 /* STZUIConstants.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZUIConstants.c; sourceTree = "<group>"; };
 		DE265C862D43EAA100EC1A07 /* STZEventTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZEventTap.h; sourceTree = "<group>"; };
 		DE265C872D43EAA100EC1A07 /* STZEventTap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZEventTap.c; sourceTree = "<group>"; };
+		DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = STZSymbols.ttf; sourceTree = "<group>"; };
 		DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZConsolePanel.m; sourceTree = "<group>"; };
 		DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZConsolePanel.h; sourceTree = "<group>"; };
 		DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 				DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */,
 				DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */,
 				DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */,
+				DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */,
 				DE70F1632D4553330034F3F6 /* MainMenu.xib */,
 				DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */,
 				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
@@ -183,6 +186,7 @@
 			files = (
 				DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */,
 				DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */,
+				DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */,
 				DE70F1622D4532270034F3F6 /* Localizable.xcstrings in Resources */,
 				DE9B152E2D43948F00E92ECE /* Assets.xcassets in Resources */,
 				DE70F1642D4553330034F3F6 /* MainMenu.xib in Resources */,

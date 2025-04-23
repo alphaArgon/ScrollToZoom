@@ -119,7 +119,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
         ? [NSTextField labelWithString:trim([checkboxTitles objectAtIndex:1])] : nil;
 
     _field = [STZModifierField fieldWithModifiers:0
-                                           target:self action:@selector(updateModifiers:)];
+                                           target:self action:@selector(updateFlags:)];
 
     NSTextField *directionLabel = [NSTextField labelWithString:NSLocalizedString(@"swipe-up-to", nil)];
 
@@ -253,7 +253,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     bool enabled = STZGetEventTapEnabled();
     [self setControlsEnabled:enabled];
     [_checkbox setState:enabled];
-    [_field setModifiers:(NSEventModifierFlags)STZGetScrollToZoomFlags()];
+    [_field setFlags:STZGetScrollToZoomFlags()];
     [_zoomInRadio setState:STZGetScrollToZoomMagnifier() > 0];
     [_zoomOutRadio setState:STZGetScrollToZoomMagnifier() < 0];
     [_speedSlider setDoubleValue:fabs(STZGetScrollToZoomMagnifier())];
@@ -328,8 +328,8 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     }
 }
 
-- (void)updateModifiers:(id)sender {
-    STZSetScrollToZoomFlags((CGEventFlags)[_field modifiers]);
+- (void)updateFlags:(id)sender {
+    STZSetScrollToZoomFlags([_field flags]);
 }
 
 - (void)updateSpeed:(id)sender {

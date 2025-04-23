@@ -1,5 +1,5 @@
 /*
- *  STZService.h
+ *  STZEventTap.h
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/1/24.
@@ -7,19 +7,14 @@
  */
 
 #import <CoreGraphics/CGEvent.h>
+#import "STZWheelSession.h"
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN
 
 
-/// Returns a valid set of modifier flags for the given flags. If `getDescription` is provided, a
-/// textual representation of the valid flags will be indirectly returned. This description is not
-/// retained.
-CGEventFlags STZValidateModifierFlags(CGEventFlags flags, CFStringRef __nonnull CF_RETURNS_NOT_RETAINED *__nullable outDescription);
-
-
-CGEventFlags STZGetScrollToZoomFlags(void);
-void STZSetScrollToZoomFlags(CGEventFlags);
+STZFlags STZGetScrollToZoomFlags(void);
+void STZSetScrollToZoomFlags(STZFlags);
 
 /// The factor to calculate the relative magnification from the scroll wheel delta.
 double STZGetScrollToZoomMagnifier(void);

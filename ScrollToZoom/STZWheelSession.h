@@ -65,6 +65,31 @@ typedef struct {
 #define kSTZWheelSessionEmpty (STZWheelSession){kSTZWheelFree, kSTZWheelToScroll}
 
 
+typedef enum __attribute__((flag_enum, enum_extensibility(open))): uint32_t {
+    //  Modifier flags, can be combined as an option set.
+    kSTZModifierShift       = NX_SHIFTMASK,
+    kSTZModifierControl     = NX_CONTROLMASK,
+    kSTZModifierOption      = NX_ALTERNATEMASK,
+    kSTZModifierCommand     = NX_COMMANDMASK,
+    kSTZModifiersMask       = NX_SHIFTMASK | NX_CONTROLMASK | NX_ALTERNATEMASK | NX_COMMANDMASK,
+
+    //  Mouse buttons, exclusive each other and with modifier flags.
+    kSTZMouseButtonMiddle   = 2,
+    kSTZMouseButtonFourth   = 3,
+    kSTZMouseButtonFifth    = 4,
+    kSTZMouseButtonSixth    = 5,
+    kSTZMouseButtonSeventh  = 6,
+    kSTZMouseButtonEighth   = 7,
+    kSTZMouseButtonsMask    = 0b111,
+} STZFlags;
+
+
+/// Returns a valid set of flags by extracting the given value. If `getDescription` is provided, a
+/// textual representation of the valid flags will be indirectly returned. This description is not
+/// retained.
+STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef __nonnull CF_RETURNS_NOT_RETAINED *__nullable outDescription);
+
+
 /// Returns a unique identifier for the sender of the event, or 0 if not available.
 uint64_t STZSenderIDForEvent(CGEventRef event);
 
