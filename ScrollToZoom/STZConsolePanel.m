@@ -7,6 +7,7 @@
  */
 
 #import "STZConsolePanel.h"
+#import "STZControls.h"
 #import "GeneratedAssetSymbols.h"
 
 
@@ -284,6 +285,13 @@ void STZUnknownEnumCase(char const *type, int64_t value) {
 }
 
 - (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)column row:(NSInteger)row {
+    static NSFont *digitsFont = nil;
+    static NSFont *symbolsFont = nil;
+    if (!digitsFont) {
+        digitsFont = [NSFont monospacedDigitSystemFontOfSize:11 weight:NSFontWeightRegular];
+        symbolsFont = STZSymbolsFontOfSize(11);
+    }
+
     NSTableCellView *cellView = [tableView makeViewWithIdentifier:[column identifier] owner:self];
     if (!cellView) {
         cellView = [[NSTableCellView alloc] init];
@@ -295,14 +303,14 @@ void STZUnknownEnumCase(char const *type, int64_t value) {
         [cellView addSubview:label];
 
         if ([[column identifier] isEqualToString:@"STZLogDates"]) {
-            [label setFont:[NSFont monospacedDigitSystemFontOfSize:11 weight:NSFontWeightRegular]];
+            [label setFont:digitsFont];
             if ([label userInterfaceLayoutDirection] == NSUserInterfaceLayoutDirectionRightToLeft) {
                 [label setAlignment:NSTextAlignmentLeft];
             } else {
                 [label setAlignment:NSTextAlignmentRight];
             }
         } else {
-            [label setFont:[NSFont systemFontOfSize:11 weight:NSFontWeightRegular]];
+            [label setFont:symbolsFont];
         }
 
         [label setTranslatesAutoresizingMaskIntoConstraints:NO];
