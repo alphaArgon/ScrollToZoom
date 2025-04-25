@@ -4,13 +4,13 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 
 ## Features
 
-- Customizable modifier keys, direction, and speed.
+- Customizable modifier keys, auxiliary mouse button, direction, and speed.
 - Compatible with other mouse optimization tools.
 - Supports per-application configuration for more options.
 
 ## Overview
 
-With the specified modifier keys held, you can perform precise zooming in any app with your mouse. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
+With the specified modifier keys held or an auxiliary mouse button pressed, you can perform precise zooming in any app with your mouse. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
 
 <img src="images/window.png" width="447" title="Screenshot of the main window">
 
