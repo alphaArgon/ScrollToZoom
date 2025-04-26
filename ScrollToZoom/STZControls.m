@@ -11,7 +11,7 @@
 
 
 NSFont *STZSymbolsFontOfSize(CGFloat size) {
-    CTFontDescriptorRef desc = NULL;
+    static CTFontDescriptorRef desc = NULL;
     if (!desc) {
         NSURL *fontURL = [[NSBundle mainBundle] URLForResource:@"STZSymbols" withExtension:@".ttf"];
         CFArrayRef descs = CTFontManagerCreateFontDescriptorsFromURL((__bridge void *)fontURL);
