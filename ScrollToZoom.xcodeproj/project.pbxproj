@@ -11,7 +11,7 @@
 		DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.c */; };
 		DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZEventTap.c */; };
 		DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */; };
-		DE4AEAC92DB96BAE006E8499 /* STZEventCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = DE4AEAC72DB96BAE006E8499 /* STZEventCommon.c */; };
+		DE4AEAC92DB96BAE006E8499 /* STZCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = DE4AEAC72DB96BAE006E8499 /* STZCommon.c */; };
 		DE5EEF902DA5081400FAC19A /* STZConsolePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */; };
 		DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */; };
 		DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */; };
@@ -35,8 +35,8 @@
 		DE265C862D43EAA100EC1A07 /* STZEventTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZEventTap.h; sourceTree = "<group>"; };
 		DE265C872D43EAA100EC1A07 /* STZEventTap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZEventTap.c; sourceTree = "<group>"; };
 		DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = STZSymbols.ttf; sourceTree = "<group>"; };
-		DE4AEAC72DB96BAE006E8499 /* STZEventCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = STZEventCommon.c; sourceTree = "<group>"; };
-		DE4AEAC82DB96BAE006E8499 /* STZEventCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZEventCommon.h; sourceTree = "<group>"; };
+		DE4AEAC72DB96BAE006E8499 /* STZCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = STZCommon.c; sourceTree = "<group>"; };
+		DE4AEAC82DB96BAE006E8499 /* STZCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZCommon.h; sourceTree = "<group>"; };
 		DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZConsolePanel.m; sourceTree = "<group>"; };
 		DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZConsolePanel.h; sourceTree = "<group>"; };
 		DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -99,12 +99,12 @@
 				DE9B152B2D43948E00E92ECE /* AppDelegate.m */,
 				DEC39DF02DAF8E040034654C /* CGEventSPI.h */,
 				DE70F1572D44B5D20034F3F6 /* STZHandlers.h */,
+				DE4AEAC82DB96BAE006E8499 /* STZCommon.h */,
+				DE4AEAC72DB96BAE006E8499 /* STZCommon.c */,
 				DE6F2A162DAF729B001270D5 /* STZProcessManager.h */,
 				DE6F2A172DAF729B001270D5 /* STZProcessManager.m */,
 				DE14D3012DB2BBE100CA3032 /* STZLaunchAtLogin.h */,
 				DE14D3022DB2BBE100CA3032 /* STZLaunchAtLogin.m */,
-				DE4AEAC82DB96BAE006E8499 /* STZEventCommon.h */,
-				DE4AEAC72DB96BAE006E8499 /* STZEventCommon.c */,
 				DE265C862D43EAA100EC1A07 /* STZEventTap.h */,
 				DE265C872D43EAA100EC1A07 /* STZEventTap.c */,
 				DEC39DED2DAF88C00034654C /* STZWheelSession.h */,
@@ -206,7 +206,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DE9B15332D43948F00E92ECE /* main.m in Sources */,
-				DE4AEAC92DB96BAE006E8499 /* STZEventCommon.c in Sources */,
+				DE4AEAC92DB96BAE006E8499 /* STZCommon.c in Sources */,
 				DE9B152C2D43948E00E92ECE /* AppDelegate.m in Sources */,
 				DE70F15D2D44FABF0034F3F6 /* STZControls.m in Sources */,
 				DE14D3032DB2BBE100CA3032 /* STZLaunchAtLogin.m in Sources */,

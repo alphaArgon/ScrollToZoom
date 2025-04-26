@@ -7,7 +7,7 @@
  */
 
 #import <CoreGraphics/CGEvent.h>
-#import "STZEventCommon.h"
+#import "STZCommon.h"
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN
