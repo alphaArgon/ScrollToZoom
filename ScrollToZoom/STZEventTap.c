@@ -227,11 +227,6 @@ void STZLoadArgumentsFromUserDefaults(void) {
 //  It’s known that *LinearMouse* intercepts events hard-ly and *Mos* intercepts soft-ly.
 
 
-static CGEventTimestamp CGEventTimestampNow(void) {
-    return clock_gettime_nsec_np(CLOCK_UPTIME_RAW_APPROX);
-}
-
-
 typedef struct {
     CFMachPortRef       port;
     CFRunLoopSourceRef  source;
@@ -352,32 +347,23 @@ typedef struct {
 
 #define kSTZWheelContextEmpty (STZWheelContext){kSTZWheelSessionEmpty, false, false, false, false, 0, 0, 0}
 
-
-static struct {
-    int                 count;
-    int                 hotIndex;
-    CGEventTimestamp    checkedAt;
-    struct {
-        uint64_t            senderID;
-        CGEventTimestamp    accessedAt;  ///< 0 for spare.
-        STZWheelContext     context;
-    }              *entries;
-} _wheelContexts = {0, 0, 0, NULL};
+static STZCScanCache _wheelContexts = kSTZCScanCacheEmptyForType(STZWheelContext);
 
 
-static void _checkExpiredWheelContexts(CGEventTimestamp now) {
+static void _logExpiredWheelContexts(uint64_t senderID, void *data, bool expired, void *refcon) {
+    if (expired) {
+        STZDebugLog("Marked context expired for [%llx]", senderID);
+    }
+}
+
+static void _checkExpiredWheelContexts(void) {
     CGEventTimestamp const CHECK_INTERVAL = 60 * NSEC_PER_SEC;  //  1 minute.
     CGEventTimestamp const LIFETIME = 300 * NSEC_PER_SEC;  //  5 minutes.
 
-    if (now - _wheelContexts.checkedAt < CHECK_INTERVAL) {return;}
-    _wheelContexts.checkedAt = now;
+    STZCScanCacheCheckExpired(&_wheelContexts, CHECK_INTERVAL, LIFETIME);
 
-    for (int i = 0; i < _wheelContexts.count; ++i) {
-        if (_wheelContexts.entries[i].accessedAt == 0) {continue;}
-        if (now - _wheelContexts.entries[i].accessedAt > LIFETIME) {
-            _wheelContexts.entries[i].accessedAt = 0;
-            STZDebugLog("Marked context expired for [%llx]", _wheelContexts.entries[i].senderID);
-        }
+    if (STZIsLoggingEnabled()) {
+        STZCScanCacheEnumerateData(&_wheelContexts, true, _logExpiredWheelContexts, NULL);
     }
 }
 
@@ -385,51 +371,34 @@ static void _checkExpiredWheelContexts(CGEventTimestamp now) {
 /// Returns the pointer to the context for the given sender. If no context is found, a new one will
 /// be allocated and returned.
 static STZWheelContext *wheelContextFor(CGEventRef event) {
+    _checkExpiredWheelContexts();
+
     uint64_t senderID = STZSenderIDForEvent(event);
-    CGEventTimestamp now = CGEventTimestampNow();
-    _checkExpiredWheelContexts(now);
 
-    int spareIndex = -1;
+    STZCScanCacheResult result;
+    STZWheelContext *context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, senderID, &result);
 
-    for (int h = 0; h < _wheelContexts.count; ++h) {
-        int i = (_wheelContexts.hotIndex + h) % _wheelContexts.count;
-        if (_wheelContexts.entries[i].senderID == senderID) {
-            if (_wheelContexts.entries[i].accessedAt == 0) {
-                STZDebugLog("Recovered expired context for [%llx]", senderID);
-            }
+    switch (result) {
+    case kSTZCScanCacheFound:
+        break;
 
-            _wheelContexts.hotIndex = i;
-            _wheelContexts.entries[i].accessedAt = now;
-            return &_wheelContexts.entries[i].context;
-        }
+    case kSTZCScanCacheExpiredRestored:
+        STZDebugLog("Recovered expired context for [%llx]", senderID);
+        break;
 
-        if (spareIndex == -1 && _wheelContexts.entries[i].accessedAt == 0) {
-            spareIndex = i;
-        }
+    case kSTZCScanCacheNewCreated:
+    case kSTZCScanCacheExpiredReused:
+        STZDebugLog("Created context for [%llx]", senderID);
+        *context = kSTZWheelContextEmpty;
+        break;
     }
 
-    if (spareIndex == -1) {
-        //  Reallocate the entries array.
-        int newCount = _wheelContexts.count ? _wheelContexts.count * 2 : 2;
-        _wheelContexts.entries = realloc(_wheelContexts.entries, newCount * sizeof(*_wheelContexts.entries));
+    return context;
+}
 
-        for (int j = _wheelContexts.count; j < newCount; ++j) {
-            _wheelContexts.entries[j].accessedAt = 0;
-        }
 
-        spareIndex = _wheelContexts.count;
-        _wheelContexts.count = newCount;
-    }
-
-    int i = spareIndex;
-    _wheelContexts.hotIndex = i;
-    _wheelContexts.entries[i].senderID = senderID;
-    _wheelContexts.entries[i].accessedAt = now;
-    _wheelContexts.entries[i].context = kSTZWheelContextEmpty;
-    _wheelContexts.count = i + 1;
-
-    STZDebugLog("Created context for [%llx]", senderID);
-    return &_wheelContexts.entries[i].context;
+static void enumerateWheelContexts(void (*callback)(uint64_t senderID, STZWheelContext *data, bool expired, void *refcon), void *refcon) {
+    STZCScanCacheEnumerateData(&_wheelContexts, false, (STZCacheEnumerationCallback)callback, refcon);
 }
 
 
@@ -593,17 +562,20 @@ static void switchToMutatingScrollWheelTap(void) {
 }
 
 
+/// Used by `tryToSwitchToPassiveScrollWheelTap`.
+static void checkEachWheelContextPassive(uint64_t senderID, STZWheelContext *context, bool _, void *flag) {
+    if (context->activated || context->session.state || context->lastEventChanged) {
+        *(bool *)flag = false;
+    }
+}
+
+
 static bool tryToSwitchToPassiveScrollWheelTap(void) {
     if (eventTapGetEnabled(&passiveScrollWheelTap)) {return true;}
     if (globalContext()->flagsIn) {return false;}
 
     bool canBePassive = true;
-    forEachWheelContext(context, {
-        if (context->activated || context->session.state || context->lastEventChanged) {
-            canBePassive = false;
-            break;
-        }
-    });
+    enumerateWheelContexts(checkEachWheelContextPassive, &canBePassive);
 
     if (!canBePassive) {return false;}
 
@@ -611,6 +583,18 @@ static bool tryToSwitchToPassiveScrollWheelTap(void) {
     eventTapSetEnabled(&mutatingScrollWheelTap, false);
     STZDebugLog("Switch to passive scroll wheel tap");
     return true;
+}
+
+
+/// Used by `hardFlagsChangedCallback`.
+static void setEachWheelContextReleased(uint64_t senderID, STZWheelContext *context, bool _, void *event) {
+    if (!globalContext()->flagsIn && context->activated) {
+        releaseSessionFromEvent(&context->session, event);
+    }
+
+    context->anyReceived = false;
+    context->activated = false;
+    context->timerToken += 1;
 }
 
 
@@ -645,17 +629,7 @@ static CGEventRef hardFlagsChangedCallback(CGEventTapProxy proxy, CGEventType ev
 
     if (globalContext()->flagsIn != flagsIn) {
         globalContext()->flagsIn = flagsIn;
-
-        forEachWheelContext(context, {
-            if (!flagsIn && context->activated) {
-                releaseSessionFromEvent(&context->session, event);
-            }
-
-            context->anyReceived = false;
-            context->activated = false;
-            context->timerToken += 1;
-        });
-
+        enumerateWheelContexts(setEachWheelContextReleased, event);
         reinsertTapsIfNeeded();
 
         if (flagsIn) {

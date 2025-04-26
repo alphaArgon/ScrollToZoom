@@ -1,5 +1,5 @@
 /*
- *  STZEventCommon.h
+ *  STZCommon.h
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/4/24.
@@ -15,12 +15,70 @@ CF_ASSUME_NONNULL_BEGIN
 
 #define CLOSED_ENUM enum __attribute__((enum_extensibility(closed)))
 
+#define FIELD_OFFSET(type, property) ((size_t)&((type *)NULL)->property)
+
 
 typedef CLOSED_ENUM: int8_t {
     kSTZMaybe               = -1,
     __STZTrivalent_false    = false,
     __STZTrivalent_true     = true,
 } STZTrivalent;
+
+
+static inline CGEventTimestamp CGEventTimestampNow(void) {
+    return clock_gettime_nsec_np(CLOCK_UPTIME_RAW_APPROX);
+}
+
+
+//  MARK: - STZCache
+
+
+typedef struct {
+    int                 count, hotIndex;
+    CGEventTimestamp    checkedAt;
+    size_t              entrySize, dataOffset;
+    void               *entries;
+} STZCScanCache;
+
+#define _STZCacheEntryType(DataType)                    \
+struct {                                                \
+    uint64_t            identifier;                     \
+    CGEventTimestamp    accessedAt;                     \
+    DataType            data;                           \
+}                                                       \
+
+#define kSTZCScanCacheEmptyForType(DataType)            \
+(STZCScanCache){                                        \
+    0, 0, 0,                                            \
+    sizeof(_STZCacheEntryType(DataType)),               \
+    FIELD_OFFSET(_STZCacheEntryType(DataType), data),   \
+    NULL                                                \
+}                                                       \
+
+typedef CLOSED_ENUM: uint8_t {
+    kSTZCScanCacheFound,
+    kSTZCScanCacheNewCreated,
+    kSTZCScanCacheExpiredReused,
+    kSTZCScanCacheExpiredRestored,
+} STZCScanCacheResult;
+
+/// Marks expired data. Expired data won’t be cleaned immediately, but might be overwritten to
+/// prevent reallocating memory, in which case the `outResult` of `STZCScanCachedDataForIdentifier`
+/// will be set to `kSTZCScanCacheExpiredReused`.
+void STZCScanCacheCheckExpired(STZCScanCache *, CGEventTimestamp checkInterval, CGEventTimestamp lifetime);
+
+/// Returns the pointer to the data of the given identifier. If the identifier is not found, a new
+/// entry will be created. `outResult` reflects how the entry is created.
+void *STZCScanCacheGetDataForIdentifier(STZCScanCache *, uint64_t identifier, STZCScanCacheResult *outResult);
+
+/// Removes all data and release the memory.
+void STZCScanCacheRemoveAll(STZCScanCache *);
+
+typedef void (*STZCacheEnumerationCallback)(uint64_t identifier, void *data, bool expired, void *__nullable refcon);
+void STZCScanCacheEnumerateData(STZCScanCache *, bool includeExpired, STZCacheEnumerationCallback callback, void *__nullable refcon);
+
+
+//  MARK: - CGEvent
 
 
 typedef CLOSED_ENUM: uint8_t {

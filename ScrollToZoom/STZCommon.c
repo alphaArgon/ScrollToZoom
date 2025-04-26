@@ -1,13 +1,125 @@
 /*
- *  STZEventCommon.c
+ *  STZCommon.c
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/4/24.
  *  Copyright © 2025 alphaArgon.
  */
 
-#import "STZEventCommon.h"
+#import "STZCommon.h"
 #import "CGEventSPI.h"
+
+
+//  MARK: - STZCache
+
+#define kSTZCacheExpired       ((CGEventTimestamp)0)
+#define kSTZCacheNew           ((CGEventTimestamp)UINT64_MAX)
+
+
+typedef struct {
+    uint64_t            identifier;
+    CGEventTimestamp    accessedAt;
+} _STZCacheEntryStub;
+
+#define STZCacheEntryAtIndex(cache, i) ((_STZCacheEntryStub *)(cache->entries + (cache->entrySize * i)))
+
+
+void STZCScanCacheCheckExpired(STZCScanCache *cache, CGEventTimestamp checkInterval, CGEventTimestamp lifetime) {
+    CGEventTimestamp now = CGEventTimestampNow();
+
+    if (now - cache->checkedAt < checkInterval) {return;}
+    cache->checkedAt = now;
+
+    for (int i = 0; i < cache->count; ++i) {
+        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, i);
+
+        if (entry->accessedAt == kSTZCacheNew) {continue;}
+        if (entry->accessedAt == kSTZCacheExpired) {continue;}
+
+        if (now - entry->accessedAt > lifetime) {
+            entry->accessedAt = kSTZCacheExpired;
+        }
+    }
+}
+
+
+void *STZCScanCacheGetDataForIdentifier(STZCScanCache *cache, uint64_t identifier, STZCScanCacheResult *outResult) {
+    CGEventTimestamp now = CGEventTimestampNow();
+    int spareIndex = -1;
+
+    for (int h = 0; h < cache->count; ++h) {
+        int i = (cache->hotIndex + h) % cache->count;
+        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, i);
+
+        if (entry->identifier == identifier) {
+            *outResult = entry->accessedAt == kSTZCacheExpired
+                ? kSTZCScanCacheExpiredRestored
+                : kSTZCScanCacheFound;
+            entry->accessedAt = now;
+            cache->hotIndex = i;
+            return (void *)entry + cache->dataOffset;
+        }
+
+        //  Prefer to use new entries instead of expired ones.
+
+        if (entry->accessedAt == kSTZCacheNew) {
+            spareIndex = i;
+            break;
+        }
+
+        if (spareIndex == -1 && entry->accessedAt == kSTZCacheExpired) {
+            spareIndex = i;
+        }
+    }
+
+    if (spareIndex == -1) {
+        int newCount = cache->count ? cache->count * 2 : 2;
+        cache->entries = reallocf(cache->entries, newCount * cache->entrySize);
+
+        for (int j = cache->count; j < newCount; ++j) {
+            STZCacheEntryAtIndex(cache, j)->accessedAt = kSTZCacheNew;
+        }
+
+        spareIndex = cache->count;
+        cache->count = newCount;
+    }
+
+    _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, spareIndex);
+    *outResult = entry->accessedAt == kSTZCacheExpired
+        ? kSTZCScanCacheExpiredReused
+        : kSTZCScanCacheNewCreated;
+    entry->identifier = identifier;
+    entry->accessedAt = now;
+    cache->hotIndex = spareIndex;
+    return (void *)entry + cache->dataOffset;
+}
+
+
+void STZCScanCacheRemoveAll(STZCScanCache *cache) {
+    free(cache->entries);
+    cache->entries = NULL;
+    cache->count = 0;
+    cache->hotIndex = 0;
+    cache->checkedAt = 0;
+}
+
+
+void STZCScanCacheEnumerateData(STZCScanCache *cache, bool includeExpired, STZCacheEnumerationCallback callback, void *refcon) {
+    for (int i = 0; i < cache->count; ++i) {
+        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, i);
+
+        if (entry->accessedAt == kSTZCacheNew) {continue;}
+
+        bool expired = entry->accessedAt == kSTZCacheExpired;
+        if (!includeExpired && expired) {continue;}
+
+        void *data = (void *)entry + cache->dataOffset;
+        callback(entry->identifier, data, expired, refcon);
+    }
+}
+
+
+//  MARK: - CGEvent
 
 
 static char const *nameOfPhase(STZPhase phase) {
