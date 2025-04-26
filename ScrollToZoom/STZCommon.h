@@ -116,10 +116,6 @@ typedef enum __attribute__((flag_enum, enum_extensibility(open))): uint32_t {
 STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef __nonnull CF_RETURNS_NOT_RETAINED *__nullable outDescription);
 
 
-/// Returns a unique identifier for the sender of the event, or 0 if not available.
-uint64_t STZSenderIDForEvent(CGEventRef event);
-
-
 void STZDebugLogEvent(char const *prefix, CGEventRef event);
 
 

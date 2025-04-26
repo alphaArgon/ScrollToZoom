@@ -42,14 +42,20 @@ enum {
     kCGGestureEventPhase = 132,
     kCGGestureEventMask = 133,
     kCGGestureEventSwipeMask = 134,
-    kCGScrollGEventestureFlagBits = 135,
-    kCGSwipeGeEventstureFlagBits = 136,
+    kCGScrollEventGestureFlagBits = 135,
+    kCGSwipeEventGestureFlagBits = 136,
     kCGGestureEventFlavor = 138,
     kCGGestureEventZoomDeltaX = 139,
     kCGGestureEventZoomDeltaY = 140,
     kCGGestureEventProgress = 142,
     kCGGestureEventStage = 143,
     kCGGestureEventBehavior = 144,
+
+    //  Reverse engineered from `-[NSEvent isDirectionInvertedFromDevice]`.
+    kCGScrollEventIsDirectionInverted = 137,
+
+    //  Thanks to https://stackoverflow.com/questions/219623 .
+    kCGEventRegistryID = 87,
 };
 
 
@@ -86,8 +92,23 @@ typedef CF_ENUM(uint32_t, IOHIDEventField) {
 double IOHIDEventGetFloatValue(IOHIDEventRef, IOHIDEventField);
 void IOHIDEventSetFloatValue(IOHIDEventRef, IOHIDEventField, double);
 
+//  This should return the same as value of `kCGEventRegistryID`.
 uint64_t IOHIDEventGetSenderID(IOHIDEventRef);
 void IOHIDEventSetSenderID(IOHIDEventRef, uint64_t);
+
+
+static inline uint64_t CGEventGetRegistryID(CGEventRef event) {
+    uint64_t registryID = CGEventGetIntegerValueField(event, kCGEventRegistryID);
+    if (registryID) {return registryID;}
+
+    IOHIDEventRef ioEvent = CGEventCopyIOHIDEvent(event);
+    if (!ioEvent) {return 0;}
+
+    uint64_t senderID = IOHIDEventGetSenderID(ioEvent);
+    IOHIDEventSetSenderID(ioEvent, senderID);
+    CFRelease(ioEvent);
+    return senderID;
+}
 
 
 CF_ASSUME_NONNULL_END

@@ -186,22 +186,10 @@ STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef *outDescription) {
 }
 
 
-uint64_t STZSenderIDForEvent(CGEventRef event) {
-    IOHIDEventRef hidEvent = CGEventCopyIOHIDEvent(event);
-    if (hidEvent) {
-        uint64_t senderID = IOHIDEventGetSenderID(hidEvent);
-        CFRelease(hidEvent);
-        return senderID;
-    } else {
-        return 0;
-    }
-}
-
-
 void STZDebugLogEvent(char const *prefix, CGEventRef event) {
     if (!STZIsLoggingEnabled()) {return;}
 
-    uint64_t senderID = STZSenderIDForEvent(event);
+    uint64_t senderID = CGEventGetRegistryID(event);
     CFStringRef flagDesc;
     STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, &flagDesc);
 
@@ -254,9 +242,7 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 
 bool STZIsScrollWheelFlipped(CGEventRef event) {
     assert(CGEventGetType(event) == kCGEventScrollWheel);
-
-    //  `137` is reverse engineered from `-[NSEvent isDirectionInvertedFromDevice]`.
-    return CGEventGetIntegerValueField(event, 137) != 0;
+    return CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) != 0;
 }
 
 

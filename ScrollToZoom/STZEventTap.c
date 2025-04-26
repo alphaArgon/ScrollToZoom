@@ -350,9 +350,9 @@ typedef struct {
 static STZCScanCache _wheelContexts = kSTZCScanCacheEmptyForType(STZWheelContext);
 
 
-static void _logExpiredWheelContexts(uint64_t senderID, void *data, bool expired, void *refcon) {
+static void _logExpiredWheelContexts(uint64_t registryID, void *data, bool expired, void *refcon) {
     if (expired) {
-        STZDebugLog("Marked context expired for [%llx]", senderID);
+        STZDebugLog("Marked context expired for [%llx]", registryID);
     }
 }
 
@@ -373,22 +373,22 @@ static void _checkExpiredWheelContexts(void) {
 static STZWheelContext *wheelContextFor(CGEventRef event) {
     _checkExpiredWheelContexts();
 
-    uint64_t senderID = STZSenderIDForEvent(event);
+    uint64_t registryID = CGEventGetRegistryID(event);
 
     STZCScanCacheResult result;
-    STZWheelContext *context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, senderID, &result);
+    STZWheelContext *context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, registryID, &result);
 
     switch (result) {
     case kSTZCScanCacheFound:
         break;
 
     case kSTZCScanCacheExpiredRestored:
-        STZDebugLog("Recovered expired context for [%llx]", senderID);
+        STZDebugLog("Recovered expired context for [%llx]", registryID);
         break;
 
     case kSTZCScanCacheNewCreated:
     case kSTZCScanCacheExpiredReused:
-        STZDebugLog("Created context for [%llx]", senderID);
+        STZDebugLog("Created context for [%llx]", registryID);
         *context = kSTZWheelContextEmpty;
         break;
     }
@@ -397,7 +397,7 @@ static STZWheelContext *wheelContextFor(CGEventRef event) {
 }
 
 
-static void enumerateWheelContexts(void (*callback)(uint64_t senderID, STZWheelContext *data, bool expired, void *refcon), void *refcon) {
+static void enumerateWheelContexts(void (*callback)(uint64_t registryID, STZWheelContext *data, bool expired, void *refcon), void *refcon) {
     STZCScanCacheEnumerateData(&_wheelContexts, false, (STZCacheEnumerationCallback)callback, refcon);
 }
 
@@ -528,14 +528,14 @@ static void postAndReleaseEvent(CGEventRef CF_CONSUMED event, CGEventTapLocation
 static void replaceEventByConsumingEvents(CGEventRef CF_CONSUMED const *events) {
     if (events[0]) {
         STZDebugLogEvent("\tEvent replaced by", events[0]);
-        postAndReleaseEvent(events[0], kCGHIDEventTap, false);
+        postAndReleaseEvent(events[0], kCGSessionEventTap, false);
     } else {
         STZDebugLog("\tEvent discarded");
     }
 
     if (events[1]) {
         STZDebugLogEvent("\tEvent replaced by", events[1]);
-        postAndReleaseEvent(events[1], kCGHIDEventTap, true);
+        postAndReleaseEvent(events[1], kCGSessionEventTap, true);
     }
 }
 
@@ -548,7 +548,7 @@ static void releaseSessionFromEvent(STZWheelSession *__nonnull session, CGEventR
 
     if (extraEvent) {
         STZDebugLogEvent("\tPost additional", extraEvent);
-        postAndReleaseEvent(extraEvent, kCGHIDEventTap, false);
+        postAndReleaseEvent(extraEvent, kCGSessionEventTap, false);
     }
 }
 
@@ -563,7 +563,7 @@ static void switchToMutatingScrollWheelTap(void) {
 
 
 /// Used by `tryToSwitchToPassiveScrollWheelTap`.
-static void checkEachWheelContextPassive(uint64_t senderID, STZWheelContext *context, bool _, void *flag) {
+static void checkEachWheelContextPassive(uint64_t registryID, STZWheelContext *context, bool _, void *flag) {
     if (context->activated || context->session.state || context->lastEventChanged) {
         *(bool *)flag = false;
     }
@@ -587,7 +587,7 @@ static bool tryToSwitchToPassiveScrollWheelTap(void) {
 
 
 /// Used by `hardFlagsChangedCallback`.
-static void setEachWheelContextReleased(uint64_t senderID, STZWheelContext *context, bool _, void *event) {
+static void setEachWheelContextReleased(uint64_t registryID, STZWheelContext *context, bool _, void *event) {
     if (!globalContext()->flagsIn && context->activated) {
         releaseSessionFromEvent(&context->session, event);
     }
