@@ -1,16 +1,20 @@
+<small>**English (US)**・[简体中文（大陆）](README.zh_CN.md)</small>
+
 # <img src="ScrollToZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@2x.png" width="128" align="right"> Scroll to Zoom
 
 A Mac utility for precisely zooming in or out using the mouse wheel.
 
 ## Features
 
-- Customizable modifier keys, auxiliary mouse button, direction, and speed.
+- Hold modifier keys or an auxiliary mouse button to zoom.
+- Customizable direction, speed, and per-application configuration.
 - Compatible with other mouse optimization tools.
-- Supports per-application configuration for more options.
+
+**Bonus for Magic Mouse users**: You can double tap and scroll, that is, finder down—up—down—moves, to zoom in and out, just like how you zoom the Apple Maps on the iPhone. This works naturally if you also enable double-tap to smart zoom.
 
 ## Overview
 
-With the specified modifier keys held or an auxiliary mouse button pressed, you can perform precise zooming in any app with your mouse. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
+With the specified modifier keys held or an auxiliary mouse button pressed, you can perform precise zooming in any app with your mouse wheel. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
 
 <img src="images/window.png" width="447" title="Screenshot of the main window">
 
