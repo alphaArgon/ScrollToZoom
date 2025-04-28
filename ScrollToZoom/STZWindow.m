@@ -7,13 +7,13 @@
  */
 
 #import "STZWindow.h"
-#import "STZEventTap.h"
+#import "STZScrollToZoom.h"
+#import "STZSettings.h"
 #import "STZLaunchAtLogin.h"
 #import "STZControls.h"
 #import "STZOptionsPanel.h"
 #import "STZConsolePanel.h"
 #import "STZUIConstants.h"
-#import "STZHandlers.h"
 #import "GeneratedAssetSymbols.h"
 
 
@@ -250,7 +250,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 }
 
 - (void)reloadData {
-    bool enabled = STZGetEventTapEnabled();
+    bool enabled = STZGetScrollToZoomEnabled();
     [self setControlsEnabled:enabled];
     [_checkbox setState:enabled];
     [_field setFlags:STZGetScrollToZoomFlags()];
@@ -287,7 +287,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 - (void)toggleScrollToZoom:(id)sender {
     BOOL enable = [_checkbox state] != NSOffState;
 
-    if (STZSetEventTapEnabled(enable)) {
+    if (STZSetScrollToZoomEnabled(enable)) {
         [self setControlsEnabled:enable];
         [_enableRetryTimer invalidate];
         _enableRetryTimer = nil;
@@ -317,7 +317,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
                 [timer invalidate];
                 STZDebugLog("Cancel checking permission");
 
-            } else if (STZSetEventTapEnabled(true)) {
+            } else if (STZSetScrollToZoomEnabled(true)) {
                 [this setControlsEnabled:YES];
                 [this->_checkbox setState:NSControlStateValueOn];
                 [this->_enableRetryTimer invalidate];

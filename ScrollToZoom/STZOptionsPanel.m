@@ -7,7 +7,7 @@
  */
 
 #import "STZOptionsPanel.h"
-#import "STZEventTap.h"
+#import "STZSettings.h"
 #import "STZUIConstants.h"
 
 

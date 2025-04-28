@@ -7,7 +7,7 @@
  */
 
 #import "STZWheelSession.h"
-#import "STZEventTap.h"
+#import "STZSettings.h"
 #import "CGEventSPI.h"
 
 
@@ -74,7 +74,7 @@ static int64_t const kSTZNegativeSignum = (int64_t)'STZ.' << 32 | 'SIG-';
 static int32_t const kSTZSignumField = kCGEventSourceUserData;
 
 
-int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event) {
+int STZGetDeltaSignumForScrollWheelEvent(CGEventRef event) {
     assert(CGEventGetType(event) == kCGEventScrollWheel);
 
     //  `hidEvent` could be `NULL`
@@ -84,62 +84,62 @@ int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event) {
 
     double delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1);
     delta *= STZIsScrollWheelFlipped(event) ? -1 : 1;
-
-    int signum;
-    uint64_t userData;
-
-    if (delta == 0) {
-        signum = 0;
-        userData = kSTZZeroSignum;
-    } else if (delta > 0) {
-        signum = +1;
-        userData = kSTZPositiveSignum;
-    } else {
-        signum = -1;
-        userData = kSTZNegativeSignum;
-    }
-
-    if (CGEventGetIntegerValueField(event, kSTZSignumField) == 0) {
-        CGEventSetIntegerValueField(event, kSTZSignumField, userData);
-    }
-
-    return signum;
+    return delta != 0 ? delta > 0 ? 1 : -1 : 0;
 }
 
 
-void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum, bool *outAccepped,
-                                         CGEventTimestamp *momentumStart,
-                                         STZPhase *outPhase, double *outScale,
-                                         STZTrivalent *outEventHasSuccessor) {
-    assert(suggestedSigum == 0 || abs(suggestedSigum) == 1);
+bool STZMarkDeltaSignumForEvent(CGEventRef event, int signum) {
+    if (CGEventGetIntegerValueField(event, kSTZSignumField) != 0) {return false;}
 
-    int signum;
+    switch (signum) {
+    case 0:
+        CGEventSetIntegerValueField(event, kSTZSignumField, kSTZZeroSignum);
+        return true;
+    case 1:
+        CGEventSetIntegerValueField(event, kSTZSignumField, kSTZPositiveSignum);
+        return true;
+    case -1:
+        CGEventSetIntegerValueField(event, kSTZSignumField, kSTZNegativeSignum);
+        return true;
+    default:
+        return false;
+    }
+}
+
+
+bool STZConsumeDeltaSignumForEvent(CGEventRef event, int *signum) {
     switch (CGEventGetIntegerValueField(event, kSTZSignumField)) {
-    case kSTZZeroSignum:        signum = 0; *outAccepped = false; break;
-    case kSTZPositiveSignum:    signum = +1; *outAccepped = false; break;
-    case kSTZNegativeSignum:    signum = -1; *outAccepped = false; break;
-    default:                    signum = suggestedSigum; *outAccepped = true; break;
+    case kSTZZeroSignum:
+        *signum = 0;
+        return true;
+    case kSTZPositiveSignum:
+        *signum = 1;
+        return true;
+    case kSTZNegativeSignum:
+        *signum = -1;
+        return true;
+    default:
+        return false;
     }
+}
 
-    if (!*outAccepped) {
-        CGEventSetIntegerValueField(event, kSTZSignumField, 0);
+
+STZTrivalent STZScrollWheelHasSuccessorEvent(STZPhase phase, bool byMomentum) {
+    if (phase == kSTZPhaseNone || (phase == kSTZPhaseEnded && !byMomentum)) {
+        return kSTZMaybe;
+    } else {
+        return phase != kSTZPhaseEnded && phase != kSTZPhaseCancelled;
     }
+}
 
-    double delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+
+void STZConvertZoomFromScrollWheel(STZPhase *phase, bool byMomentum, int signum,  double delta,
+                                   CGEventTimestamp now, CGEventTimestamp *momentumStart,
+                                   double *outScale) {
+    assert(signum == 0 || abs(signum) == 1);
     delta = signum * fabs(delta);
 
-    bool byMomentum;
-    STZGetPhaseFromScrollWheelEvent(event, outPhase, &byMomentum);
-
-    if (*outPhase == kSTZPhaseNone) {
-        *outEventHasSuccessor = kSTZMaybe;
-    } else if (delta == 0 && !byMomentum && *outPhase == kSTZPhaseEnded) {
-        *outEventHasSuccessor = STZGetScrollMomentumToZoomAttenuation() == 1 ? false : kSTZMaybe;
-    } else {
-        *outEventHasSuccessor = *outPhase != kSTZPhaseEnded && *outPhase != kSTZPhaseChanged;
-    }
-
-    switch (*outPhase) {
+    switch (*phase) {
     case kSTZPhaseEnded:
     case kSTZPhaseCancelled:
         *outScale = 0;
@@ -148,32 +148,32 @@ void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum, b
     case kSTZPhaseMayBegin:
     case kSTZPhaseBegan:
         *outScale = delta * STZGetScrollToZoomMagnifier();
-
+        
         if (byMomentum) {
-            *momentumStart = CGEventGetTimestamp(event);
-
+            *momentumStart = now;
+            
             if (STZGetScrollMomentumToZoomAttenuation() == 1) {
-                *outPhase = kSTZPhaseEnded;
+                *phase = kSTZPhaseEnded;
                 *outScale = 0;
             }
         }
-
         break;
-
+        
     case kSTZPhaseNone:
     case kSTZPhaseChanged:
         *outScale = delta * STZGetScrollToZoomMagnifier();
-
+        
         if (byMomentum) {
             double k = 1 - STZGetScrollMomentumToZoomAttenuation();
-            double dt = (CGEventGetTimestamp(event) - *momentumStart) / (double)NSEC_PER_SEC;
+            double dt = (now - *momentumStart) / (double)NSEC_PER_SEC;
             *outScale *= k != 0 ? pow(k, dt / k) : 0;
-
+            
             if (fabs(*outScale) < STZGetScrollMinMomentumMagnification()) {
-                *outPhase = kSTZPhaseEnded;
+                *phase = kSTZPhaseEnded;
                 *outScale = 0;
             }
         }
+        break;
     }
 }
 
@@ -242,7 +242,7 @@ void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase
     //  Gestures may be broken if we send `mayBegin` events. In this case we ignore the event and
     //  leave the session unchanged.
     if (type != kSTZWheelToScroll && phase == kSTZPhaseMayBegin) {
-        *action = kSTZEventReplaced;
+        *action = kSTZEventReplaced;  //  Discard
         return;
     }
 
@@ -279,7 +279,7 @@ void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase
         case kSTZPhaseEnded:
         case kSTZPhaseCancelled:
             //  Already free, sending the event would cause unbalanced state.
-            *action = kSTZEventReplaced;
+            *action = kSTZEventReplaced;  //  Discard
             return;
         }
         break;
@@ -287,7 +287,7 @@ void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase
     case kSTZWheelWillBegin:
         switch (phase) {
         case kSTZPhaseMayBegin:
-            *action = kSTZEventReplaced;
+            *action = kSTZEventReplaced;  //  Discard
             return;
 
         case kSTZPhaseBegan:
@@ -312,7 +312,7 @@ void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase
     case kSTZWheelDidBegin:
         switch (phase) {
         case kSTZPhaseMayBegin:
-            *action = kSTZEventReplaced;
+            *action = kSTZEventReplaced;  //  Discard
             return;
 
         case kSTZPhaseBegan:
@@ -383,4 +383,12 @@ void STZWheelSessionAssign(STZWheelSession *session, STZWheelType type, STZPhase
         session->state = kSTZWheelFree;
         break;
     }
+}
+
+
+bool STZWheelSessionIsEnded(STZWheelSession *const session, STZPhase byEventPhase) {
+    if (session->state != kSTZWheelFree) {return false;}
+    return byEventPhase == kSTZPhaseEnded
+        || byEventPhase == kSTZPhaseCancelled
+        || byEventPhase == kSTZPhaseNone;
 }

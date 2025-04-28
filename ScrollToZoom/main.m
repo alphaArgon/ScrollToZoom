@@ -8,7 +8,6 @@
 
 #import <AppKit/AppKit.h>
 #import "AppDelegate.h"
-#import "STZEventTap.h"
 
 
 int main(int argc, char const **argv) {

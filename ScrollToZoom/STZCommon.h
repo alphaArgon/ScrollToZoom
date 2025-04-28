@@ -35,9 +35,11 @@ static inline CGEventTimestamp CGEventTimestampNow(void) {
 
 typedef struct {
     int                 count, hotIndex;
+    CGEventTimestamp    dataLifetime;
+    CGEventTimestamp    checkInterval;
     CGEventTimestamp    checkedAt;
     size_t              entrySize, dataOffset;
-    void               *entries;
+    void               *__nullable entries;
 } STZCScanCache;
 
 #define _STZCacheEntryType(DataType)                    \
@@ -49,7 +51,7 @@ struct {                                                \
 
 #define kSTZCScanCacheEmptyForType(DataType)            \
 (STZCScanCache){                                        \
-    0, 0, 0,                                            \
+    0, 0, 0, 0, 0,                                      \
     sizeof(_STZCacheEntryType(DataType)),               \
     FIELD_OFFSET(_STZCacheEntryType(DataType), data),   \
     NULL                                                \
@@ -62,20 +64,37 @@ typedef CLOSED_ENUM: uint8_t {
     kSTZCScanCacheExpiredRestored,
 } STZCScanCacheResult;
 
+
+/// Whether the cache is once accessed.
+bool STZCScanCacheIsInUse(STZCScanCache *);
+
+/// Sets the parameter of expiration checking parameters. If you pass a zero `dataLifetime` to the
+/// function, which are the default values, the cache are never cleaned.
+void STZCScanCacheSetDataLifetime(STZCScanCache *, CGEventTimestamp dataLifetime, CGEventTimestamp autoCheckInterval);
+
 /// Marks expired data. Expired data won’t be cleaned immediately, but might be overwritten to
 /// prevent reallocating memory, in which case the `outResult` of `STZCScanCachedDataForIdentifier`
 /// will be set to `kSTZCScanCacheExpiredReused`.
-void STZCScanCacheCheckExpired(STZCScanCache *, CGEventTimestamp checkInterval, CGEventTimestamp lifetime);
+void STZCScanCacheCheckExpired(STZCScanCache *, bool forceCheck);
 
 /// Returns the pointer to the data of the given identifier. If the identifier is not found, a new
-/// entry will be created. `outResult` reflects how the entry is created.
-void *STZCScanCacheGetDataForIdentifier(STZCScanCache *, uint64_t identifier, STZCScanCacheResult *outResult);
+/// entry will be created if `createIfNeeded`, or `NULL` will be returned. `outResult` reflects how
+/// the entry is created.
+void *__nullable STZCScanCacheGetDataForIdentifier(STZCScanCache *, uint64_t identifier, bool createIfNeeded, STZCScanCacheResult *__nullable outResult);
 
 /// Removes all data and release the memory.
 void STZCScanCacheRemoveAll(STZCScanCache *);
 
-typedef void (*STZCacheEnumerationCallback)(uint64_t identifier, void *data, bool expired, void *__nullable refcon);
-void STZCScanCacheEnumerateData(STZCScanCache *, bool includeExpired, STZCacheEnumerationCallback callback, void *__nullable refcon);
+
+typedef struct {
+    int                 index;
+    bool                includeExpired;
+    STZCScanCache      *cache;
+    CGEventTimestamp    now;
+} STZCacheIterator;
+
+void STZCScanCacheIteratorInitialize(STZCacheIterator *, STZCScanCache *, bool includeExpired);
+void *__nullable STZCScanCacheIteratorGetNextData(STZCacheIterator *, uint64_t *__nullable outIdentifier, bool *__nullable outExpired);
 
 
 //  MARK: - CGEvent
@@ -128,8 +147,8 @@ bool STZIsScrollWheelFlipped(CGEventRef);
 /// A scroll wheel event may have two periods: the scroll phase and the momentum phase. The momentum
 /// phase is optional but exclusive to the scroll phase. In this case, `outByMomentum` will be set
 /// to `true` and the returned value will reflect the momentum phase.
-void STZGetPhaseFromScrollWheelEvent(CGEventRef event, STZPhase *outPhase, bool *outByMomentum);
-void STZGetPhaseFromGestureEvent(CGEventRef event, STZPhase *outPhase);
+STZPhase STZGetPhaseFromScrollWheelEvent(CGEventRef event, bool *outByMomentum);
+STZPhase STZGetPhaseFromGestureEvent(CGEventRef event);
 
 
 /// Enforces the event to have the given phase.

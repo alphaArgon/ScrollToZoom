@@ -7,8 +7,10 @@
  */
 
 #import "AppDelegate.h"
-#import "STZEventTap.h"
+#import "STZScrollToZoom.h"
+#import "STZSettings.h"
 #import "STZWindow.h"
+#import "STZConsolePanel.h"
 #import "STZOptionsPanel.h"
 #import "STZProcessManager.h"
 #import "GeneratedAssetSymbols.h"
@@ -38,7 +40,7 @@ static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZ
     }
 
     STZLoadArgumentsFromUserDefaults();
-    if (!STZSetEventTapEnabled(true)) {
+    if (!STZSetScrollToZoomEnabled(true)) {
         [STZWindow orderFrontSharedWindow];
     }
 }
@@ -49,7 +51,7 @@ static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZ
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
-    return !STZGetEventTapEnabled();
+    return !STZGetScrollToZoomEnabled();
 }
 
 - (void)orderFrontAboutPanel:(id)sender {

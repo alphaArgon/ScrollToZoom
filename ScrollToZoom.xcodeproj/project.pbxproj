@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DE14D3032DB2BBE100CA3032 /* STZLaunchAtLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3022DB2BBE100CA3032 /* STZLaunchAtLogin.m */; };
 		DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.c */; };
-		DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZEventTap.c */; };
+		DE265C882D43EAA100EC1A07 /* STZScrollToZoom.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZScrollToZoom.c */; };
 		DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */; };
 		DE4AEAC92DB96BAE006E8499 /* STZCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = DE4AEAC72DB96BAE006E8499 /* STZCommon.c */; };
+		DE4AEB1B2DBCDAB6006E8499 /* STZDotDashDrag.c in Sources */ = {isa = PBXBuildFile; fileRef = DE4AEB1A2DBCDAB6006E8499 /* STZDotDashDrag.c */; };
 		DE5EEF902DA5081400FAC19A /* STZConsolePanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */; };
 		DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */; };
 		DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */; };
@@ -20,23 +20,27 @@
 		DE70F1602D44FC1B0034F3F6 /* STZWindow.m in Sources */ = {isa = PBXBuildFile; fileRef = DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */; };
 		DE70F1622D4532270034F3F6 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = DE70F1612D4532270034F3F6 /* Localizable.xcstrings */; };
 		DE70F1642D4553330034F3F6 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE70F1632D4553330034F3F6 /* MainMenu.xib */; };
+		DE7E940C2DBE3F0800B92684 /* STZSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = DE7E940B2DBE3F0800B92684 /* STZSettings.m */; };
+		DE97E2992DBCFAF20003027D /* MultitouchSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE97E2982DBCFAF20003027D /* MultitouchSupport.framework */; };
 		DE9B152C2D43948E00E92ECE /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = DE9B152B2D43948E00E92ECE /* AppDelegate.m */; };
 		DE9B152E2D43948F00E92ECE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DE9B152D2D43948F00E92ECE /* Assets.xcassets */; };
 		DE9B15332D43948F00E92ECE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DE9B15322D43948F00E92ECE /* main.m */; };
+		DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */; };
 		DEC39DEF2DAF88C00034654C /* STZWheelSession.c in Sources */ = {isa = PBXBuildFile; fileRef = DEC39DEE2DAF88C00034654C /* STZWheelSession.c */; };
 		DEC39DF32DAFBFB00034654C /* STZOptionsPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		DE14D3012DB2BBE100CA3032 /* STZLaunchAtLogin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZLaunchAtLogin.h; sourceTree = "<group>"; };
-		DE14D3022DB2BBE100CA3032 /* STZLaunchAtLogin.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZLaunchAtLogin.m; sourceTree = "<group>"; };
 		DE14D3052DB600CE00CA3032 /* STZUIConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZUIConstants.h; sourceTree = "<group>"; };
 		DE14D3062DB600CE00CA3032 /* STZUIConstants.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZUIConstants.c; sourceTree = "<group>"; };
-		DE265C862D43EAA100EC1A07 /* STZEventTap.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZEventTap.h; sourceTree = "<group>"; };
-		DE265C872D43EAA100EC1A07 /* STZEventTap.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZEventTap.c; sourceTree = "<group>"; };
+		DE265C862D43EAA100EC1A07 /* STZScrollToZoom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZScrollToZoom.h; sourceTree = "<group>"; };
+		DE265C872D43EAA100EC1A07 /* STZScrollToZoom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZScrollToZoom.c; sourceTree = "<group>"; };
 		DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = STZSymbols.ttf; sourceTree = "<group>"; };
 		DE4AEAC72DB96BAE006E8499 /* STZCommon.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = STZCommon.c; sourceTree = "<group>"; };
 		DE4AEAC82DB96BAE006E8499 /* STZCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZCommon.h; sourceTree = "<group>"; };
+		DE4AEB182DBCDAB6006E8499 /* STZDotDashDrag.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZDotDashDrag.h; sourceTree = "<group>"; };
+		DE4AEB192DBCDAB6006E8499 /* MTSupportSPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTSupportSPI.h; sourceTree = "<group>"; };
+		DE4AEB1A2DBCDAB6006E8499 /* STZDotDashDrag.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = STZDotDashDrag.c; sourceTree = "<group>"; };
 		DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZConsolePanel.m; sourceTree = "<group>"; };
 		DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZConsolePanel.h; sourceTree = "<group>"; };
 		DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = InfoPlist.xcstrings; sourceTree = "<group>"; };
@@ -51,12 +55,17 @@
 		DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZWindow.m; sourceTree = "<group>"; };
 		DE70F1612D4532270034F3F6 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Localizable.xcstrings; sourceTree = "<group>"; };
 		DE70F1632D4553330034F3F6 /* MainMenu.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = MainMenu.xib; sourceTree = "<group>"; };
+		DE7E940A2DBE3F0800B92684 /* STZSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZSettings.h; sourceTree = "<group>"; };
+		DE7E940B2DBE3F0800B92684 /* STZSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STZSettings.m; sourceTree = "<group>"; };
+		DE97E2982DBCFAF20003027D /* MultitouchSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MultitouchSupport.framework; path = /System/Library/PrivateFrameworks/MultitouchSupport.framework; sourceTree = "<group>"; };
 		DE9B15272D43948E00E92ECE /* Scroll to Zoom.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Scroll to Zoom.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DE9B152A2D43948E00E92ECE /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		DE9B152B2D43948E00E92ECE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		DE9B152D2D43948F00E92ECE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE9B15322D43948F00E92ECE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ScrollToZoom.entitlements; sourceTree = "<group>"; };
+		DEA4545E2DBE48B9005B046B /* STZLaunchAtLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZLaunchAtLogin.h; sourceTree = "<group>"; };
+		DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STZLaunchAtLogin.m; sourceTree = "<group>"; };
 		DEC39DED2DAF88C00034654C /* STZWheelSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZWheelSession.h; sourceTree = "<group>"; };
 		DEC39DEE2DAF88C00034654C /* STZWheelSession.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZWheelSession.c; sourceTree = "<group>"; };
 		DEC39DF02DAF8E040034654C /* CGEventSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGEventSPI.h; sourceTree = "<group>"; };
@@ -69,17 +78,74 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE97E2992DBCFAF20003027D /* MultitouchSupport.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		DE7E94072DBE3C2900B92684 /* GUI */ = {
+			isa = PBXGroup;
+			children = (
+				DE14D3052DB600CE00CA3032 /* STZUIConstants.h */,
+				DE14D3062DB600CE00CA3032 /* STZUIConstants.c */,
+				DE70F15B2D44FABF0034F3F6 /* STZControls.h */,
+				DE70F15C2D44FABF0034F3F6 /* STZControls.m */,
+				DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */,
+				DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */,
+				DEC39DF12DAFBFB00034654C /* STZOptionsPanel.h */,
+				DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */,
+				DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */,
+				DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */,
+				DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */,
+				DE70F1632D4553330034F3F6 /* MainMenu.xib */,
+				DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */,
+				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
+				DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */,
+				DE9B152D2D43948F00E92ECE /* Assets.xcassets */,
+			);
+			name = GUI;
+			sourceTree = "<group>";
+		};
+		DE7E94082DBE3C4C00B92684 /* SPI */ = {
+			isa = PBXGroup;
+			children = (
+				DEC39DF02DAF8E040034654C /* CGEventSPI.h */,
+				DE4AEB192DBCDAB6006E8499 /* MTSupportSPI.h */,
+			);
+			name = SPI;
+			sourceTree = "<group>";
+		};
+		DE7E94092DBE3C6000B92684 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				DE7E940A2DBE3F0800B92684 /* STZSettings.h */,
+				DE7E940B2DBE3F0800B92684 /* STZSettings.m */,
+				DEA4545E2DBE48B9005B046B /* STZLaunchAtLogin.h */,
+				DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */,
+				DE6F2A162DAF729B001270D5 /* STZProcessManager.h */,
+				DE6F2A172DAF729B001270D5 /* STZProcessManager.m */,
+				DE4AEB182DBCDAB6006E8499 /* STZDotDashDrag.h */,
+				DE4AEB1A2DBCDAB6006E8499 /* STZDotDashDrag.c */,
+			);
+			name = Misc;
+			sourceTree = "<group>";
+		};
+		DE97E2972DBCFAF20003027D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DE97E2982DBCFAF20003027D /* MultitouchSupport.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		DE9B151E2D43948E00E92ECE = {
 			isa = PBXGroup;
 			children = (
 				DE9B15292D43948E00E92ECE /* ScrollToZoom */,
 				DE9B15282D43948E00E92ECE /* Products */,
+				DE97E2972DBCFAF20003027D /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,37 +163,27 @@
 				DE9B15322D43948F00E92ECE /* main.m */,
 				DE9B152A2D43948E00E92ECE /* AppDelegate.h */,
 				DE9B152B2D43948E00E92ECE /* AppDelegate.m */,
-				DEC39DF02DAF8E040034654C /* CGEventSPI.h */,
+				DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */,
+				DE7E94082DBE3C4C00B92684 /* SPI */,
+				DEA454612DBE4987005B046B /* Event */,
+				DE7E94092DBE3C6000B92684 /* Misc */,
+				DE7E94072DBE3C2900B92684 /* GUI */,
+			);
+			path = ScrollToZoom;
+			sourceTree = "<group>";
+		};
+		DEA454612DBE4987005B046B /* Event */ = {
+			isa = PBXGroup;
+			children = (
 				DE70F1572D44B5D20034F3F6 /* STZHandlers.h */,
 				DE4AEAC82DB96BAE006E8499 /* STZCommon.h */,
 				DE4AEAC72DB96BAE006E8499 /* STZCommon.c */,
-				DE6F2A162DAF729B001270D5 /* STZProcessManager.h */,
-				DE6F2A172DAF729B001270D5 /* STZProcessManager.m */,
-				DE14D3012DB2BBE100CA3032 /* STZLaunchAtLogin.h */,
-				DE14D3022DB2BBE100CA3032 /* STZLaunchAtLogin.m */,
-				DE265C862D43EAA100EC1A07 /* STZEventTap.h */,
-				DE265C872D43EAA100EC1A07 /* STZEventTap.c */,
 				DEC39DED2DAF88C00034654C /* STZWheelSession.h */,
 				DEC39DEE2DAF88C00034654C /* STZWheelSession.c */,
-				DE14D3052DB600CE00CA3032 /* STZUIConstants.h */,
-				DE14D3062DB600CE00CA3032 /* STZUIConstants.c */,
-				DE70F15B2D44FABF0034F3F6 /* STZControls.h */,
-				DE70F15C2D44FABF0034F3F6 /* STZControls.m */,
-				DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */,
-				DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */,
-				DEC39DF12DAFBFB00034654C /* STZOptionsPanel.h */,
-				DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */,
-				DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */,
-				DE5EEF8F2DA5081400FAC19A /* STZConsolePanel.m */,
-				DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */,
-				DE70F1632D4553330034F3F6 /* MainMenu.xib */,
-				DE5EEFA42DA79E3700FAC19A /* StatusMenu.xib */,
-				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
-				DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */,
-				DE9B152D2D43948F00E92ECE /* Assets.xcassets */,
-				DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */,
+				DE265C862D43EAA100EC1A07 /* STZScrollToZoom.h */,
+				DE265C872D43EAA100EC1A07 /* STZScrollToZoom.c */,
 			);
-			path = ScrollToZoom;
+			name = Event;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,10 +264,12 @@
 				DE9B15332D43948F00E92ECE /* main.m in Sources */,
 				DE4AEAC92DB96BAE006E8499 /* STZCommon.c in Sources */,
 				DE9B152C2D43948E00E92ECE /* AppDelegate.m in Sources */,
+				DE4AEB1B2DBCDAB6006E8499 /* STZDotDashDrag.c in Sources */,
 				DE70F15D2D44FABF0034F3F6 /* STZControls.m in Sources */,
-				DE14D3032DB2BBE100CA3032 /* STZLaunchAtLogin.m in Sources */,
-				DE265C882D43EAA100EC1A07 /* STZEventTap.c in Sources */,
+				DE265C882D43EAA100EC1A07 /* STZScrollToZoom.c in Sources */,
 				DEC39DEF2DAF88C00034654C /* STZWheelSession.c in Sources */,
+				DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */,
+				DE7E940C2DBE3F0800B92684 /* STZSettings.m in Sources */,
 				DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */,
 				DEC39DF32DAFBFB00034654C /* STZOptionsPanel.m in Sources */,
 				DE6F2A182DAF729B001270D5 /* STZProcessManager.m in Sources */,
@@ -357,8 +415,9 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = N8933HAGDL;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollToZoom/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -369,10 +428,14 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0b2;
+				MARKETING_VERSION = 1.0b3;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Debug;
 		};
@@ -384,8 +447,9 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 13;
+				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = N8933HAGDL;
+				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollToZoom/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
@@ -396,10 +460,14 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0b2;
+				MARKETING_VERSION = 1.0b3;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SYSTEM_FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SYSTEM_LIBRARY_DIR)/PrivateFrameworks",
+				);
 			};
 			name = Release;
 		};

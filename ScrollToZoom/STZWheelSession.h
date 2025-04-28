@@ -45,8 +45,18 @@ typedef struct {
 void STZDebugLogSessionChange(char const *prefix, STZWheelSession from, STZWheelSession to);
 
 
+/// Returns the sign of the scroll wheel delta.
+int STZGetDeltaSignumForScrollWheelEvent(CGEventRef event);
+
+
 /// Set the user data field of the event to the sign of the scroll wheel delta if it’s not used.
-int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event);
+bool STZMarkDeltaSignumForEvent(CGEventRef event, int signum);
+bool STZConsumeDeltaSignumForEvent(CGEventRef event, int *signum);
+
+
+/// Whether the event is followed by other event events. This value is set to `maybe` if the wheel
+/// is non-continuous, or the event ends a smooth scroll phase (which may start a momentum phase).
+STZTrivalent STZScrollWheelHasSuccessorEvent(STZPhase phase, bool byMomentum);
 
 
 /// Calculates the simulated zoom gesture phase and magnification from the scroll wheel event.
@@ -56,17 +66,9 @@ int STZMarkDeltaSignumForScrollWheelEvent(CGEventRef event);
 /// parameter will be updated to the event timestamp; otherwise this parameter is read-only, and the
 /// caller is responsible for setting it to the timestamp of the most recent event that began a
 /// momentum phase, which was typically informed by this function in the former case.
-///
-/// The `outEventHasSuccessor` is a trinary-logic value indicates whether the event is followed by
-/// other event events. This value is set to `maybe` if the wheel is non-continuous, or the event
-/// ends a smooth scroll phase (which may start a smooth momentum phase).
-///
-/// If the event is previously marked with a signum, the marked value will be used, rather than the
-/// passed value. the signum is used to override the sign of the magnificant.
-void STZConvertPhaseFromScrollWheelEvent(CGEventRef event, int suggestedSigum, bool *outAccepped,
-                                         CGEventTimestamp *momentumStart,
-                                         STZPhase *outPhase, double *outScale,
-                                         STZTrivalent *outEventHasSuccessor);
+void STZConvertZoomFromScrollWheel(STZPhase *phase, bool byMomentum, int signum,  double delta,
+                                   CGEventTimestamp now, CGEventTimestamp *momentumStart,
+                                   double *outScale);
 
 
 /// Creates a scroll wheel event to discard the current `session` if it’s active.
@@ -87,12 +89,17 @@ void STZWheelSessionDiscard(STZWheelSession *session, CGEventRef byEvent,
 /// The `outEvents` should have at least the capacity of two and be initially filled with `NULL`.
 /// When `action` is set to `kEventAdapted`, new events will be filled sequentially in the array. If
 /// no events is filled, the original event should be discarded.
+///
+/// The `endEnds` indicates whether the event is a terminating one, that is, whose phase is ended,
+/// cancelled, or none, and trivially ends the session.
 void STZWheelSessionUpdate(STZWheelSession *session, STZWheelType type, STZPhase phase, double data,
                            CGEventRef wheelEvent, CGEventRef __nonnull outEvents[__nullable CF_RETURNS_RETAINED 2],
                            STZEventAction *action);
 
 
 void STZWheelSessionAssign(STZWheelSession *session, STZWheelType type, STZPhase phase);
+
+bool STZWheelSessionIsEnded(STZWheelSession *const session, STZPhase byEventPhase);
 
 
 CF_ASSUME_NONNULL_END

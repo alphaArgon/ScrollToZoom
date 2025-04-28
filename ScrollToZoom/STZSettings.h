@@ -1,5 +1,5 @@
 /*
- *  STZEventTap.h
+ *  STZSettings.h
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/1/24.
@@ -46,7 +46,7 @@ void STZSetScrollMinMomentumMagnification(double);
 typedef enum __attribute__((flag_enum)): uint32_t {
     kSTZEventTapDefaultOptions  = 0,
     kSTZEventTapDisabled        = 1 << 0,
-    kSTZEventTapExcludeFlags      = 1 << 1,
+    kSTZEventTapExcludeFlags    = 1 << 1,
 } STZEventTapOptions;
 
 STZEventTapOptions STZGetEventTapOptionsForBundleIdentifier(CFStringRef __nullable bundleID);
@@ -57,9 +57,6 @@ void STZSetEventTapOptionsForBundleIdentifier(CFStringRef bundleID, STZEventTapO
 CFDictionaryRef STZCopyAllEventTapOptions(void);
 
 void STZLoadArgumentsFromUserDefaults(void);
-
-bool STZGetEventTapEnabled(void);
-bool STZSetEventTapEnabled(bool);  ///< Returns whether the given value equals the state after calling this function.
 
 
 CF_ASSUME_NONNULL_END
