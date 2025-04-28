@@ -82,7 +82,7 @@ int STZGetDeltaSignumForScrollWheelEvent(CGEventRef event) {
     //  double delta = IOHIDEventGetFloatValue(hidEvent, kIOHIDEventFieldScrollY);
     //  CFRelease(hidEvent);
 
-    double delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1);
+    double delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
     delta *= STZIsScrollWheelFlipped(event) ? -1 : 1;
     return delta != 0 ? delta > 0 ? 1 : -1 : 0;
 }
@@ -148,26 +148,26 @@ void STZConvertZoomFromScrollWheel(STZPhase *phase, bool byMomentum, int signum,
     case kSTZPhaseMayBegin:
     case kSTZPhaseBegan:
         *outScale = delta * STZGetScrollToZoomMagnifier();
-        
+
         if (byMomentum) {
             *momentumStart = now;
-            
+
             if (STZGetScrollMomentumToZoomAttenuation() == 1) {
                 *phase = kSTZPhaseEnded;
                 *outScale = 0;
             }
         }
         break;
-        
+
     case kSTZPhaseNone:
     case kSTZPhaseChanged:
         *outScale = delta * STZGetScrollToZoomMagnifier();
-        
+
         if (byMomentum) {
             double k = 1 - STZGetScrollMomentumToZoomAttenuation();
             double dt = (now - *momentumStart) / (double)NSEC_PER_SEC;
             *outScale *= k != 0 ? pow(k, dt / k) : 0;
-            
+
             if (fabs(*outScale) < STZGetScrollMinMomentumMagnification()) {
                 *phase = kSTZPhaseEnded;
                 *outScale = 0;
