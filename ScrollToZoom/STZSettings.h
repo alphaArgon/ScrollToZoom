@@ -56,6 +56,8 @@ void STZSetEventTapOptionsForBundleIdentifier(CFStringRef bundleID, STZEventTapO
 /// pattern represents the options.
 CFDictionaryRef STZCopyAllEventTapOptions(void);
 
+STZEventTapOptions STZGetRecommendedEventTapOptionsForBundleIdentifier(CFStringRef bundleID);
+
 void STZLoadArgumentsFromUserDefaults(void);
 
 

@@ -107,6 +107,11 @@ uint64_t STZRunningApplicationsSnapshotVersion(void) {
 }
 
 
-CFStringRef __nullable STZGetBundleIdentifierForProcessID(pid_t pid) {
+CFStringRef STZGetBundleIdentifierForProcessID(pid_t pid) {
     return (__bridge void *)[[STZBundleIdentifierManager sharedManager] bundleIdentifierForProcessID:pid];
+}
+
+
+CFURLRef STZGetInstalledURLForBundleIdentifier(CFStringRef bundleID) {
+    return (__bridge void *)[[NSWorkspace sharedWorkspace] URLForApplicationWithBundleIdentifier:(__bridge id)bundleID];
 }

@@ -112,14 +112,6 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
 }
 
 static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
-static NSSet<NSString *> *recommendedBundleIdentifiersToExcludeFlags = nil;
-
-+ (void)initialize {
-    if (self != [STZOptionsViewController class]) {return;}
-    recommendedBundleIdentifiersToExcludeFlags = [NSSet setWithArray:@[
-        @"org.mozilla.firefox"
-    ]];
-}
 
 - (void)dealloc {
     [[NSWorkspace sharedWorkspace] removeObserver:self
@@ -405,7 +397,8 @@ static NSSet<NSString *> *recommendedBundleIdentifiersToExcludeFlags = nil;
     [_excludingFlagsCheckBox setState:!!(options & kSTZEventTapExcludeFlags)];
     [_excludingFlagsCheckBox setEnabled:!(options & kSTZEventTapDisabled)];
 
-    if ([recommendedBundleIdentifiersToExcludeFlags containsObject:[entry bundleIdentifier]]) {
+    if (STZGetRecommendedEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier])
+        & kSTZEventTapExcludeFlags) {
         [_recommendedLabel setHidden:NO];
         [_recommendedLabel setStringValue:NSLocalizedString(@"recommended-for-this-app", nil)];
 

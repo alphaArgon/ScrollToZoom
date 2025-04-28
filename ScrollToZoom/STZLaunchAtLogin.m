@@ -9,7 +9,7 @@
 #import "STZLaunchAtLogin.h"
 #import <ServiceManagement/ServiceManagement.h>
 #import <ApplicationServices/ApplicationServices.h>
-#import <AppKit/NSWorkspace.h>
+#import "STZProcessManager.h"
 
 
 #pragma clang diagnostic push
@@ -88,7 +88,8 @@ RELEASE_NONE:
 
 
 bool STZShouldEnableLaunchAtLogin(void) {
-    NSURL *url = [[NSWorkspace sharedWorkspace] URLForApplicationWithBundleIdentifier:[[NSBundle mainBundle] bundleIdentifier]];
+    NSString *bundleID = [[NSBundle mainBundle] bundleIdentifier];
+    NSURL *url = (__bridge id)STZGetInstalledURLForBundleIdentifier((__bridge void *)bundleID);
     if (![url isEqual:[[NSBundle mainBundle] bundleURL]]) {return false;}
 
     //  Should be in:

@@ -7,6 +7,7 @@
  */
 
 #import "STZSettings.h"
+#import "STZProcessManager.h"
 #import <Foundation/Foundation.h>
 
 
@@ -23,6 +24,14 @@ static NSString *const STZScrollToZoomMagnifierKey = @"STZScrollToZoomMagnifier"
 static NSString *const STZScrollMomentumToZoomAttenuationKey = @"STZScrollMomentumToZoomAttenuation";
 static NSString *const STZScrollMinMomentumMagnificationKey = @"STZScrollMinMomentumMagnification";
 static NSString *const STZEventTapOptionsForAppsKey = @"STZEventTapOptionsForApps";
+
+
+static struct {
+    CFStringRef         bundleID;
+    STZEventTapOptions  options;
+} STZRecommendedEventTapOptions[] = {
+    {CFSTR("org.mozilla.firefox"), kSTZEventTapExcludeFlags}
+};
 
 
 static double clamp(double x, double lo, double hi) {
@@ -121,6 +130,17 @@ CFDictionaryRef STZCopyAllEventTapOptions(void) {
 }
 
 
+STZEventTapOptions STZGetRecommendedEventTapOptionsForBundleIdentifier(CFStringRef bundleID) {
+    size_t count = sizeof(STZRecommendedEventTapOptions) / sizeof(*STZRecommendedEventTapOptions);
+    for (size_t i = 0; i < count; ++i) {
+        if (CFEqual(STZRecommendedEventTapOptions[i].bundleID, bundleID)) {
+            return STZRecommendedEventTapOptions[i].options;
+        }
+    }
+    return 0;
+}
+
+
 void STZLoadArgumentsFromUserDefaults(void) {
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
@@ -161,6 +181,20 @@ void STZLoadArgumentsFromUserDefaults(void) {
                 CFDictionarySetValue(STZEventTapOptionsObjsForApps, (__bridge void *)key, (__bridge void *)value);
             }
         }
+
+    } else {
+        size_t count = sizeof(STZRecommendedEventTapOptions) / sizeof(*STZRecommendedEventTapOptions);
+        for (size_t i = 0; i < count; ++i) {
+            CFStringRef bundleID = STZRecommendedEventTapOptions[i].bundleID;
+            if (!STZGetInstalledURLForBundleIdentifier(bundleID)) {continue;}
+
+            STZEventTapOptions options = STZRecommendedEventTapOptions[i].options;
+
+            CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &options);
+            CFDictionarySetValue(STZEventTapOptionsForApps, bundleID, (void *)(uintptr_t)options);
+            CFDictionarySetValue(STZEventTapOptionsObjsForApps, bundleID, number);
+            CFRelease(number);
+        }
     }
 
     STZDebugLog("Arguments loaded from user defaults:");
@@ -172,4 +206,3 @@ void STZLoadArgumentsFromUserDefaults(void) {
     STZDebugLog("\tScrollMomentumToZoomAttenuation set to %f", STZScrollMomentumToZoomAttenuation);
     STZDebugLog("\tScrollMinMomentumMagnification set to %f", STZScrollMinMomentumMagnification);
 }
-

@@ -301,6 +301,8 @@ bool STZSetScrollToZoomEnabled(bool enable) {
     if (!enable) {
         setAllEventTapsRegistered(false, false);
         STZSetListeningMultitouchDevices(false);
+        STZCScanCacheRemoveAll(&_wheelContexts);
+        globalFlagsIn = false;
         STZDebugLog("Event tap unregistered");
         return true;
 
@@ -309,8 +311,8 @@ bool STZSetScrollToZoomEnabled(bool enable) {
         return false;
 
     } else {
-        static dispatch_once_t onceToken;
-        dispatch_once(&onceToken, ^{
+        static bool listened = false;
+        if (!listened) {
             //  Callbacks are invoked on the the main thread. We use only one thread.
             CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
                                             NULL, &anyEventTapAdded,
@@ -321,7 +323,7 @@ bool STZSetScrollToZoomEnabled(bool enable) {
                                             CFSTR(kCGNotifyEventTapRemoved), NULL,
                                             0 /* ignored for Darwin center */);
             STZDotDashDragObserveActivation(dotDashDragActivationCallback, NULL);
-        });
+        };
 
         STZSetListeningMultitouchDevices(true);
         STZDebugLog("Event tap registered");
@@ -338,7 +340,7 @@ static void reinsertTapsIfNeeded(void) {
     setAllEventTapsRegistered(false, false);
 
     if (!registerEventTapsOrCleanUp()) {
-        STZDebugLog("Event tap failed to re-enable.");
+        STZDebugLog("Event tap failed to re-inset.");
     }
 }
 
