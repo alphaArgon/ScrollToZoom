@@ -17,7 +17,7 @@
 
 当按住设置的修饰键，或按下鼠标侧边键（或中键）时，可以在任何 app 中用鼠标滚轮来精准缩放。「滚动来缩放」在后台运行，将滚轮事件模拟为缩放手势。体积轻巧（约 1 MB），性能高效。
 
-<img src="images/window.png" width="447" title="主窗口截图">
+<img src="images/window.zh_CN.png" width="443" title="主窗口截图">
 
 「滚动来缩放」可以与 [Mos](https://github.com/Caldis/Mos)、[LinearMouse](https://github.com/linearmouse/linearmouse) 或其他你想用的工具无缝配合使用。如果这些工具提供了滚动平滑支持，「滚动来缩放」也能从中揩油，提供平滑的缩放。
 
