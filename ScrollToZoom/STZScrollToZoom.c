@@ -202,6 +202,17 @@ static STZWheelContext *wheelContextFor(CGEventRef event) {
 }
 
 
+static STZWheelContext *wheelContextWithFallbackFor(CGEventRef event) {
+    uint64_t registryID = CGEventGetRegistryID(event);
+
+    if (registryID == 0) {
+        STZCScanCacheGetRecentIdentifier(&_wheelContexts, &registryID);
+    }
+
+    return wheelContextAt(registryID);
+}
+
+
 static void removeAllWheelContexts(void) {
     STZCScanCacheRemoveAll(&_wheelContexts);
 }
@@ -559,7 +570,7 @@ static CGEventRef passiveScrollWheelCallback(CGEventTapProxy proxy, CGEventType 
 
     STZDebugLogEvent("Received readonly", event);
 
-    STZWheelContext *context = wheelContextFor(event);
+    STZWheelContext *context = wheelContextWithFallbackFor(event);
     context->timerToken += 1;
 
     bool byMomentum;
@@ -589,7 +600,7 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
 
     STZDebugLogEvent("Received mutable", event);
 
-    STZWheelContext *context = wheelContextFor(event);
+    STZWheelContext *context = wheelContextWithFallbackFor(event);
     context->timerToken += 1;
 
     bool byMomentum;
@@ -636,7 +647,7 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
             signum = STZGetDeltaSignumForScrollWheelEvent(event);
         }
 
-        double delta = CGEventGetDoubleValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+        double delta = STZGetScrollWheelPrimaryDelta(event);
         CGEventTimestamp timestamp = CGEventGetTimestamp(event);
         STZConvertZoomFromScrollWheel(&desiredPhase, byMomentum, signum, delta,
                                       timestamp, &context->momentumStart, &data);

@@ -125,6 +125,17 @@ void *STZCScanCacheGetDataForIdentifier(STZCScanCache *cache, uint64_t identifie
 }
 
 
+bool STZCScanCacheGetRecentIdentifier(STZCScanCache *cache, uint64_t *outIdentifier) {
+    if (cache->count == 0) {return false;}
+
+    _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, cache->hotIndex);
+    if (entry->accessedAt == kSTZCacheNew) {return false;}
+
+    *outIdentifier = entry->identifier;
+    return true;
+}
+
+
 void STZCScanCacheRemoveAll(STZCScanCache *cache) {
     free(cache->entries);
     cache->entries = NULL;
@@ -255,7 +266,7 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
         break;
 
     case kCGEventScrollWheel:
-        data = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+        data = STZGetScrollWheelPrimaryDelta(event);
         phase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
         char const *phaseTag = byMomentum ? "momentum" : "smooth";
         char const *tail = STZIsScrollWheelFlipped(event) ? ", flipped" : "";
@@ -290,6 +301,15 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 bool STZIsScrollWheelFlipped(CGEventRef event) {
     assert(CGEventGetType(event) == kCGEventScrollWheel);
     return CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) != 0;
+}
+
+
+double STZGetScrollWheelPrimaryDelta(CGEventRef event) {
+    double data = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+    if (data == 0) {
+        data = CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis1);
+    }
+    return data;
 }
 
 

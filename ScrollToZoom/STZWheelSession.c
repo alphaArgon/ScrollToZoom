@@ -82,7 +82,7 @@ int STZGetDeltaSignumForScrollWheelEvent(CGEventRef event) {
     //  double delta = IOHIDEventGetFloatValue(hidEvent, kIOHIDEventFieldScrollY);
     //  CFRelease(hidEvent);
 
-    double delta = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+    double delta = STZGetScrollWheelPrimaryDelta(event);
     delta *= STZIsScrollWheelFlipped(event) ? -1 : 1;
     return delta != 0 ? delta > 0 ? 1 : -1 : 0;
 }

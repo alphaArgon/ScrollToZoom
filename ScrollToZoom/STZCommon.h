@@ -82,6 +82,9 @@ void STZCScanCacheCheckExpired(STZCScanCache *, bool forceCheck);
 /// the entry is created.
 void *__nullable STZCScanCacheGetDataForIdentifier(STZCScanCache *, uint64_t identifier, bool createIfNeeded, STZCScanCacheResult *__nullable outResult);
 
+/// Returns the most recently accessed identifier.
+bool STZCScanCacheGetRecentIdentifier(STZCScanCache *, uint64_t *outIdentifier);
+
 /// Removes all data and release the memory.
 void STZCScanCacheRemoveAll(STZCScanCache *);
 
@@ -140,6 +143,8 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event);
 
 /// Whether natural scrolling is enabled for this event.
 bool STZIsScrollWheelFlipped(CGEventRef);
+
+double STZGetScrollWheelPrimaryDelta(CGEventRef);
 
 
 /// Converts the phase of the scroll wheel event to the unified phase.
