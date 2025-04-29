@@ -87,7 +87,7 @@ bool STZSetListeningMultitouchDevices(bool flag) {
         return false;
     }
 
-    if (IOServiceAddMatchingNotification(mouseNotificationPort, kIOWillTerminateNotification,
+    if (IOServiceAddMatchingNotification(mouseNotificationPort, kIOTerminatedNotification,
                                          CFDictionaryCreateCopy(kCFAllocatorDefault, properties) /* consumed */,
                                          anyMouseRemoved, NULL, &removedIterator) != KERN_SUCCESS) {
         //  Release the initialized `addedIterator`.
@@ -156,12 +156,14 @@ static void anyMouseRemoved(void *refcon, io_iterator_t iterator) {
     io_object_t item;
     while ((item = IOIteratorNext(iterator))) {
         if (addedMice) {
-            //  Removing the device will release it.
-            //  Releasing the device will stop it.
-
             uint64_t registryID = 0;
             IORegistryEntryGetRegistryEntryID(item, &registryID);
-            CFDictionaryRemoveValue(addedMice, uint64Key(registryID));
+
+            MTDeviceRef device = (void *)CFDictionaryGetValue(addedMice, uint64Key(registryID));
+            if (device) {
+                MTDeviceStop(device);
+                CFDictionaryRemoveValue(addedMice, uint64Key(registryID));
+            }
         }
 
         IOObjectRelease(item);
@@ -169,8 +171,14 @@ static void anyMouseRemoved(void *refcon, io_iterator_t iterator) {
 }
 
 
+static void stopDevice(void const *key, void const *value, void *context) {
+    MTDeviceStop((void *)value);
+}
+
+
 static void removeAllMice(void) {
     if (addedMice) {
+        CFDictionaryApplyFunction(addedMice, stopDevice, NULL);
         CFRelease(addedMice);
         addedMice = NULL;
     }
