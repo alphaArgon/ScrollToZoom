@@ -139,12 +139,14 @@ typedef struct {
     bool                recognizedByFlags;      ///< Automatically reset when flags changes.
     STZEventTapOptions  byFlagsOptions;
 
+    CGPoint             lockedMouseLocation;  ///< Updated when recognized.
+
     int                 hardignum;
     CGEventTimestamp    momentumStart;
     uint64_t            timerToken;
 } STZWheelContext;
 
-#define kSTZWheelContextEmpty (STZWheelContext){kSTZWheelSessionEmpty, false, false, false, false, 0, 0, 0, 0}
+#define kSTZWheelContextEmpty (STZWheelContext){kSTZWheelSessionEmpty, false, false, false, false, 0, CGPointZero, 0, 0, 0}
 
 static STZCScanCache _wheelContexts = kSTZCScanCacheEmptyForType(STZWheelContext);
 
@@ -571,6 +573,13 @@ static CGEventRef passiveScrollWheelCallback(CGEventTapProxy proxy, CGEventType 
 }
 
 
+static bool isWheelContextRecognizedActivated(STZWheelContext *context) {
+    if (context->recognizedByDotDash) {return true;}
+    if (context->byFlagsOptions & kSTZEventTapDisabled) {return false;}
+    return context->recognizedByFlags;
+}
+
+
 static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
     switch (eventType) {
     case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
@@ -586,6 +595,8 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
     bool byMomentum;
     STZPhase eventPhase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
     STZPhase desiredPhase = eventPhase;
+
+    bool wasActivated = isWheelContextRecognizedActivated(context);
 
     if (!context->recognizedByFlags && globalFlagsIn) {
         context->recognizedByFlags = true;
@@ -604,11 +615,16 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
         }
     }
 
+    bool isActivated = isWheelContextRecognizedActivated(context);
+
+    if (isActivated && !wasActivated) {
+        context->lockedMouseLocation = CGEventGetLocation(event);
+    }
+
     STZWheelType type;
     double data = 0;
 
-    if (context->recognizedByDotDash
-     || (context->recognizedByFlags && !(context->byFlagsOptions & kSTZEventTapDisabled))) {
+    if (isActivated) {
         int signum;
 
         if (STZEventTapGetEnabled(&hardScrollWheelTap)) {
@@ -659,10 +675,14 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
     //  The event is annotated; returning a different event may have no effect. Therefore all
     //  the out events will be newly posted and `NULL` is returnrd.
 
-    if (context->recognizedByFlags && (context->byFlagsOptions & kSTZEventTapExcludeFlags)) {
-        for (int i = 0; i < 2; ++i) {
-            CGEventRef event = outEvents[i];
-            if (event) {
+    bool excludeFlags = context->recognizedByFlags && (context->byFlagsOptions & kSTZEventTapExcludeFlags);
+
+    for (int i = 0; i < 2; ++i) {
+        CGEventRef event = outEvents[i];
+        if (event) {
+            CGEventSetLocation(event, context->lockedMouseLocation);
+
+            if (excludeFlags) {
                 CGEventFlags flags = CGEventGetFlags(event);
                 flags &= ~STZGetScrollToZoomFlags();
                 CGEventSetFlags(event, flags);
