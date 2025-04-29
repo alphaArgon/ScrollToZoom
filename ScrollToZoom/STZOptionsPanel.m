@@ -11,11 +11,7 @@
 #import "STZUIConstants.h"
 
 
-@interface STZOptionsViewController : NSSplitViewController <NSOutlineViewDelegate, NSOutlineViewDataSource>
-
-- (void)noteChangeForBundleIdentifier:(NSString *)bundleID;
-
-@end
+@interface STZOptionsViewController : NSSplitViewController <NSOutlineViewDelegate, NSOutlineViewDataSource> @end
 
 
 __attribute__((objc_direct_members))
@@ -82,10 +78,6 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
     [[self sharedPanel] makeKeyAndOrderFront:nil];
 }
 
-+ (void)noteChangeForBundleIdentifier:(NSString *)bundleID {
-    [(STZOptionsViewController *)[STZSharedOptionsPanel contentViewController] noteChangeForBundleIdentifier:bundleID];
-}
-
 - (instancetype)initWithContentRect:(NSRect)contentRect
                           styleMask:(NSWindowStyleMask)style
                             backing:(NSBackingStoreType)backingStoreType
@@ -109,6 +101,7 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
     NSButton           *_enabledCheckbox;
     NSButton           *_excludingFlagsCheckBox;
     NSTextField        *_recommendedLabel;
+    BOOL                _changesMadeBySelf;
 }
 
 static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
@@ -215,6 +208,17 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 
 - (void)viewWillAppear {
     [self reloadData];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didChangeForBundleIdentifier:)
+                                                 name:(__bridge id)kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName
+                                               object:nil];
+}
+
+- (void)viewWillDisappear {
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:(__bridge id)kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName
+                                                  object:nil];
 }
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context {
@@ -377,10 +381,12 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [self loadControlValues];
 }
 
-- (void)noteChangeForBundleIdentifier:(NSString *)bundleID {
+- (void)didChangeForBundleIdentifier:(NSNotification *)notification {
+    if (_changesMadeBySelf) {return;}
     STZApplicationEntry *entry = [self selectedEntry];
     if (!entry) {return;}
 
+    NSString *bundleID = [[notification userInfo] objectForKey:@"bundleIdentifier"];
     if ([bundleID isEqualToString:[entry bundleIdentifier]]) {
         [self loadControlValues];
     }
@@ -411,19 +417,23 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     STZApplicationEntry *entry = [self selectedEntry];
     if (!entry) {return;}
 
+    _changesMadeBySelf = YES;
     STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
     options = [_enabledCheckbox state] ? options & ~kSTZEventTapDisabled : options | kSTZEventTapDisabled;
     STZSetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
     [_excludingFlagsCheckBox setEnabled:!(options & kSTZEventTapDisabled)];
+    _changesMadeBySelf = NO;
 }
 
 - (void)toggleExcludingFlags:(id)sender {
     STZApplicationEntry *entry = [self selectedEntry];
     if (!entry) {return;}
 
+    _changesMadeBySelf = YES;
     STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
     options = [_excludingFlagsCheckBox state] ? options | kSTZEventTapExcludeFlags : options & ~kSTZEventTapExcludeFlags;
     STZSetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
+    _changesMadeBySelf = NO;
 }
 
 @end

@@ -68,6 +68,50 @@
         }
       }
     },
+    "dot-dash-drag-to-zoom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Allow Magic Mouse gestures"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允许妙控鼠标手势"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "允許巧控滑鼠手勢"
+          }
+        }
+      }
+    },
+    "dot-dash-drag-to-zoom-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-tap with one finger and hold, then scroll to zoom."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单指轻点两下并保持，然后滚动来缩放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
+          }
+        }
+      }
+    },
     "enable-with-#" : {
       "localizations" : {
         "en" : {
@@ -205,19 +249,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Inertia setting applies to built-in trackpads, Magic Trackpads, and Apple mice."
+            "value" : "Inertia setting applies to built-in trackpads, Magic Trackpads, and Magic Mice."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "惯性设置适用于 MacBook 内置触控板、妙控板和 Apple 鼠标。"
+            "value" : "惯性设置适用于 MacBook 内置触控板、妙控板和妙控鼠标。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "慣性設定適用於 MacBook 內建觸控式軌跡板、巧控板和 Apple 滑鼠。"
+            "value" : "慣性設定適用於 MacBook 內建觸控式軌跡板、巧控板和巧控滑鼠。"
           }
         }
       }
@@ -503,7 +547,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "要允許自動啟動，請結束此應用，然後將其移動至「應用程序」檔案夾。"
+            "value" : "要允許自動開啟，請結束此應用，然後將其移動至「應用程序」檔案夾。"
           }
         }
       }

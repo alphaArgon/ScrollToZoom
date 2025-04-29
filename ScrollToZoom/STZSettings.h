@@ -43,6 +43,13 @@ void STZSetScrollMomentumToZoomAttenuation(double);
 double STZGetScrollMinMomentumMagnification(void);
 void STZSetScrollMinMomentumMagnification(double);
 
+/// Whether double tap and scroll to zoom, a bonus for Magic Mouse, is enabled.
+bool STZGetDotDashDragToZoomEnabled(void);
+void STZSetDotDashDragToZoomEnabled(bool);
+
+/// Posted to the local center when `STZSetDotDashDragToZoomEnabled` is called.
+extern CFStringRef const kSTZDotDashDragToZoomEnabledDidChangeNotificationName;
+
 typedef enum __attribute__((flag_enum)): uint32_t {
     kSTZEventTapDefaultOptions  = 0,
     kSTZEventTapDisabled        = 1 << 0,
@@ -51,6 +58,10 @@ typedef enum __attribute__((flag_enum)): uint32_t {
 
 STZEventTapOptions STZGetEventTapOptionsForBundleIdentifier(CFStringRef __nullable bundleID);
 void STZSetEventTapOptionsForBundleIdentifier(CFStringRef bundleID, STZEventTapOptions);
+
+/// Posted to the local center when `STZSetEventTapOptionsForBundleIdentifier` is called.
+/// The user info has a key `bundleIdentifier`, indicating options for what have changed.
+extern CFStringRef const kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName;
 
 /// Returns all tap options keyed by the bundle identifier. The value is a raw pointer whose bit
 /// pattern represents the options.

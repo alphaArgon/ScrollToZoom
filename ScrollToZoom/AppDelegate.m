@@ -10,8 +10,6 @@
 #import "STZScrollToZoom.h"
 #import "STZSettings.h"
 #import "STZWindow.h"
-#import "STZConsolePanel.h"
-#import "STZOptionsPanel.h"
 #import "STZProcessManager.h"
 #import "GeneratedAssetSymbols.h"
 
@@ -83,7 +81,6 @@ static void toggleSTZEventTapOptionsForKeyApplication(STZEventTapOptions flag) {
         options |= flag;
     }
     STZSetEventTapOptionsForBundleIdentifier(bundleID, options);
-    [STZOptionsPanel noteChangeForBundleIdentifier:(__bridge id)bundleID];
 }
 
 - (void)toggleEnabledForKeyApplication:(id)sender {

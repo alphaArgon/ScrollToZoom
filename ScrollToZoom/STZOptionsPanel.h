@@ -16,7 +16,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic, class, readonly) STZOptionsPanel *sharedPanel;
 
 + (void)orderFrontSharedPanel;
-+ (void)noteChangeForBundleIdentifier:(NSString *)bundleID;
 
 @end
 

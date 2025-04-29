@@ -200,6 +200,11 @@ static STZWheelContext *wheelContextFor(CGEventRef event) {
 }
 
 
+static void removeAllWheelContexts(void) {
+    STZCScanCacheRemoveAll(&_wheelContexts);
+}
+
+
 /// Enumerates all wheel contexts.
 #define forEachWheelContext(var)                                                                    \
     STZCacheIterator __iterator;                                                                    \
@@ -274,7 +279,7 @@ static bool registerEventTapsOrCleanUp(void) {
     if (!setAllEventTapsRegistered(true, !exclusive)) {
         setAllEventTapsRegistered(false, false);
         STZSetListeningMultitouchDevices(false);
-        STZCScanCacheRemoveAll(&_wheelContexts);
+        removeAllWheelContexts();
         globalFlagsIn = false;
         return false;
     }
@@ -285,6 +290,20 @@ static bool registerEventTapsOrCleanUp(void) {
     needsReinsertTaps = false;
     expectedTapCount = count;
     return true;
+}
+
+
+static void dotDashEnabledToggled(CFNotificationCenterRef center, void *observer,
+                                  CFNotificationName name, const void *object,
+                                  CFDictionaryRef userInfo) {
+    if (STZGetDotDashDragToZoomEnabled()) {
+        STZSetListeningMultitouchDevices(true);
+    } else {
+        STZSetListeningMultitouchDevices(false);
+        forEachWheelContext(context) {
+            context->dotDashDragging = false;
+        }
+    }
 }
 
 
@@ -301,7 +320,7 @@ bool STZSetScrollToZoomEnabled(bool enable) {
     if (!enable) {
         setAllEventTapsRegistered(false, false);
         STZSetListeningMultitouchDevices(false);
-        STZCScanCacheRemoveAll(&_wheelContexts);
+        removeAllWheelContexts();
         globalFlagsIn = false;
         STZDebugLog("Event tap unregistered");
         return true;
@@ -315,17 +334,24 @@ bool STZSetScrollToZoomEnabled(bool enable) {
         if (!listened) {
             //  Callbacks are invoked on the the main thread. We use only one thread.
             CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                            NULL, &anyEventTapAdded,
+                                            NULL, anyEventTapAdded,
                                             CFSTR(kCGNotifyEventTapAdded), NULL,
                                             0 /* ignored for Darwin center */);
             CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                            NULL, &anyEventTapRemoved,
+                                            NULL, anyEventTapRemoved,
                                             CFSTR(kCGNotifyEventTapRemoved), NULL,
                                             0 /* ignored for Darwin center */);
+            CFNotificationCenterAddObserver(CFNotificationCenterGetLocalCenter(),
+                                            NULL, dotDashEnabledToggled,
+                                            kSTZDotDashDragToZoomEnabledDidChangeNotificationName, NULL,
+                                            CFNotificationSuspensionBehaviorDeliverImmediately);
             STZDotDashDragObserveActivation(dotDashDragActivationCallback, NULL);
         };
 
-        STZSetListeningMultitouchDevices(true);
+        if (STZGetDotDashDragToZoomEnabled()) {
+            STZSetListeningMultitouchDevices(true);
+        }
+
         STZDebugLog("Event tap registered");
         return true;
     }

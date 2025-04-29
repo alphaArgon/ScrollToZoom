@@ -92,6 +92,7 @@ static NSString *trim(NSString *string) {
     NSButton           *_zoomOutRadio;
     NSSlider           *_speedSlider;
     NSSlider           *_inertiaSlider;
+    NSButton           *_dotDashCheckbox;
     NSButton           *_launchCheckbox;
     NSButton           *_optionsButton;
     NSButton           *_consoleButton;
@@ -147,6 +148,14 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     [inertiaMessageLabel setTextColor:[NSColor secondaryLabelColor]];
     [inertiaMessageLabel setSelectable:NO];
 
+    _dotDashCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"dot-dash-drag-to-zoom", nil)
+                                            target:self action:@selector(toggleDotDashDrag:)];
+
+    NSTextField *dotDashMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"dot-dash-drag-to-zoom-message", nil)];
+    [dotDashMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
+    [dotDashMessageLabel setTextColor:[NSColor secondaryLabelColor]];
+    [dotDashMessageLabel setSelectable:NO];
+
     _launchCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"launch-at-login", nil)
                                            target:self action:@selector(toggleLaunchAtLogin:)];
 
@@ -172,6 +181,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 
     [view setSubviews:@[_checkbox, _field, directionLabel, _zoomInRadio, _zoomOutRadio,
                         speedLabel, _speedSlider, inertiaLabel, _inertiaSlider, inertiaMessageLabel,
+                        _dotDashCheckbox, dotDashMessageLabel,
                         _launchCheckbox, _optionsButton, _consoleButton]];
     if (checkboxTail) {[view addSubview:checkboxTail];}
     if (launchMessageLabel) {[view addSubview:launchMessageLabel];}
@@ -214,8 +224,15 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
         [[inertiaMessageLabel leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor]],
         [[inertiaMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
 
+        [[_dotDashCheckbox leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor] constant:-kSTZUICheckboxWidth],
+        [[_dotDashCheckbox topAnchor] constraintEqualToAnchor:[inertiaMessageLabel bottomAnchor] constant:kSTZUISmallSpacing],
+
+        [[dotDashMessageLabel leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor]],
+        [[dotDashMessageLabel topAnchor] constraintEqualToAnchor:[_dotDashCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[dotDashMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
+
         [[_launchCheckbox leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor] constant:-kSTZUICheckboxWidth],
-        [[_launchCheckbox topAnchor] constraintEqualToAnchor:[inertiaMessageLabel bottomAnchor] constant:kSTZUINormalSpacing],
+        [[_launchCheckbox topAnchor] constraintEqualToAnchor:[dotDashMessageLabel bottomAnchor] constant:kSTZUISmallSpacing],
 
         [[_optionsButton trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
         [[_optionsButton topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing],
@@ -258,6 +275,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     [_zoomOutRadio setState:STZGetScrollToZoomMagnifier() < 0];
     [_speedSlider setDoubleValue:fabs(STZGetScrollToZoomMagnifier())];
     [_inertiaSlider setDoubleValue:1 - STZGetScrollMomentumToZoomAttenuation()];
+    [_dotDashCheckbox setState:STZGetDotDashDragToZoomEnabled()];
     [_launchCheckbox setState:STZGetLaunchAtLoginEnabled()];
 }
 
@@ -268,6 +286,7 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     [_speedSlider setEnabled:enabled];
     [_inertiaSlider setEnabled:enabled];
     [_optionsButton setEnabled:enabled];
+    [_dotDashCheckbox setEnabled:enabled];
     [_launchCheckbox setEnabled:enabled && [_launchCheckbox tag] != -1];
 }
 
@@ -282,6 +301,11 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 - (void)toggleLaunchAtLogin:(id)sender {
     BOOL enable = [_launchCheckbox state] != NSOffState;
     STZSetLaunchAtLoginEnabled(enable);
+}
+
+- (void)toggleDotDashDrag:(id)sender {
+    BOOL enable = [_dotDashCheckbox state] != NSOffState;
+    STZSetDotDashDragToZoomEnabled(enable);
 }
 
 - (void)toggleScrollToZoom:(id)sender {
