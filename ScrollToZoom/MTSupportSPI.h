@@ -39,13 +39,15 @@ typedef struct {
 
 typedef struct {
     MTFrameID       frame;
+    uint32_t        _padding1[1];
     CFTimeInterval  timestamp;
-    uint32_t        unknown[4];
+    uint32_t        _padding2[4];
     MTPoint         location;
     MTPoint         velocity;
+    uint32_t        _padding3[12];
 } MTTouch;
 
-typedef int (*MTContactCallback)(MTDeviceRef, MTTouch const *touch, CFIndex touchCount, CFTimeInterval, MTFrameID);
+typedef int (*MTContactCallback)(MTDeviceRef, MTTouch const *touches, CFIndex touchCount, CFTimeInterval, MTFrameID);
 void MTRegisterContactFrameCallback(MTDeviceRef, MTContactCallback);
 
 

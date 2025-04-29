@@ -12,13 +12,14 @@
 
 
 typedef struct {
-    CFIndex             lastTouches;
+    uint8_t             touchCount;
+    uint8_t             effectiveCount;
+    uint8_t             tapCount;
     MTPoint             tapLocation;
     CGEventTimestamp    tapTimestamp;
-    CFIndex             tapCount;
 } STZTapContext;
 
-#define kSTZTapContextEmpty (STZTapContext){0, (MTPoint){0, 0}, 0, 0}
+#define kSTZTapContextEmpty (STZTapContext){0, 0, 0, (MTPoint){0, 0}, 0}
 
 static STZCScanCache tapContexts = kSTZCScanCacheEmptyForType(STZTapContext);
 static os_unfair_lock tapContextLock = OS_UNFAIR_LOCK_INIT;
@@ -195,18 +196,19 @@ static float pointDistance(MTPoint a, MTPoint b) {
 
 
 static bool isTapDotDashDrag(STZTapContext *context) {
-    if (!context->lastTouches || context->tapCount != 2) {return false;}
+    if (!context->effectiveCount) {return false;}
+    if (context->tapCount != 2) {return false;}
     if (context->tapLocation.x < 0.1) {return false;}
     if (context->tapLocation.x > 0.9) {return false;}
     return true;
 }
 
 
-static int magicMouseTouched(MTDeviceRef device, MTTouch const *touch, CFIndex touchCount, CFTimeInterval frameTime, MTFrameID frame) {
+//  This function might be called from other thread.
+static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex touchCount, CFTimeInterval frameTime, MTFrameID frame) {
     uint64_t registryID = 0;
     MTDeviceGetRegistryID(device, &registryID);
 
-    //  This function might be called from other thread.
     os_unfair_lock_lock(&tapContextLock);
 
     if (!STZCScanCacheIsInUse(&tapContexts)) {
@@ -229,32 +231,51 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touch, CFIndex t
         break;
     }
 
-    if (touchCount != context->lastTouches) {
-        bool singleTap = touchCount == 1 && context->lastTouches == 0;
+    if (touchCount == context->touchCount) {
+        goto END;
+    }
+
+    uint8_t effectiveCount = 0;
+    uint8_t effectiveIndex = 0;
+
+    for (uint32_t i = 0; i < touchCount; ++i) {
+        //  Exclude fingers on the edge.
+        if (touches[i].location.x > 0.05 && touches[i].location.x < 0.95) {
+            effectiveIndex = i;
+            effectiveCount += 1;
+        }
+    }
+
+    if (effectiveCount != context->effectiveCount) {
+        bool singleTap = effectiveCount == 1 && context->effectiveCount == 0;
         bool wasActive = isTapDotDashDrag(context);
 
         if (!singleTap) {
-            if (touchCount != 0) {
+            if (effectiveCount != 0) {
                 context->tapTimestamp = -INFINITY;
                 context->tapCount = 0;
             }
 
         } else {
             CGEventTimestamp now = CGEventTimestampNow();
-            if (now - context->tapTimestamp > (0.25 * NSEC_PER_SEC)
-             || pointDistance(touch->location, context->tapLocation) > 0.5) {
-                context->tapTimestamp = now;
-                context->tapLocation = touch->location;
+            CGEventTimestamp delta = CGEventTimestampNow() - context->tapTimestamp;
+            if (delta > (0.25 * NSEC_PER_SEC)
+             || pointDistance(touches[effectiveIndex].location, context[effectiveIndex].tapLocation) > 0.5) {
+                context->tapLocation = touches[effectiveIndex].location;
                 context->tapCount = 0;
             }
 
-            context->tapCount += 1;
-            if (context->tapCount == 3) {
-                context->tapCount = 1;
+            //  Magic Mouse sends touches per ~0.011s. Taps too frequent could be mistouch.
+            if (delta > (0.05 * NSEC_PER_SEC)) {
+                context->tapTimestamp = now;
+                context->tapCount += 1;
+                if (context->tapCount == 3) {
+                    context->tapCount = 1;
+                }
             }
         }
 
-        context->lastTouches = touchCount;
+        context->effectiveCount = effectiveCount;
 
         if (isTapDotDashDrag(context) != wasActive) {
             os_unfair_lock_unlock(&tapContextLock);
@@ -270,6 +291,9 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touch, CFIndex t
         }
     }
 
+    context->touchCount = touchCount;
+
+END:
     os_unfair_lock_unlock(&tapContextLock);
     return 0;
 }
