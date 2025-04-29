@@ -609,7 +609,7 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
     if (eventPhase == kSTZPhaseBegan && !byMomentum) {
         if (context->dotDashDragging) {
             uint64_t registryID = CGEventGetRegistryID(event);
-            context->recognizedByDotDash = STZDotDashDragIsActiveWithinTimeout(registryID, 0.75 * NSEC_PER_SEC);
+            context->recognizedByDotDash = STZDotDashDragIsActiveWithinTimeout(registryID, 0.5 * NSEC_PER_SEC);
         } else {
             context->recognizedByDotDash = false;
         }
