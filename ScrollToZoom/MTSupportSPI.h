@@ -33,6 +33,34 @@ bool MTDeviceIsBuiltIn(MTDeviceRef);
 
 typedef uint32_t MTFrameID;
 
+
+typedef CF_ENUM(uint32_t, MTTouchPhase) {
+
+    /// Not used.
+    kMTTouchPhaseNone,
+
+    /// Magic Trackpad sends this as the first state; Magic Mouse sends on unknown situations.
+    kMTTouchPhaseBegan,
+
+    /// The finger is above the surface, and no tap is made yet.
+    kMTTouchPhaseWillDown,
+
+    /// The finger just tapped on the surface.
+    kMTTouchPhaseDidDown,
+
+    /// The finger is on the surface.
+    kMTTouchPhaseSolid,
+
+    /// The finger just raised from the surface.
+    kMTTouchPhaseWillUp,
+
+    /// The finger is above the surface, and any tap is made.
+    kMTTouchPhaseDidUp,
+
+    /// The finger is no longer recognized.
+    kMTTouchPhaseEnded,
+};
+
 typedef struct {
     float   x, y;
 } MTPoint;
@@ -41,14 +69,17 @@ typedef struct {
     MTFrameID       frame;
     uint32_t        _padding1[1];
     CFTimeInterval  timestamp;
-    uint32_t        _padding2[4];
+    uint32_t        trackingNumber;
+    MTTouchPhase    phase;
+    uint32_t        _padding2[2];
     MTPoint         location;
     MTPoint         velocity;
     uint32_t        _padding3[12];
 } MTTouch;
 
-typedef int (*MTContactCallback)(MTDeviceRef, MTTouch const *touches, CFIndex touchCount, CFTimeInterval, MTFrameID);
+typedef int (*MTContactCallback)(MTDeviceRef, MTTouch const *touches, CFIndex touchCount, CFTimeInterval, MTFrameID, void *refcon);
 void MTRegisterContactFrameCallback(MTDeviceRef, MTContactCallback);
+void MTRegisterContactFrameCallbackWithRefcon(MTDeviceRef, MTContactCallback, void *refcon);
 
 
 MTDeviceRef __nullable MTDeviceCreateFromService(io_service_t);
