@@ -197,8 +197,17 @@ void STZDotDashDragObserveActivation(STZDashDotDragCallback callback, void *refc
 }
 
 
-static float pointDistance(MTPoint a, MTPoint b) {
-    return hypot(a.x - b.x, a.y - b.y);
+#define SQUARE(x) (x * x)
+
+
+static float pointDistanceSquare(MTPoint a, MTPoint b) {
+    float dx = a.x - b.x, dy = a.y - b.y;
+    return SQUARE(dx) + SQUARE(dy);
+}
+
+
+static float vectorLengthSquare(MTPoint vector) {
+    return SQUARE(vector.x) + SQUARE(vector.y);
 }
 
 
@@ -221,7 +230,8 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
 
     for (uint32_t i = 0; i < touchCount; ++i) {
         //  Exclude fingers on the edge.
-        if (touches[i].phase == kMTTouchPhaseSolid
+        if (touches[i].phase >= kMTTouchPhaseDidDown
+         && touches[i].phase <= kMTTouchPhaseWillUp
          && touches[i].location.x > 0.05
          && touches[i].location.x < 0.95) {
             effectiveIndex = i;
@@ -265,7 +275,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
             CGEventTimestamp now = CGEventTimestampNow();
             CGEventTimestamp delta = CGEventTimestampNow() - context->tapTimestamp;
             if (delta > (0.25 * NSEC_PER_SEC)
-             || pointDistance(touches[effectiveIndex].location, context->tapLocation) > 0.25) {
+             || pointDistanceSquare(touches[effectiveIndex].location, context->tapLocation) > SQUARE(0.25)) {
                 context->tapLocation = touches[effectiveIndex].location;
                 context->tapCount = 0;
             }
@@ -293,6 +303,14 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
             });
 
             os_unfair_lock_lock(&tapContextLock);
+        }
+
+    } else if (effectiveCount == 1 && context->tapCount == 1) {
+        //  If a finger moved during the touch, reset the tap count.
+        if (vectorLengthSquare(touches[effectiveIndex].velocity) > SQUARE(1)
+         || pointDistanceSquare(touches[effectiveIndex].location, context->tapLocation) > SQUARE(0.1)) {
+            context->tapLocation = touches[effectiveIndex].location;
+            context->tapCount = 0;
         }
     }
 
