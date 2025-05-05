@@ -173,7 +173,7 @@ void STZLoadArgumentsFromUserDefaults(void) {
 
     NSInteger flags = [userDefaults integerForKey:STZScrollToZoomFlagsKey];
     if (flags != 0) {
-        STZScrollToZoomFlags = STZValidateFlags(STZScrollToZoomFlags, NULL);
+        STZScrollToZoomFlags = STZValidateFlags((uint32_t)flags, NULL);
     }
 
     NSNumber *magnifier = [userDefaults objectForKey:STZScrollToZoomMagnifierKey];
