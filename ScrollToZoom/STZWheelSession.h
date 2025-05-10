@@ -42,6 +42,11 @@ typedef struct {
 #define kSTZWheelSessionEmpty (STZWheelSession){kSTZWheelFree, kSTZWheelToScroll}
 
 
+static inline bool STZWheelSessionIsOfType(STZWheelSession *session, STZWheelType type) {
+    return session->state != kSTZWheelFree && session->type == type;
+}
+
+
 void STZDebugLogSessionChange(char const *prefix, STZWheelSession from, STZWheelSession to);
 
 

@@ -607,8 +607,6 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
     STZPhase eventPhase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
     STZPhase desiredPhase = eventPhase;
 
-    bool wasActivated = isWheelContextRecognizedActivated(context);
-
     if (!context->recognizedByFlags && globalFlagsIn) {
         context->recognizedByFlags = true;
 
@@ -626,16 +624,14 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
         }
     }
 
-    bool isActivated = isWheelContextRecognizedActivated(context);
-
-    if (isActivated && !wasActivated) {
-        context->lockedMouseLocation = CGEventGetLocation(event);
-    }
-
     STZWheelType type;
     double data = 0;
 
-    if (isActivated) {
+    if (isWheelContextRecognizedActivated(context)) {
+        if (!STZWheelSessionIsOfType(&context->session, kSTZWheelToZoom)) {
+            context->lockedMouseLocation = CGEventGetLocation(event);
+        }
+
         int signum;
 
         if (STZEventTapGetEnabled(&hardScrollWheelTap)) {
