@@ -171,8 +171,8 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [listController setView:scrollView];
     NSSplitViewItem *listItem = [NSSplitViewItem sidebarWithViewController:listController];
     [listItem setCanCollapse:NO];
-    [listItem setMinimumThickness:150];
-    [listItem setMaximumThickness:150];
+    [listItem setMinimumThickness:158];
+    [listItem setMaximumThickness:158];
 
     NSViewController *panelController = [[NSViewController alloc] init];
     [panelController setView:panelView];

@@ -1,5 +1,5 @@
 /*
- *  STZUIConstants.c
+ *  STZUIConstants.m
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/4/21.
@@ -21,7 +21,11 @@ CGFloat kSTZUIFixCheckboxTrailing;
 
 __attribute__((constructor))
 static void init(void) {
-    if (__builtin_available(macOS 10.16, *)) {
+    if (@available(macOS 26, *)) {
+        kSTZUICheckboxWidth = 22;
+        kSTZUISliderBaselineOffset = 0;
+        kSTZUIFixCheckboxTrailing = 0;
+    } else if (@available(macOS 10.16, *)) {
         kSTZUICheckboxWidth = 20;
         kSTZUISliderBaselineOffset = 0;
         kSTZUIFixCheckboxTrailing = -5;

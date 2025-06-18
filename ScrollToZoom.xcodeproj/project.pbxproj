@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.c */; };
+		DE0B33852E01E48000DE9BA5 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DE0B33842E01E48000DE9BA5 /* AppIcon.icon */; };
+		DE14D3072DB600CE00CA3032 /* STZUIConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.m */; };
 		DE265C882D43EAA100EC1A07 /* STZScrollToZoom.c in Sources */ = {isa = PBXBuildFile; fileRef = DE265C872D43EAA100EC1A07 /* STZScrollToZoom.c */; };
 		DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */; };
 		DE4AEAC92DB96BAE006E8499 /* STZCommon.c in Sources */ = {isa = PBXBuildFile; fileRef = DE4AEAC72DB96BAE006E8499 /* STZCommon.c */; };
@@ -31,8 +32,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		DE0B33842E01E48000DE9BA5 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DE14D3052DB600CE00CA3032 /* STZUIConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZUIConstants.h; sourceTree = "<group>"; };
-		DE14D3062DB600CE00CA3032 /* STZUIConstants.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZUIConstants.c; sourceTree = "<group>"; };
+		DE14D3062DB600CE00CA3032 /* STZUIConstants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZUIConstants.m; sourceTree = "<group>"; };
 		DE265C862D43EAA100EC1A07 /* STZScrollToZoom.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZScrollToZoom.h; sourceTree = "<group>"; };
 		DE265C872D43EAA100EC1A07 /* STZScrollToZoom.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = STZScrollToZoom.c; sourceTree = "<group>"; };
 		DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = STZSymbols.ttf; sourceTree = "<group>"; };
@@ -63,7 +65,6 @@
 		DE9B152B2D43948E00E92ECE /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		DE9B152D2D43948F00E92ECE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		DE9B15322D43948F00E92ECE /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ScrollToZoom.entitlements; sourceTree = "<group>"; };
 		DEA4545E2DBE48B9005B046B /* STZLaunchAtLogin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STZLaunchAtLogin.h; sourceTree = "<group>"; };
 		DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STZLaunchAtLogin.m; sourceTree = "<group>"; };
 		DEC39DED2DAF88C00034654C /* STZWheelSession.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZWheelSession.h; sourceTree = "<group>"; };
@@ -89,7 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				DE14D3052DB600CE00CA3032 /* STZUIConstants.h */,
-				DE14D3062DB600CE00CA3032 /* STZUIConstants.c */,
+				DE14D3062DB600CE00CA3032 /* STZUIConstants.m */,
 				DE70F15B2D44FABF0034F3F6 /* STZControls.h */,
 				DE70F15C2D44FABF0034F3F6 /* STZControls.m */,
 				DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */,
@@ -104,6 +105,7 @@
 				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
 				DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */,
 				DE9B152D2D43948F00E92ECE /* Assets.xcassets */,
+				DE0B33842E01E48000DE9BA5 /* AppIcon.icon */,
 			);
 			name = GUI;
 			sourceTree = "<group>";
@@ -163,7 +165,6 @@
 				DE9B15322D43948F00E92ECE /* main.m */,
 				DE9B152A2D43948E00E92ECE /* AppDelegate.h */,
 				DE9B152B2D43948E00E92ECE /* AppDelegate.m */,
-				DE9B15342D43948F00E92ECE /* ScrollToZoom.entitlements */,
 				DE7E94082DBE3C4C00B92684 /* SPI */,
 				DEA454612DBE4987005B046B /* Event */,
 				DE7E94092DBE3C6000B92684 /* Misc */,
@@ -245,6 +246,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DE0B33852E01E48000DE9BA5 /* AppIcon.icon in Resources */,
 				DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */,
 				DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */,
 				DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */,
@@ -270,7 +272,7 @@
 				DEC39DEF2DAF88C00034654C /* STZWheelSession.c in Sources */,
 				DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */,
 				DE7E940C2DBE3F0800B92684 /* STZSettings.m in Sources */,
-				DE14D3072DB600CE00CA3032 /* STZUIConstants.c in Sources */,
+				DE14D3072DB600CE00CA3032 /* STZUIConstants.m in Sources */,
 				DEC39DF32DAFBFB00034654C /* STZOptionsPanel.m in Sources */,
 				DE6F2A182DAF729B001270D5 /* STZProcessManager.m in Sources */,
 				DE5EEF902DA5081400FAC19A /* STZConsolePanel.m in Sources */,
@@ -412,11 +414,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = N8933HAGDL;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollToZoom/Info.plist;
@@ -428,7 +430,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -444,11 +446,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 21;
-				DEVELOPMENT_TEAM = N8933HAGDL;
+				CURRENT_PROJECT_VERSION = 22;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = ScrollToZoom/Info.plist;
@@ -460,7 +462,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0.4;
+				MARKETING_VERSION = 1.0.5;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
