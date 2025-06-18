@@ -31,7 +31,13 @@ You’ll need:
 - macOS 10.13 High Sierra or later, and
 - A pointing device that supports scrolling.
 
-Download the [latest release](https://github.com/alphaArgon/ScrollToZoom/releases) and move the unarchived content into the Applications folder. Open the app and click on the checkbox. You need to grant permission by following the instructions on the popover on the first launch.
+Download the [latest release](https://github.com/alphaArgon/ScrollToZoom/releases) and move the unarchived content into the Applications folder. On macOS Sequoia or later, you need to run the following command in Terminal to bypass Gatekeeper (if you do trust this app):
+
+```sh
+xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
+```
+
+Make sure the path (/Applications/Scroll to Zoom.app) matches the actual location of the app and spaces are escaped. For the first launch, right-click the app and choose Open from the context menu. You may also need to grant the required permissions as prompted.
 
 Because this app uses some protected technologies, it cannot be sandboxed and distributed on the Mac App Store.
 

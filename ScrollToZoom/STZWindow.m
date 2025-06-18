@@ -189,6 +189,11 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
         [subviews setTranslatesAutoresizingMaskIntoConstraints:NO];
     }
 
+    if (@available(macOS 26, *)) {
+        [_speedSlider setControlSize:NSControlSizeSmall];
+        [_inertiaSlider setControlSize:NSControlSizeSmall];
+    }
+
     [NSLayoutConstraint activateConstraints:@[
         [[_checkbox topAnchor] constraintEqualToAnchor:[view topAnchor] constant:kSTZUINormalSpacing],
         [[_checkbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],

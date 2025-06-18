@@ -10,6 +10,9 @@
 #import "GeneratedAssetSymbols.h"
 
 
+#define TAHOE_CONTROL_RADIUS ((CGFloat)5.0)
+
+
 NSFont *STZSymbolsFontOfSize(CGFloat size) {
     static CTFontDescriptorRef desc = NULL;
     if (!desc) {
@@ -196,55 +199,84 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 }
 
 - (void)drawFocusRingMask {
-    [[NSImage imageNamed:ACImageNameModifierFieldBezelMask] drawInRect:[self bounds]];
+    if (@available(macOS 26, *)) {
+        [[NSBezierPath bezierPathWithRoundedRect:[self bounds]
+                                         xRadius:TAHOE_CONTROL_RADIUS
+                                         yRadius:TAHOE_CONTROL_RADIUS] fill];
+    } else {
+        [[NSImage imageNamed:ACImageNameModifierFieldBezelMask] drawInRect:[self bounds]];
+    }
 }
 
 - (void)viewWillDraw {
-    BOOL emphasized = [self isHighlighted] && [[self window] isKeyWindow];
-    [_symbolLabel setTextColor:emphasized ? [NSColor alternateSelectedControlTextColor] : [NSColor labelColor]];
+    if ([self isEnabled]) {
+        BOOL emphasized = [self isHighlighted] && [[self window] isKeyWindow];
+        [_symbolLabel setTextColor:emphasized ? [NSColor alternateSelectedControlTextColor] : [NSColor labelColor]];
+    }
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
     BOOL emphasized = [self isHighlighted] && [[self window] isKeyWindow];
 
-    if (!emphasized) {
-        NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOff];
-        [bezel drawInRect:[self bounds]
-                 fromRect:(NSRect){NSZeroPoint, [bezel size]}
-                operation:NSCompositingOperationSourceOver
-                 fraction:[self isEnabled] ? 1 : 0.5];
+    if (@available(macOS 26, *)) {
+        if (!emphasized) {
+            NSColor *borderColor = [NSColor separatorColor];
+            CGFloat alpha = [borderColor alphaComponent];
+            [[borderColor colorWithAlphaComponent:[self isEnabled] ? alpha : alpha / 2] setStroke];
+
+            NSBezierPath *path = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect([self bounds], 0.5, 0.5)
+                                                                 xRadius:TAHOE_CONTROL_RADIUS - 0.5
+                                                                 yRadius:TAHOE_CONTROL_RADIUS - 0.5];
+            [path setLineWidth:1];
+            [path stroke];
+
+        } else {
+            [[NSColor controlAccentColor] setFill];
+            [[NSBezierPath bezierPathWithRoundedRect:[self bounds]
+                                             xRadius:TAHOE_CONTROL_RADIUS
+                                             yRadius:TAHOE_CONTROL_RADIUS] fill];
+        }
 
     } else {
-        NSImage *backingImage = nil;
+        if (!emphasized) {
+            NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOff];
+            [bezel drawInRect:[self bounds]
+                     fromRect:(NSRect){NSZeroPoint, [bezel size]}
+                    operation:NSCompositingOperationSourceOver
+                     fraction:[self isEnabled] ? 1 : 0.5];
 
-        BOOL hasOwnBacking = [self layer] != nil;
-        if (!hasOwnBacking) {
-            backingImage = [[NSImage alloc] initWithSize:[self bounds].size];
-            [backingImage lockFocus];
-        }
-
-        NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOn];
-        [bezel drawInRect:[self bounds]
-                 fromRect:(NSRect){NSZeroPoint, [bezel size]}
-                operation:NSCompositingOperationSourceOver
-                 fraction:1];
-
-        if (@available(macOS 10.14, *)) {
-            [[NSColor controlAccentColor] setFill];
         } else {
-            [[NSColor colorForControlTint:[NSColor currentControlTint]] setFill];
-        }
-        NSRectFillUsingOperation([self bounds], NSCompositingOperationColor);
+            NSImage *backingImage = nil;
 
-        NSImage *mask = [NSImage imageNamed:ACImageNameModifierFieldBezelMask];
-        [mask drawInRect:[self bounds]
-                 fromRect:(NSRect){NSZeroPoint, [mask size]}
-                operation:NSCompositingOperationDestinationIn
-                 fraction:1];
+            BOOL hasOwnBacking = [self layer] != nil;
+            if (!hasOwnBacking) {
+                backingImage = [[NSImage alloc] initWithSize:[self bounds].size];
+                [backingImage lockFocus];
+            }
 
-        if (backingImage) {
-            [backingImage unlockFocus];
-            [backingImage drawInRect:[self bounds]];
+            NSImage *bezel = [NSImage imageNamed:ACImageNameModifierFieldBezelOn];
+            [bezel drawInRect:[self bounds]
+                     fromRect:(NSRect){NSZeroPoint, [bezel size]}
+                    operation:NSCompositingOperationSourceOver
+                     fraction:1];
+
+            if (@available(macOS 10.14, *)) {
+                [[NSColor controlAccentColor] setFill];
+            } else {
+                [[NSColor colorForControlTint:[NSColor currentControlTint]] setFill];
+            }
+            NSRectFillUsingOperation([self bounds], NSCompositingOperationColor);
+
+            NSImage *mask = [NSImage imageNamed:ACImageNameModifierFieldBezelMask];
+            [mask drawInRect:[self bounds]
+                     fromRect:(NSRect){NSZeroPoint, [mask size]}
+                    operation:NSCompositingOperationDestinationIn
+                     fraction:1];
+
+            if (backingImage) {
+                [backingImage unlockFocus];
+                [backingImage drawInRect:[self bounds]];
+            }
         }
     }
 }
@@ -258,7 +290,11 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 }
 
 - (NSSize)intrinsicContentSize {
-    return NSMakeSize(_symbolMaxWidth + 8, 19);
+    if (@available(macOS 26, *)) {
+        return NSMakeSize(_symbolMaxWidth + 8, 21);
+    } else {
+        return NSMakeSize(_symbolMaxWidth + 8, 19);
+    }
 }
 
 @end

@@ -32,7 +32,13 @@
 - macOS 10.13 High Sierra 或更高版本
 - 支持滚动的可点击设备
 
-下载 [latest release](https://github.com/alphaArgon/ScrollToZoom/releases)，然后将解压的内容移动到「应用程序」文件夹。打开本 app 并勾选第一个复选框。首次启动时，你需要按照弹出窗口中的说明授予权限。
+下载 [latest release](https://github.com/alphaArgon/ScrollToZoom/releases)，然后将解压的内容移动到「应用程序」文件夹。在 macOS Sequoia 或更高系统中，需要在终端中运行下列命令来绕过 Gatekeeper（如果你确实信任此 app）：
+
+```sh
+xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
+```
+
+确保路径名 (/Applications/Scroll to Zoom.app) 符合 app 的实际位置，且空格被正确转义。对于首次启动，请右键点击 app，从上下文菜单中选择「打开」，并按照提示授予必要的权限。
 
 由于此 app 使用了一些受保护的技术，它不能运行在 App Sandbox 里，也不能上架 Mac App Store。
 
