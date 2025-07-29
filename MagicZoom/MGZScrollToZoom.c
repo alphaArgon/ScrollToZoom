@@ -38,8 +38,16 @@ static void eventTapTimeout(void) {
 }
 
 
-static CFMachPortRef       tapPort;
-static CFRunLoopSourceRef  tapSource;
+static CFMachPortRef        tapPort = NULL;
+static CFRunLoopSourceRef   tapSource = NULL;
+static bool                 tapEnabled = false;
+
+
+static void onDoubleTap(uint64_t registryID, bool active, void *refcon) {
+    if (tapPort != NULL && active && !tapEnabled) {
+        CGEventTapEnable(tapPort, tapEnabled = true);
+    }
+}
 
 
 static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEventRef event, void *userInfo) {
@@ -48,6 +56,8 @@ static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEv
     case kCGEventTapDisabledByUserInput:    return NULL;
     default: assert(eventType == kCGEventScrollWheel); break;
     }
+
+    printf("run\n");
 
     bool byMomentum;
     STZPhase phase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
@@ -70,7 +80,10 @@ static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEv
 
     } else {
         context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, registryID, false, NULL);
-        if (context == NULL || !context->conversion) {return event;}
+        if (context == NULL || !context->conversion) {
+            CGEventTapEnable(tapPort, tapEnabled = false);
+            return event;
+        }
 
         if (phase == kSTZPhaseEnded || phase == kSTZPhaseCancelled) {
             context->conversion = kMGZNoConvert;
@@ -142,7 +155,7 @@ bool MGZSetScrollToZoomEnabled(bool enable) {
     if (!enable) {
         STZSetListeningMultitouchDevices(false);
         CFRunLoopRemoveSource(CFRunLoopGetMain(), tapSource, kCFRunLoopCommonModes);
-        CGEventTapEnable(tapPort, false);
+        CGEventTapEnable(tapPort, tapEnabled = false);
         CFRelease(tapSource);
         CFRelease(tapPort);
         tapPort = NULL;
@@ -153,6 +166,7 @@ bool MGZSetScrollToZoomEnabled(bool enable) {
 
     if (!AXIsProcessTrusted()) {return false;}
     if (!STZSetListeningMultitouchDevices(true)) {return false;}
+    STZDotDashDragObserveActivation(onDoubleTap, NULL);
 
     tapPort = CGEventTapCreate(kCGSessionEventTap, kCGHeadInsertEventTap,
                                kCGEventTapOptionDefault, 1 << kCGEventScrollWheel,
@@ -160,8 +174,13 @@ bool MGZSetScrollToZoomEnabled(bool enable) {
     if (tapPort == NULL) {return false;}
 
     tapSource = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tapPort, 0);
-
-    CGEventTapEnable(tapPort, true);
     CFRunLoopAddSource(CFRunLoopGetMain(), tapSource, kCFRunLoopCommonModes);
+
+    if (!STZCScanCacheIsInUse(&_wheelContexts)) {
+        CGEventTimestamp const DATA_LIFETIME = 300 * NSEC_PER_SEC;  //  5 minutes.
+        CGEventTimestamp const CHECK_INTERVAL = 60 * NSEC_PER_SEC;  //  1 minute.
+        STZCScanCacheSetDataLifetime(&_wheelContexts, DATA_LIFETIME, CHECK_INTERVAL);
+    }
+
     return true;
 }

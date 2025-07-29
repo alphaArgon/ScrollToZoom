@@ -68,8 +68,8 @@ typedef CLOSED_ENUM: uint8_t {
 /// Whether the cache is once accessed.
 bool STZCScanCacheIsInUse(STZCScanCache *);
 
-/// Sets the parameter of expiration checking parameters. If you pass a zero `dataLifetime` to the
-/// function, which are the default values, the cache are never cleaned.
+/// Sets the parameter of expiration checking parameters. If you pass zero `dataLifetime` to the
+/// function, which is the default value, the caches are never cleaned.
 void STZCScanCacheSetDataLifetime(STZCScanCache *, CGEventTimestamp dataLifetime, CGEventTimestamp autoCheckInterval);
 
 /// Marks expired data. Expired data won’t be cleaned immediately, but might be overwritten to
