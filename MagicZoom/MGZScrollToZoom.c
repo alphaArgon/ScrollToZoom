@@ -52,13 +52,14 @@ static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEv
     bool byMomentum;
     STZPhase phase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
 
-    //  Magic Mice don’t send events of this phase.
-    if (phase == kSTZPhaseMayBegin) {return NULL;}
-
     uint64_t registryID = CGEventGetRegistryID(event);
     MGZWheelContext *context;
 
-    if (phase == kSTZPhaseBegan && !byMomentum && STZDotDashDragIsActiveWithinTimeout(registryID, 0.5 * NSEC_PER_SEC)) {
+    if ((phase == kSTZPhaseBegan || phase == kSTZPhaseMayBegin) && !byMomentum
+     && STZDotDashDragIsActiveWithinTimeout(registryID, 0.5 * NSEC_PER_SEC)) {
+        //  Magic Mice don’t send events of this phase.
+        if (phase == kSTZPhaseMayBegin) {return NULL;}
+
         STZCScanCacheResult result;
         context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, registryID, true, &result);
         if (result == kSTZCScanCacheNewCreated || result == kSTZCScanCacheExpiredReused) {
