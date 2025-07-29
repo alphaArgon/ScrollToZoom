@@ -29,6 +29,7 @@
 		DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */; };
 		DEC39DEF2DAF88C00034654C /* STZWheelSession.c in Sources */ = {isa = PBXBuildFile; fileRef = DEC39DEE2DAF88C00034654C /* STZWheelSession.c */; };
 		DEC39DF32DAFBFB00034654C /* STZOptionsPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */; };
+		DEE3050F2E39014000E4429A /* STZPermissionView.m in Sources */ = {isa = PBXBuildFile; fileRef = DEE3050E2E39013B00E4429A /* STZPermissionView.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +73,8 @@
 		DEC39DF02DAF8E040034654C /* CGEventSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGEventSPI.h; sourceTree = "<group>"; };
 		DEC39DF12DAFBFB00034654C /* STZOptionsPanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZOptionsPanel.h; sourceTree = "<group>"; };
 		DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZOptionsPanel.m; sourceTree = "<group>"; };
+		DEE3050D2E39012900E4429A /* STZPermissionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZPermissionView.h; sourceTree = "<group>"; };
+		DEE3050E2E39013B00E4429A /* STZPermissionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZPermissionView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +98,8 @@
 				DE70F15C2D44FABF0034F3F6 /* STZControls.m */,
 				DE70F15E2D44FC1B0034F3F6 /* STZWindow.h */,
 				DE70F15F2D44FC1B0034F3F6 /* STZWindow.m */,
+				DEE3050D2E39012900E4429A /* STZPermissionView.h */,
+				DEE3050E2E39013B00E4429A /* STZPermissionView.m */,
 				DEC39DF12DAFBFB00034654C /* STZOptionsPanel.h */,
 				DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */,
 				DE5EEF912DA5082700FAC19A /* STZConsolePanel.h */,
@@ -270,6 +275,7 @@
 				DE70F15D2D44FABF0034F3F6 /* STZControls.m in Sources */,
 				DE265C882D43EAA100EC1A07 /* STZScrollToZoom.c in Sources */,
 				DEC39DEF2DAF88C00034654C /* STZWheelSession.c in Sources */,
+				DEE3050F2E39014000E4429A /* STZPermissionView.m in Sources */,
 				DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */,
 				DE7E940C2DBE3F0800B92684 /* STZSettings.m in Sources */,
 				DE14D3072DB600CE00CA3032 /* STZUIConstants.m in Sources */,

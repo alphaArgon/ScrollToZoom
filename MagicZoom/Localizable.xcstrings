@@ -1,0 +1,292 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "cancel" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancel"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "取消"
+          }
+        }
+      }
+    },
+    "dot-dash-drag-to-zoom-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-tap with one finger and hold, then scroll to zoom."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单指轻点两下并保持，然后滚动来缩放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
+          }
+        }
+      }
+    },
+    "enable-magic-zoom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use Magic Mouse gesture to zoom"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用妙控鼠标手势来缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用巧控滑鼠來縮放"
+          }
+        }
+      }
+    },
+    "grant-permission" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Grant Permission"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予权限"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "授予權限"
+          }
+        }
+      }
+    },
+    "inertia" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inertia:"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "惯性："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性："
+          }
+        }
+      }
+    },
+    "launch-at-login" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Launch Magic Zoom at login"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登录时启动妙控缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "登入時開啟巧控縮放"
+          }
+        }
+      }
+    },
+    "magic-zoom" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magic Zoom"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "妙控缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "巧控縮放"
+          }
+        }
+      }
+    },
+    "permission-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open System Settings and allow this application’s control. If the item for the application is already presented in the list, please remove it and retry."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打开 “系统设置” 并允许此应用程序的控制。如果该应用程序项已在列表中，请将其移除后重试。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "打開「系統設定」並允許此應用程式的控制。如果該應用程式項已在列表中啟用，請將其移除後再試一次。"
+          }
+        }
+      }
+    },
+    "permission-title" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The Accessibility permission is required to enable magic zoom."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要 “辅助功能” 权限以启用妙控缩放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "需要「輔助使用」權限以啟用巧控縮放。"
+          }
+        }
+      }
+    },
+    "permission-warning" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When magic zoom is enabled, removing the permission may cause the computer unresponsive."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当妙控缩放启用时，移除权限可能会导致电脑不能响应。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "當巧控縮放啟用時，移除權限可能會導致電腦不能回應。"
+          }
+        }
+      }
+    },
+    "should-not-launch-at-login-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "To enable automatic launch, quit and move this app to the Applications folder."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允许自动启动，请退出此应用，再将其移动至 “应用程序” 文件夹。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "要允許自動開啟，請結束此應用，然後將其移動至「應用程序」檔案夾。"
+          }
+        }
+      }
+    },
+    "speed" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speed:"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "速度："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "速度："
+          }
+        }
+      }
+    },
+    "view-source-on-github" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source on GitHub"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "托管于 GitHub"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "發佈於 GitHub"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

@@ -1,0 +1,78 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "cHM-Vp-sZN.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"About\"; ObjectID = \"cHM-Vp-sZN\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "About"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关于"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "關於"
+          }
+        }
+      }
+    },
+    "fob-KR-aYr.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"Magic Zoom Settings…\"; ObjectID = \"fob-KR-aYr\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Magic Zoom Settings…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "妙控缩放设置…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "巧控縮放設定⋯"
+          }
+        }
+      }
+    },
+    "UNr-iX-52s.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"Quit\"; ObjectID = \"UNr-iX-52s\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Quit"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "退出"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "結束"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}
