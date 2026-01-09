@@ -57,8 +57,6 @@ static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEv
     default: assert(eventType == kCGEventScrollWheel); break;
     }
 
-    printf("run\n");
-
     bool byMomentum;
     STZPhase phase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
 

@@ -60,7 +60,7 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 
 - Mozilla Firefox：同「简介」中所述。
 - Google Chrome：仅当累加缩放量超过某个阈值时，缩放事件才会生效。这是 Chrome 的设计决定。
-- Sketch：单次缩放量的缩放事件会被忽略。这是 Sketch 的设计决定。
+- Sketch：单次缩放量小的缩放事件会被忽略。这是 Sketch 的设计决定。
 
 欢迎提交 issue 来改进这个项目。
 

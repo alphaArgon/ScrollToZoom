@@ -12,7 +12,7 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 
 ### <img src="MagicZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@1x.png" width="64" align="right"> Bonus for Magic Mouse users
 
-You can double tap and scroll, that is, finder down—up—down—moves, to zoom in and out, just like how you zoom the Apple Maps on the iPhone. This works naturally if you also enable double-tap to smart zoom.
+You can double tap and scroll, that is, finger down—up—down—moves, to zoom in and out, just like how you zoom the Apple Maps on the iPhone. This works naturally if you also enable double-tap to smart zoom.
 
 If you need only this feature, and no other mouse optimization apps are installed, you can build MagicZoom.xcodeproj in this repo on your own. The independent app has a certain performance improvement.
 

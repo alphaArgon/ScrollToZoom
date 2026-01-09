@@ -49,7 +49,7 @@ typedef CF_ENUM(uint32_t, MTTouchPhase) {
     kMTTouchPhaseDidDown,
 
     /// The finger is on the surface.
-    kMTTouchPhaseSolid,
+    kMTTouchPhaseMoved,
 
     /// The finger just raised from the surface.
     kMTTouchPhaseWillUp,
@@ -69,12 +69,21 @@ typedef struct {
     MTFrameID       frame;
     uint32_t        _padding1[1];
     CFTimeInterval  timestamp;
-    uint32_t        trackingNumber;
+    uint32_t        pathID;
     MTTouchPhase    phase;
-    uint32_t        _padding2[2];
+    uint32_t        fingerID;
+    uint32_t        _padding2[1];
     MTPoint         location;
     MTPoint         velocity;
-    uint32_t        _padding3[12];
+    float           zTotal;
+    uint32_t        _padding3[1];
+    float           angle;
+    float           majorAxis;
+    float           minorAxis;
+    MTPoint         locationMM;
+    MTPoint         velocityMM;
+    uint32_t        _padding4[2];
+    float           zDensity;
 } MTTouch;
 
 typedef int (*MTContactCallback)(MTDeviceRef, MTTouch const *touches, CFIndex touchCount, CFTimeInterval, MTFrameID, void *refcon);
