@@ -359,6 +359,8 @@ bool STZSetScrollToZoomEnabled(bool enable) {
                                             kSTZDotDashDragToZoomEnabledDidChangeNotificationName, NULL,
                                             CFNotificationSuspensionBehaviorDeliverImmediately);
             STZDotDashDragObserveActivation(dotDashDragActivationCallback, NULL);
+
+            listened = true;
         };
 
         if (STZGetDotDashDragToZoomEnabled()) {
@@ -711,8 +713,11 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
 
         uint64_t token = context->timerToken;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.35 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (token != context->timerToken) {
-                return CFRelease(event);
+            //  The cache growth may reallocate storage and invalidate the previous pointer.
+            STZWheelContext *context = wheelContextWithFallbackFor(event);
+            if (!context || token != context->timerToken) {
+                CFRelease(event);
+                return;
             }
 
             STZDebugLog("\tNo events received while awaiting");
@@ -741,7 +746,9 @@ static CGEventRef mutatingScrollWheelCallback(CGEventTapProxy proxy, CGEventType
 
         uint64_t token = context->timerToken;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (token != context->timerToken) {
+            //  The cache growth may reallocate storage and invalidate the previous pointer.
+            STZWheelContext *context = wheelContextWithFallbackFor(event);
+            if (!context || token != context->timerToken) {
                 if (tupleEvents.first) {CFRelease(tupleEvents.first);}
                 if (tupleEvents.last) {CFRelease(tupleEvents.last);}
                 return;

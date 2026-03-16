@@ -285,11 +285,13 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
         STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
         STZDebugLog("%s mouse down from [%llx] of %@ button",
                     prefix, senderID, desc);
+        break;
 
     case kCGEventOtherMouseUp:
         STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
         STZDebugLog("%s mouse up from [%llx] of %@ button",
                     prefix, senderID, desc);
+        break;
 
     default:
         STZDebugLog("%s unexpected event from [%llx] with %@", prefix, senderID, flagDesc);

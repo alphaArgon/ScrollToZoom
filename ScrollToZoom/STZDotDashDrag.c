@@ -37,6 +37,8 @@ typedef struct {
 
 
 static STZCScanCache fingerprintses = kSTZCScanCacheEmptyForType(STZFingerprints);
+static os_unfair_lock fingerprintsLock = OS_UNFAIR_LOCK_INIT;
+
 static STZCScanCache tapContexts = kSTZCScanCacheEmptyForType(STZTapContext);
 static os_unfair_lock tapContextLock = OS_UNFAIR_LOCK_INIT;
 
@@ -242,6 +244,8 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
     uint64_t registryID = 0;
     MTDeviceGetRegistryID(device, &registryID);
 
+    os_unfair_lock_lock(&fingerprintsLock);
+
     if (!STZCScanCacheIsInUse(&fingerprintses)) {
         CGEventTimestamp const DATA_LIFETIME = 300 * NSEC_PER_SEC;  //  5 minutes.
         CGEventTimestamp const CHECK_INTERVAL = 60 * NSEC_PER_SEC;  //  1 minute.
@@ -265,6 +269,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
 
     for (int i = 0; i < allTouchCount; ++i) {
         int j = touches[i].fingerID;
+        if (j >= 8) {continue;}
 
         if (touches[i].phase < kMTTouchPhaseDidDown
          || touches[i].phase > kMTTouchPhaseWillUp) {
@@ -282,12 +287,12 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         if (!fingerprints->at[j].touchDown) {continue;}
         if (fingerprints->at[j].tooFast) {continue;}
 
-        if (vectorLengthSquare(touches[i].velocity) > SQUARE(1)) {
+        if (vectorLengthSquare(touches[i].velocity) > SQUARE(4)) {
             fingerprints->at[j].tooFast = true;
             continue;
         }
 
-        if (touches[i].zDensity > 0.625 && touches[i].zTotal > 0.375) {
+        if (touches[i].zDensity > 0.375 && touches[i].zTotal > 0.25) {
             fingerprints->at[j].hitFirmly = true;
         }
 
@@ -297,6 +302,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         }
     }
 
+    os_unfair_lock_unlock(&fingerprintsLock);
     os_unfair_lock_lock(&tapContextLock);
 
     if (!STZCScanCacheIsInUse(&tapContexts)) {

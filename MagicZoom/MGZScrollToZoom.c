@@ -124,7 +124,9 @@ static CGEventRef tapCallback(CGEventTapProxy proxy, CGEventType eventType, CGEv
 
         uint64_t token = context->timerToken;
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            if (token != context->timerToken) {
+            //  The cache growth may reallocate storage and invalidate the previous pointer.
+            MGZWheelContext *context = STZCScanCacheGetDataForIdentifier(&_wheelContexts, registryID, false, NULL);
+            if (context == NULL || token != context->timerToken) {
                 CFRelease(zoomEvent);
             } else {
                 context->conversion = kMGZNoConvert;
