@@ -10,11 +10,11 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 - Customizable direction, speed, and per-application configuration.
 - Compatible with other mouse optimization tools.
 
-### <img src="MagicZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@1x.png" width="64" align="right"> Bonus for Magic Mouse users
+### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> Bonus for Magic Mouse users
 
-You can double tap and scroll, that is, finger down—up—down—moves, to zoom in and out, just like how you zoom the Apple Maps on the iPhone. This works naturally if you also enable double-tap to smart zoom.
+You can double tap and scroll, that is, finger down—up—down—moves, to zoom in and out, just like how you zoom in Apple Maps on your iPhone. This works naturally if you also enable double-tap to smart zoom.
 
-If you need only this feature, and no other mouse optimization apps are installed, you can build MagicZoom.xcodeproj in this repo on your own. The independent app has a certain performance improvement.
+Previously, a specialized app, Magic Zoom, was developed solely for this feature. It’s now integrated into Scroll to Zoom. If you don’t need key- or button-triggered zooming, you can disable it in the settings.
 
 ## Overview
 
@@ -24,7 +24,7 @@ With the specified modifier keys held or an auxiliary mouse button pressed, you 
 
 Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/Caldis/Mos), [LinearMouse](https://github.com/linearmouse/linearmouse), or others you love. If that tool provides a smooth scrolling experience, Scroll to Zoom will benefit from it, giving a smooth zooming experience.
 
-Regardless of how these tools configure the direction of scrolling, the zooming is always based on your fingers moves. You can configure whether “fingers up” means zooming in or out in the app.
+Regardless of how these tools configure the direction of scrolling, the zooming is always based on your finger movements. You can configure whether “fingers up” means zooming in or out in the app.
 
 You can control for what app Scroll to Zoom should be enabled. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase Modifier Keys” for it in the settings.
 
@@ -59,7 +59,7 @@ This app has a built-in logging panel. Open the settings window while holding th
 
 - Mozilla Firefox: Described in Overview.
 - Google Chrome: Zoom events only take effect after the accumulated scale exceeds a certain threshold. This is a design decision of Chrome.
-- Sketch: Zoom events with small scale are ignored. This is a design decision of Sketch.
+- Sketch: Zoom events with a small scale are ignored. This is a design decision of Sketch.
 
 You are welcome to report issues and contribute to this project.
 

@@ -25,6 +25,30 @@
         }
       }
     },
+    "DMM-np-v3N.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"Advanced Settings…\"; ObjectID = \"DMM-np-v3N\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Advanced Settings…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "高级设置…"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "進階設定⋯"
+          }
+        }
+      }
+    },
     "fWp-hF-hiz.title" : {
       "comment" : "Class = \"NSMenuItem\"; title = \"Enable for App Name\"; ObjectID = \"fWp-hF-hiz\";",
       "extractionState" : "extracted_with_value",
@@ -122,37 +146,37 @@
       }
     },
     "XMk-VA-xDX.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Options for App:\"; ObjectID = \"XMk-VA-xDX\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Options for App\"; ObjectID = \"XMk-VA-xDX\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Options for App:"
+            "value" : "Options for App"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当前应用选项："
+            "value" : "当前应用选项"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "此應用選項："
+            "value" : "此應用選項"
           }
         }
       }
     },
     "ZYs-BC-JC3.title" : {
-      "comment" : "Class = \"NSMenuItem\"; title = \"Erase Modifiers Keys\"; ObjectID = \"ZYs-BC-JC3\";",
+      "comment" : "Class = \"NSMenuItem\"; title = \"Erase Modifier Keys\"; ObjectID = \"ZYs-BC-JC3\";",
       "extractionState" : "extracted_with_value",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "new",
-            "value" : "Erase Modifiers Keys"
+            "value" : "Erase Modifier Keys"
           }
         },
         "zh-Hans" : {

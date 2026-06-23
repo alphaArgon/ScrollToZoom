@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="22505" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="22505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner"/>
@@ -16,8 +16,15 @@
                         <action selector="orderFrontSharedWindow:" target="-1" id="NcZ-Nx-OWu"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Advanced Settings…" alternate="YES" id="DMM-np-v3N">
+                    <modifierMask key="keyEquivalentModifierMask" option="YES"/>
+                    <connections>
+                        <action selector="orderFrontSharedWindowAlternate:" target="-1" id="F2l-81-e30"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="PGh-Av-fCS"/>
-                <menuItem title="Options for App:" enabled="NO" id="XMk-VA-xDX">
+                <menuItem title="Options for App" tag="110105" enabled="NO" id="XMk-VA-xDX">
+                    <attributedString key="attributedTitle"/>
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
                 <menuItem title="Enable for App Name" id="fWp-hF-hiz">
@@ -26,7 +33,7 @@
                         <action selector="toggleEnabledForKeyApplication:" target="-1" id="3g2-Wa-7Xr"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Erase Modifiers Keys" id="ZYs-BC-JC3">
+                <menuItem title="Erase Modifier Keys" id="ZYs-BC-JC3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
                         <action selector="toggleExcludingFlagsForKeyApplication:" target="-1" id="cjw-Lx-QdN"/>

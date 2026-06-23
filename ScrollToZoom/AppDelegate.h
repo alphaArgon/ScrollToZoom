@@ -13,6 +13,7 @@
 
 - (IBAction)orderFrontAboutPanel:(nullable id)sender;
 - (IBAction)orderFrontSharedWindow:(nullable id)sender;
+- (IBAction)orderFrontSharedWindowAlternate:(nullable id)sender;
 - (IBAction)toggleEnabledForKeyApplication:(nullable id)sender;
 - (IBAction)toggleExcludingFlagsForKeyApplication:(nullable id)sender;
 

@@ -211,13 +211,13 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(didChangeForBundleIdentifier:)
-                                                 name:(__bridge id)kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName
+                                                 name:(__bridge id)kSTZAppOptionsDidChangeNotification
                                                object:nil];
 }
 
 - (void)viewWillDisappear {
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:(__bridge id)kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName
+                                                    name:(__bridge id)kSTZAppOptionsDidChangeNotification
                                                   object:nil];
 }
 
@@ -260,7 +260,7 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
         }
     }
 
-    NSDictionary *configured = (__bridge_transfer id)STZCopyAllEventTapOptions();
+    NSDictionary *configured = (__bridge_transfer id)STZCopyOptionsForAllApps();
     for (NSString *bundleID in [configured keyEnumerator]) {
         if (![met containsObject:bundleID]) {
             [_configuredBundleIDs addObject:[STZApplicationEntry entryWithBundleIdentifier:bundleID]];
@@ -397,14 +397,14 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     if (!entry) {return;}
 
     [_enabledCheckbox setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-%@", nil), [entry localizedName]]];
-    STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
+    STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
 
-    [_enabledCheckbox setState:!(options & kSTZEventTapDisabled)];
-    [_excludingFlagsCheckBox setState:!!(options & kSTZEventTapExcludeFlags)];
-    [_excludingFlagsCheckBox setEnabled:!(options & kSTZEventTapDisabled)];
+    [_enabledCheckbox setState:!(options & kSTZDisabledForApp)];
+    [_excludingFlagsCheckBox setState:!!(options & kSTZFlagsExcludedForApp)];
+    [_excludingFlagsCheckBox setEnabled:!(options & kSTZDisabledForApp)];
 
-    if (STZGetRecommendedEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier])
-        & kSTZEventTapExcludeFlags) {
+    if (STZGetRecommendedAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier])
+        & kSTZFlagsExcludedForApp) {
         [_recommendedLabel setHidden:NO];
         [_recommendedLabel setStringValue:NSLocalizedString(@"recommended-for-this-app", nil)];
 
@@ -418,10 +418,10 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     if (!entry) {return;}
 
     _changesMadeBySelf = YES;
-    STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
-    options = [_enabledCheckbox state] ? options & ~kSTZEventTapDisabled : options | kSTZEventTapDisabled;
-    STZSetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
-    [_excludingFlagsCheckBox setEnabled:!(options & kSTZEventTapDisabled)];
+    STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
+    options = [_enabledCheckbox state] ? options & ~kSTZDisabledForApp : options | kSTZDisabledForApp;
+    STZSetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
+    [_excludingFlagsCheckBox setEnabled:!(options & kSTZDisabledForApp)];
     _changesMadeBySelf = NO;
 }
 
@@ -430,9 +430,9 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     if (!entry) {return;}
 
     _changesMadeBySelf = YES;
-    STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
-    options = [_excludingFlagsCheckBox state] ? options | kSTZEventTapExcludeFlags : options & ~kSTZEventTapExcludeFlags;
-    STZSetEventTapOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
+    STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
+    options = [_excludingFlagsCheckBox state] ? options | kSTZFlagsExcludedForApp : options & ~kSTZFlagsExcludedForApp;
+    STZSetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
     _changesMadeBySelf = NO;
 }
 

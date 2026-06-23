@@ -1,5 +1,5 @@
 /*
- *  Untitled.h
+ *  STZPermissionView.h
  *  ScrollToZoom
  *
  *  Created by alpha on 2025/7/29.

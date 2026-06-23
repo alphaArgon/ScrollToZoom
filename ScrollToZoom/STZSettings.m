@@ -11,28 +11,33 @@
 #import <Foundation/Foundation.h>
 
 
-STZFlags STZScrollToZoomFlags = kSTZModifierOption;
-double STZScrollToZoomMagnifier = 0.0025;
-double STZScrollMomentumToZoomAttenuation = 0.8;
-double STZScrollMinMomentumMagnification = 0.001;
-bool STZDisablesDotDashDragToZoom = false;
-CFMutableDictionaryRef STZEventTapOptionsForApps = NULL;
-CFMutableDictionaryRef STZEventTapOptionsObjsForApps = NULL;
+STZModes const kSTZModesAll = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled | kSTZWantsDictatorship;
 
 
-static NSString *const STZScrollToZoomFlagsKey = @"STZScrollToZoomFlags";
-static NSString *const STZScrollToZoomMagnifierKey = @"STZScrollToZoomMagnifier";
-static NSString *const STZScrollMomentumToZoomAttenuationKey = @"STZScrollMomentumToZoomAttenuation";
-static NSString *const STZScrollMinMomentumMagnificationKey = @"STZScrollMinMomentumMagnification";
-static NSString *const STZDisablesDotDashDragToZoomKey = @"STZDisableDotDashDragToZoom";
-static NSString *const STZEventTapOptionsForAppsKey = @"STZEventTapOptionsForApps";
+STZModes STZPreferredModes = kSTZModesAll;
+STZFlags STZTriggerFlags = kSTZModifierOption;
+double STZMagnificationScalar = 0.0025;
+double STZMomentumZoomAttenuation = 0.8;
+double STZScrollMomentumZoomMinValue = 0.001;
+CFMutableDictionaryRef STZOptionsForApps = NULL;
+CFMutableDictionaryRef STZOptionsObjsForApps = NULL;
+
+
+static NSString *const STZModesKey = @"STZModeFlags";
+static NSString *const STZTriggerFlagsKey = @"STZScrollToZoomFlags";
+static NSString *const STZMagnificationScalarKey = @"STZScrollToZoomMagnifier";
+static NSString *const STZMomentumZoomAttenuationKey = @"STZScrollMomentumToZoomAttenuation";
+static NSString *const STZScrollMomentumZoomMinValueKey = @"STZScrollMinMomentumMagnification";
+static NSString *const STZOptionsForAppsKey = @"STZEventTapOptionsForApps";
+
+static NSString *const STZLegacyDisablesMagicZoomKey = @"STZDisableDotDashDragToZoom";
 
 
 static struct {
-    CFStringRef         bundleID;
-    STZEventTapOptions  options;
-} STZRecommendedEventTapOptions[] = {
-    {CFSTR("org.mozilla.firefox"), kSTZEventTapExcludeFlags}
+    CFStringRef     bundleID;
+    STZAppOptions   options;
+} STZRecommendedAppOptions[] = {
+    {CFSTR("org.mozilla.firefox"), kSTZFlagsExcludedForApp}
 };
 
 
@@ -43,195 +48,184 @@ static double clamp(double x, double lo, double hi) {
 }
 
 
-STZFlags STZGetScrollToZoomFlags(void) {
-    return STZScrollToZoomFlags;
-}
+static void _loadUserDefaultsIfNeeded(void) {
+    static bool loaded = false;
+    if (loaded) {return;}
 
-void STZSetScrollToZoomFlags(STZFlags flags) {
-    CFStringRef desc;
-    STZScrollToZoomFlags = STZValidateFlags(flags, &desc);
-
-    [[NSUserDefaults standardUserDefaults] setInteger:STZScrollToZoomFlags
-                                               forKey:STZScrollToZoomFlagsKey];
-    STZDebugLog("ScrollToZoomFlags set to %@", desc);
-}
-
-
-double STZGetScrollToZoomMagnifier(void) {
-    return STZScrollToZoomMagnifier;
-}
-
-void STZSetScrollToZoomMagnifier(double magnifier) {
-    STZScrollToZoomMagnifier = clamp(magnifier, -1, 1);
-
-    [[NSUserDefaults standardUserDefaults] setDouble:STZScrollToZoomMagnifier
-                                              forKey:STZScrollToZoomMagnifierKey];
-    STZDebugLog("ScrollToZoomMagnifier set to %f", STZScrollToZoomMagnifier);
-}
-
-
-double STZGetScrollMomentumToZoomAttenuation(void) {
-    return STZScrollMomentumToZoomAttenuation;
-}
-
-void STZSetScrollMomentumToZoomAttenuation(double attenuation) {
-    STZScrollMomentumToZoomAttenuation = clamp(attenuation, 0, 1);
-
-    [[NSUserDefaults standardUserDefaults] setDouble:STZScrollMomentumToZoomAttenuation
-                                              forKey:STZScrollMomentumToZoomAttenuationKey];
-    STZDebugLog("ScrollMomentumToZoomAttenuation set to %f", attenuation);
-}
-
-
-double STZGetScrollMinMomentumMagnification(void) {
-    return STZScrollMinMomentumMagnification;
-}
-
-void STZSetScrollMinMomentumMagnification(double minMagnification) {
-    STZScrollMinMomentumMagnification = clamp(minMagnification, 0, 1);
-
-    [[NSUserDefaults standardUserDefaults] setDouble:STZScrollMinMomentumMagnification
-                                              forKey:STZScrollMinMomentumMagnificationKey];
-    STZDebugLog("ScrollMinMomentumMagnification set to %f", minMagnification);
-}
-
-
-bool STZGetDotDashDragToZoomEnabled(void) {
-    return !STZDisablesDotDashDragToZoom;
-}
-
-void STZSetDotDashDragToZoomEnabled(bool enable) {
-    STZDisablesDotDashDragToZoom = !enable;
-
-    [[NSUserDefaults standardUserDefaults] setBool:STZDisablesDotDashDragToZoom
-                                            forKey:STZDisablesDotDashDragToZoomKey];
-    STZDebugLog("STZDisablesDotDashDragToZoom set to %s", !enable ? "true (disabled)" : "false (enabled)");
-
-    CFNotificationCenterPostNotification(CFNotificationCenterGetLocalCenter(),
-                                         kSTZDotDashDragToZoomEnabledDidChangeNotificationName,
-                                         NULL, NULL, true);
-}
-
-CFStringRef const kSTZDotDashDragToZoomEnabledDidChangeNotificationName = CFSTR("STZDotDashDragToZoomEnabledDidChangeNotification");
-
-
-STZEventTapOptions STZGetEventTapOptionsForBundleIdentifier(CFStringRef bundleID) {
-    if (!bundleID) {return 0;}
-    if (!STZEventTapOptionsForApps) {return 0;}
-    return (STZEventTapOptions)(uintptr_t)CFDictionaryGetValue(STZEventTapOptionsForApps, bundleID);
-}
-
-void STZSetEventTapOptionsForBundleIdentifier(CFStringRef bundleID, STZEventTapOptions options) {
-    if (!STZEventTapOptionsForApps) {return;}
-
-    if (options == (uintptr_t)CFDictionaryGetValue(STZEventTapOptionsForApps, bundleID)) {
-        return;
-    }
-
-    if (!options) {
-        CFDictionaryRemoveValue(STZEventTapOptionsForApps, bundleID);
-        CFDictionaryRemoveValue(STZEventTapOptionsObjsForApps, bundleID);
-
-    } else {
-        CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &options);
-        CFDictionarySetValue(STZEventTapOptionsForApps, bundleID, (void *)(uintptr_t)options);
-        CFDictionarySetValue(STZEventTapOptionsObjsForApps, bundleID, number);
-        CFRelease(number);
-    }
-
-    [[NSUserDefaults standardUserDefaults] setObject:(__bridge id)STZEventTapOptionsObjsForApps
-                                              forKey:STZEventTapOptionsForAppsKey];
-    STZDebugLog("EventTapOptions set to %u for %@", options, bundleID);
-
-    CFDictionaryRef userInfo = (__bridge void *)@{@"bundleIdentifier": (__bridge id)bundleID};
-    CFNotificationCenterPostNotification(CFNotificationCenterGetLocalCenter(),
-                                         kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName,
-                                         NULL, userInfo, true);
-}
-
-CFStringRef const kSTZEventTapOptionsForBundleIdentifierDidChangeNotificationName = CFSTR("STZEventTapOptionsForBundleIdentifierDidChangeNotification");
-
-
-CFDictionaryRef STZCopyAllEventTapOptions(void) {
-    return CFDictionaryCreateCopy(kCFAllocatorDefault, STZEventTapOptionsForApps);
-}
-
-
-STZEventTapOptions STZGetRecommendedEventTapOptionsForBundleIdentifier(CFStringRef bundleID) {
-    size_t count = sizeof(STZRecommendedEventTapOptions) / sizeof(*STZRecommendedEventTapOptions);
-    for (size_t i = 0; i < count; ++i) {
-        if (CFEqual(STZRecommendedEventTapOptions[i].bundleID, bundleID)) {
-            return STZRecommendedEventTapOptions[i].options;
-        }
-    }
-    return 0;
-}
-
-
-void STZLoadArgumentsFromUserDefaults(void) {
+    //  Concurrent loading from multiple threads is OK.
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
-    NSInteger flags = [userDefaults integerForKey:STZScrollToZoomFlagsKey];
+    NSNumber *modes = [userDefaults objectForKey:STZModesKey];
+    if (modes && [modes isKindOfClass:[NSNumber self]]) {
+        STZPreferredModes = [modes intValue] & kSTZModesAll;
+
+    } else if ([userDefaults boolForKey:STZLegacyDisablesMagicZoomKey]) {
+        [userDefaults removeObjectForKey:STZLegacyDisablesMagicZoomKey];
+        STZPreferredModes = kSTZModesAll & ~kSTZMagicZoomEnabled;
+    }
+
+    NSInteger flags = [userDefaults integerForKey:STZTriggerFlagsKey];
     if (flags != 0) {
-        STZScrollToZoomFlags = STZValidateFlags((uint32_t)flags, NULL);
+        STZTriggerFlags = STZFlagsValidate((uint32_t)flags);
     }
 
-    NSNumber *magnifier = [userDefaults objectForKey:STZScrollToZoomMagnifierKey];
+    NSNumber *magnifier = [userDefaults objectForKey:STZMagnificationScalarKey];
     if (magnifier && [magnifier isKindOfClass:[NSNumber self]]) {
-        STZScrollToZoomMagnifier = clamp([magnifier doubleValue], -1, 1);
+        STZMagnificationScalar = clamp([magnifier doubleValue], -1, 1);
     }
 
-    NSNumber *attenuation = [userDefaults objectForKey:STZScrollMomentumToZoomAttenuationKey];
+    NSNumber *attenuation = [userDefaults objectForKey:STZMomentumZoomAttenuationKey];
     if (attenuation && [attenuation isKindOfClass:[NSNumber self]]) {
-        STZScrollMomentumToZoomAttenuation = clamp([attenuation doubleValue], 0, 1);
+        STZMomentumZoomAttenuation = clamp([attenuation doubleValue], 0, 1);
     }
 
-    NSNumber *minMomentum = [userDefaults objectForKey:STZScrollMinMomentumMagnificationKey];
+    NSNumber *minMomentum = [userDefaults objectForKey:STZScrollMomentumZoomMinValueKey];
     if (minMomentum && [minMomentum isKindOfClass:[NSNumber self]]) {
-        STZScrollMinMomentumMagnification = clamp([minMomentum doubleValue], 0, 1);
+        STZScrollMomentumZoomMinValue = clamp([minMomentum doubleValue], 0, 1);
     }
 
-    STZDisablesDotDashDragToZoom = [userDefaults boolForKey:STZDisablesDotDashDragToZoomKey];
-
-    if (STZEventTapOptionsForApps) {
-        CFDictionaryRemoveAllValues(STZEventTapOptionsForApps);
-        CFDictionaryRemoveAllValues(STZEventTapOptionsObjsForApps);
+    if (STZOptionsForApps) {
+        CFDictionaryRemoveAllValues(STZOptionsForApps);
+        CFDictionaryRemoveAllValues(STZOptionsObjsForApps);
     } else {
-        STZEventTapOptionsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
-        STZEventTapOptionsObjsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
+        STZOptionsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
+        STZOptionsObjsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     }
 
-    NSDictionary *eventTapOptions = [userDefaults objectForKey:STZEventTapOptionsForAppsKey];
+    NSDictionary *eventTapOptions = [userDefaults objectForKey:STZOptionsForAppsKey];
     if (eventTapOptions) {
         for (NSString *key in eventTapOptions) {
             NSNumber *value = [eventTapOptions objectForKey:key];
             if ([value isKindOfClass:[NSNumber self]]) {
-                CFDictionarySetValue(STZEventTapOptionsForApps, (__bridge void *)key, (void *)(uintptr_t)[value intValue]);
-                CFDictionarySetValue(STZEventTapOptionsObjsForApps, (__bridge void *)key, (__bridge void *)value);
+                CFDictionarySetValue(STZOptionsForApps, (__bridge void *)key, (void *)(uintptr_t)[value intValue]);
+                CFDictionarySetValue(STZOptionsObjsForApps, (__bridge void *)key, (__bridge void *)value);
             }
         }
 
     } else {
-        size_t count = sizeof(STZRecommendedEventTapOptions) / sizeof(*STZRecommendedEventTapOptions);
+        size_t count = sizeof(STZRecommendedAppOptions) / sizeof(*STZRecommendedAppOptions);
         for (size_t i = 0; i < count; ++i) {
-            CFStringRef bundleID = STZRecommendedEventTapOptions[i].bundleID;
+            CFStringRef bundleID = STZRecommendedAppOptions[i].bundleID;
             if (!STZGetInstalledURLForBundleIdentifier(bundleID)) {continue;}
 
-            STZEventTapOptions options = STZRecommendedEventTapOptions[i].options;
+            STZAppOptions options = STZRecommendedAppOptions[i].options;
 
             CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &options);
-            CFDictionarySetValue(STZEventTapOptionsForApps, bundleID, (void *)(uintptr_t)options);
-            CFDictionarySetValue(STZEventTapOptionsObjsForApps, bundleID, number);
+            CFDictionarySetValue(STZOptionsForApps, bundleID, (void *)(uintptr_t)options);
+            CFDictionarySetValue(STZOptionsObjsForApps, bundleID, number);
             CFRelease(number);
         }
     }
 
-    STZDebugLog("Arguments loaded from user defaults:");
+    loaded = true;
+}
 
-    CFStringRef desc;
-    STZValidateFlags(STZScrollToZoomFlags, &desc);
-    STZDebugLog("\tScrollToZoomFlags set to %@", desc);
-    STZDebugLog("\tScrollToZoomMagnifier set to %f", STZScrollToZoomMagnifier);
-    STZDebugLog("\tScrollMomentumToZoomAttenuation set to %f", STZScrollMomentumToZoomAttenuation);
-    STZDebugLog("\tScrollMinMomentumMagnification set to %f", STZScrollMinMomentumMagnification);
+
+
+STZModes STZGetPreferredModes(void) {
+    _loadUserDefaultsIfNeeded();
+    return STZPreferredModes;
+}
+
+void STZSetPreferredModes(STZModes modes) {
+    STZPreferredModes = modes & kSTZModesAll;
+    [[NSUserDefaults standardUserDefaults] setInteger:STZPreferredModes
+                                               forKey:STZModesKey];
+}
+
+
+STZFlags STZGetTriggerFlags(void) {
+    _loadUserDefaultsIfNeeded();
+    return STZTriggerFlags;
+}
+
+void STZSetTriggerFlags(STZFlags flags) {
+    STZTriggerFlags = STZFlagsValidate(flags);
+    [[NSUserDefaults standardUserDefaults] setInteger:STZTriggerFlags
+                                               forKey:STZTriggerFlagsKey];
+}
+
+
+double STZGetMagnificationScalar(void) {
+    _loadUserDefaultsIfNeeded();
+    return STZMagnificationScalar;
+}
+
+void STZSetMagnificationScalar(double magnifier) {
+    STZMagnificationScalar = clamp(magnifier, -1, 1);
+    [[NSUserDefaults standardUserDefaults] setDouble:STZMagnificationScalar
+                                              forKey:STZMagnificationScalarKey];
+}
+
+
+double STZGetMomentumZoomAttenuation(void) {
+    _loadUserDefaultsIfNeeded();
+    return STZMomentumZoomAttenuation;
+}
+
+void STZSetMomentumZoomAttenuation(double attenuation) {
+    STZMomentumZoomAttenuation = clamp(attenuation, 0, 1);
+    [[NSUserDefaults standardUserDefaults] setDouble:STZMomentumZoomAttenuation
+                                              forKey:STZMomentumZoomAttenuationKey];
+}
+
+
+double STZGetMomentumZoomMinValue(void) {
+    _loadUserDefaultsIfNeeded();
+    return STZScrollMomentumZoomMinValue;
+}
+
+void STZSetMomentumZoomMinValue(double minMagnification) {
+    STZScrollMomentumZoomMinValue = clamp(minMagnification, 0, 1);
+    [[NSUserDefaults standardUserDefaults] setDouble:STZScrollMomentumZoomMinValue
+                                              forKey:STZScrollMomentumZoomMinValueKey];
+}
+
+
+STZAppOptions STZGetAppOptionsForBundleIdentifier(CFStringRef bundleID) {
+    if (!bundleID) {return 0;}
+    _loadUserDefaultsIfNeeded();
+    return (STZAppOptions)(uintptr_t)CFDictionaryGetValue(STZOptionsForApps, bundleID);
+}
+
+void STZSetAppOptionsForBundleIdentifier(CFStringRef bundleID, STZAppOptions options) {
+    _loadUserDefaultsIfNeeded();
+    if (options == (uintptr_t)CFDictionaryGetValue(STZOptionsForApps, bundleID)) {return;}
+
+    if (!options) {
+        CFDictionaryRemoveValue(STZOptionsForApps, bundleID);
+        CFDictionaryRemoveValue(STZOptionsObjsForApps, bundleID);
+
+    } else {
+        CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &options);
+        CFDictionarySetValue(STZOptionsForApps, bundleID, (void *)(uintptr_t)options);
+        CFDictionarySetValue(STZOptionsObjsForApps, bundleID, number);
+        CFRelease(number);
+    }
+
+    [[NSUserDefaults standardUserDefaults] setObject:(__bridge id)STZOptionsObjsForApps
+                                              forKey:STZOptionsForAppsKey];
+
+    CFDictionaryRef userInfo = (__bridge void *)@{@"bundleIdentifier": (__bridge id)bundleID};
+    CFNotificationCenterPostNotification(CFNotificationCenterGetLocalCenter(),
+                                         kSTZAppOptionsDidChangeNotification,
+                                         NULL, userInfo, true);
+}
+
+CFStringRef const kSTZAppOptionsDidChangeNotification = CFSTR("STZAppOptionsDidChangeNotification");
+
+
+CFDictionaryRef STZCopyOptionsForAllApps(void) {
+    return CFDictionaryCreateCopy(kCFAllocatorDefault, STZOptionsForApps);
+}
+
+
+STZAppOptions STZGetRecommendedAppOptionsForBundleIdentifier(CFStringRef bundleID) {
+    size_t count = sizeof(STZRecommendedAppOptions) / sizeof(*STZRecommendedAppOptions);
+    for (size_t i = 0; i < count; ++i) {
+        if (CFEqual(STZRecommendedAppOptions[i].bundleID, bundleID)) {
+            return STZRecommendedAppOptions[i].options;
+        }
+    }
+    return 0;
 }

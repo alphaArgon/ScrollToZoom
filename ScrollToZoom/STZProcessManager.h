@@ -6,7 +6,8 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import <CoreFoundation/CoreFoundation.h>
+#pragma once
+#include <CoreFoundation/CoreFoundation.h>
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN

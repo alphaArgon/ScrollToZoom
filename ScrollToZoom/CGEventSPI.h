@@ -6,8 +6,9 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import <CoreGraphics/CGEvent.h>
-#import <IOKit/hid/IOHIDLib.h>
+#pragma once
+#include <CoreGraphics/CGEvent.h>
+#include <IOKit/hid/IOHIDLib.h>
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN

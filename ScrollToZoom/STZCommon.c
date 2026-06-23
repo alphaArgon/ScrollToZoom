@@ -10,237 +10,273 @@
 #import "CGEventSPI.h"
 
 
-//  MARK: - STZCache
+STZFlags STZFlagsValidate(uint32_t dirtyFlags) {
+    if (dirtyFlags & kSTZMouseButtonsMask) {
+        STZFlags flags = dirtyFlags & kSTZMouseButtonsMask;
+        return flags == 1 ? 0 : flags;
 
-#define kSTZCacheExpired       ((CGEventTimestamp)0)
-#define kSTZCacheNew           ((CGEventTimestamp)UINT64_MAX)
-
-
-typedef struct {
-    uint64_t            identifier;
-    CGEventTimestamp    accessedAt;
-} _STZCacheEntryStub;
-
-#define STZCacheEntryAtIndex(cache, i) ((_STZCacheEntryStub *)(cache->entries + (cache->entrySize * i)))
-
-
-static void _STZCScanCacheCheckExpiredKnownNow(STZCScanCache *cache, bool forceCheck, CGEventTimestamp now) {
-    if (!forceCheck && now - cache->checkedAt < cache->checkInterval) {return;}
-    cache->checkedAt = now;
-
-    if (!cache->dataLifetime) {return;}
-
-    for (int i = 0; i < cache->count; ++i) {
-        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, i);
-
-        if (entry->accessedAt == kSTZCacheNew) {continue;}
-        if (entry->accessedAt == kSTZCacheExpired) {continue;}
-
-        if (now - entry->accessedAt > cache->dataLifetime) {
-            entry->accessedAt = kSTZCacheExpired;
-        }
+    } else {
+        return dirtyFlags & kSTZModifiersMask;
     }
 }
 
 
-bool STZCScanCacheIsInUse(STZCScanCache *cache) {
-    return cache->entries != NULL;
+CFStringRef STZFlagsCopyDescription(uint32_t anyFlags) {
+    if (anyFlags & kSTZMouseButtonsMask) {
+        if (anyFlags == kSTZMouseButtonMiddle) {
+            return CFRetain(CFSTR("\U0001f5b1 Mid"));
+        } else {
+            return CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR("\U0001f5b1 %u"), anyFlags);
+        }
+    }
+
+    static struct {
+        uint16_t    symbol;
+        STZFlags    flag;
+    } const items[] = {
+        {u'⌃', kSTZModifierControl},
+        {u'⌥', kSTZModifierOption},
+        {u'⇧', kSTZModifierShift},
+        {u'⌘', kSTZModifierCommand},
+        {u'⇪', kCGEventFlagMaskAlphaShift},
+    };
+
+    static const size_t itemCount = sizeof(items) / sizeof(*items);
+    uint16_t characters[itemCount + 2];
+    size_t characterCount = 0;
+
+    for (size_t i = 0; i < 5; ++i) {
+        if (anyFlags & items[i].flag) {
+            characters[characterCount] = items[i].symbol;
+            characterCount += 1;
+        }
+    }
+
+    if (anyFlags & kSTZModifierFn) {
+        characters[characterCount++] = 'f';
+        characters[characterCount++] = 'n';
+    }
+
+    return CFStringCreateWithCharacters(kCFAllocatorDefault, characters, characterCount);
 }
 
 
-void STZCScanCacheSetDataLifetime(STZCScanCache *cache, CGEventTimestamp dataLifetime, CGEventTimestamp autoCheckInterval) {
-    cache->dataLifetime = dataLifetime;
-    cache->checkInterval = autoCheckInterval;
+//  MARK: -
+
+
+static void noop(void *ptr) {}
+
+
+static inline int div_ceil(int a, int b) {
+    return (a + b - 1) / b;
 }
 
 
-void STZCScanCacheCheckExpired(STZCScanCache *cache, bool forceCheck) {
-    _STZCScanCacheCheckExpiredKnownNow(cache, forceCheck, CGEventTimestampNow());
+struct _STZCache {
+    int                 count;
+    int                 recentIndex;
+    CGEventTimestamp    valueLifetime;
+    int                 valueSize;
+    int                 entrySize;
+    void               *entries;
+    void (*valueDisposeCallback)(void *valueAddr);
+    uint8_t             inlinePayload[80];
+};
+
+
+typedef struct {
+    uint64_t            key;
+    CGEventTimestamp    accessedAt;  ///< 0 means not used.
+} _STZCacheEntryStub;
+
+
+_STZCacheEntryStub *STZCacheGetEntryAtIndex(STZCacheRef cache, int i) {
+    return (_STZCacheEntryStub *)(cache->entries + cache->entrySize * i);
 }
 
 
-static void STZCScanCacheAutoCheckExpired(STZCScanCache *cache, CGEventTimestamp now) {
-    if (!cache->checkInterval) {return;}
-    _STZCScanCacheCheckExpiredKnownNow(cache, false, now);
+STZCacheRef STZCacheCreate(size_t valueSize, CGEventTimestamp valueLifetime, void (*valueDisposeCallback)(void *valueAddr)) {
+    STZCacheRef cache = malloc(sizeof(*cache));
+    cache->recentIndex = 0;
+    cache->valueLifetime = valueLifetime;
+    cache->valueSize = (int)valueSize;
+    cache->entrySize = (1 + div_ceil((int)valueSize, sizeof(_STZCacheEntryStub))) * sizeof(_STZCacheEntryStub);
+    cache->entries = cache->inlinePayload;
+    cache->valueDisposeCallback = valueDisposeCallback ?: noop;
+
+    cache->count = sizeof(cache->inlinePayload) / cache->entrySize;
+    for (int i = 0; i < cache->count; ++i) {
+        STZCacheGetEntryAtIndex(cache, i)->accessedAt = 0;
+    }
+
+    return cache;
 }
 
 
-void *STZCScanCacheGetDataForIdentifier(STZCScanCache *cache, uint64_t identifier, bool createIfNeeded, STZCScanCacheResult *outResult) {
+void STZCacheRelease(STZCacheRef cache) {
+    for (int i = 0; i < cache->count; ++i) {
+        _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, i);
+        if (entry->accessedAt != 0) {
+            cache->valueDisposeCallback(&entry[1]);
+        }
+    }
+    if (cache->entries != cache->inlinePayload) {
+        free(cache->entries);
+    }
+    free(cache);
+}
+
+
+void *STZCacheGetValueForKey(STZCacheRef cache, uint64_t key, bool *outCreatedIfAbsent) {
     CGEventTimestamp now = CGEventTimestampNow();
-    STZCScanCacheAutoCheckExpired(cache, now);
 
     int spareIndex = -1;
 
     for (int h = 0; h < cache->count; ++h) {
-        int i = (cache->hotIndex + h) % cache->count;
-        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, i);
+        int i = (cache->recentIndex + h) % cache->count;
+        _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, i);
 
-        if (entry->identifier == identifier) {
-            if (outResult) {
-                *outResult = entry->accessedAt == kSTZCacheExpired
-                    ? kSTZCScanCacheExpiredRestored
-                    : kSTZCScanCacheFound;
+        if (entry->accessedAt == 0) {
+            spareIndex = i;
+
+        } else if ((now - entry->accessedAt) >= cache->valueLifetime) {
+            if (spareIndex == -1) {
+                spareIndex = i;
             }
+
+        } else if (entry->key == key) {
             entry->accessedAt = now;
-            cache->hotIndex = i;
-            return (void *)entry + cache->dataOffset;
-        }
+            cache->recentIndex = i;
 
-        //  Prefer to use new entries instead of expired ones.
-
-        if (entry->accessedAt == kSTZCacheNew) {
-            spareIndex = i;
-            break;
-        }
-
-        if (spareIndex == -1 && entry->accessedAt == kSTZCacheExpired) {
-            spareIndex = i;
+            if (outCreatedIfAbsent) {
+                *outCreatedIfAbsent = false;
+            }
+            return &entry[1];
         }
     }
 
-    if (!createIfNeeded) {return NULL;}
+    if (!outCreatedIfAbsent) {
+        return NULL;
+    }
+
+    *outCreatedIfAbsent = true;
 
     if (spareIndex == -1) {
-        int newCount = cache->count ? cache->count * 2 : 2;
-        cache->entries = reallocf(cache->entries, newCount * cache->entrySize);
+        int newCount = (double)cache->count * 1.5 + 1;
 
-        for (int j = cache->count; j < newCount; ++j) {
-            STZCacheEntryAtIndex(cache, j)->accessedAt = kSTZCacheNew;
+        if (cache->entries == cache->inlinePayload) {
+            cache->entries = malloc(newCount * cache->entrySize);
+            memcpy(cache->entries, cache->inlinePayload, sizeof(cache->inlinePayload));
+        } else {
+            cache->entries = realloc(cache->entries, newCount * cache->entrySize);
+        }
+
+        for (int i = cache->count; i < newCount; ++i) {
+            STZCacheGetEntryAtIndex(cache, i)->accessedAt = 0;
         }
 
         spareIndex = cache->count;
         cache->count = newCount;
     }
 
-    _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, spareIndex);
-    if (outResult) {
-        *outResult = entry->accessedAt == kSTZCacheExpired
-            ? kSTZCScanCacheExpiredReused
-            : kSTZCScanCacheNewCreated;
+    _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, spareIndex);
+    if (entry->accessedAt != 0) {
+        cache->valueDisposeCallback(&entry[1]);
     }
-    entry->identifier = identifier;
+
+    entry->key = key;
     entry->accessedAt = now;
-    cache->hotIndex = spareIndex;
-    return (void *)entry + cache->dataOffset;
+    cache->recentIndex = spareIndex;
+    return &entry[1];
 }
 
 
-bool STZCScanCacheGetRecentIdentifier(STZCScanCache *cache, uint64_t *outIdentifier) {
-    if (cache->count == 0) {return false;}
+void *__nullable STZCacheGetRecentValue(STZCacheRef cache, uint64_t *__nullable outKey) {
+    if (cache->count == 0) {return NULL;}
 
-    _STZCacheEntryStub *entry = STZCacheEntryAtIndex(cache, cache->hotIndex);
-    if (entry->accessedAt == kSTZCacheNew) {return false;}
+    _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, cache->recentIndex);
+    if (entry->accessedAt == 0) {return NULL;}
 
-    *outIdentifier = entry->identifier;
-    return true;
-}
-
-
-void STZCScanCacheRemoveAll(STZCScanCache *cache) {
-    free(cache->entries);
-    cache->entries = NULL;
-    cache->count = 0;
-    cache->hotIndex = 0;
-    cache->checkedAt = 0;
-}
-
-
-void STZCScanCacheIteratorInitialize(STZCacheIterator *iterator, STZCScanCache *cache, bool includeExpired) {
     CGEventTimestamp now = CGEventTimestampNow();
-    STZCScanCacheAutoCheckExpired(cache, now);
+    if ((now - entry->accessedAt) >= cache->valueLifetime) {return NULL;}
 
-    iterator->index = 0;
-    iterator->includeExpired = includeExpired;
-    iterator->cache = cache;
-    iterator->now = now;
-}
-
-
-void *STZCScanCacheIteratorGetNextData(STZCacheIterator *iterator, uint64_t *outIdentifier, bool *outExpired) {
-    while (iterator->index < iterator->cache->count) {
-        int i = iterator->index;
-        iterator->index += 1;
-
-        _STZCacheEntryStub *entry = STZCacheEntryAtIndex(iterator->cache, i);
-        if (entry->accessedAt == kSTZCacheNew) {continue;}
-
-        bool expired = entry->accessedAt == kSTZCacheExpired;
-        if (expired && !iterator->includeExpired) {continue;}
-        entry->accessedAt = iterator->now;
-
-        if (outIdentifier) {*outIdentifier = entry->identifier;}
-        if (outExpired) {*outExpired = expired;}
-        return (void *)entry + iterator->cache->dataOffset;
+    if (outKey != NULL) {
+        *outKey = entry->key;
     }
-
-    return NULL;
+    return &entry[1];
 }
 
 
-//  MARK: - CGEvent
+void *STZCacheGetValue(STZCacheRef cache, uint64_t key) {
+    return STZCacheGetValueForKey(cache, key, NULL);
+}
 
 
-static char const *nameOfPhase(STZPhase phase) {
-    switch (phase) {
-    case kSTZPhaseNone:             return "none";
-    case kSTZPhaseBegan:            return "began";
-    case kSTZPhaseChanged:          return "changed";
-    case kSTZPhaseEnded:            return "ended";
-    case kSTZPhaseCancelled:        return "cancelled";
-    case kSTZPhaseMayBegin:         return "may begin";
+void *STZCacheSetValue(STZCacheRef cache, uint64_t key, void const *valueAddr) {
+    bool newlyCreated;
+    void *valueDst = STZCacheGetValueForKey(cache, key, &newlyCreated);
+    if (!newlyCreated) {
+        cache->valueDisposeCallback(valueDst);
     }
+    memcpy(valueDst, valueAddr, cache->valueSize);
+    return valueDst;
 }
 
 
-STZFlags STZValidateFlags(uint32_t dirtyFlags, CFStringRef *outDescription) {
-    if (dirtyFlags & kSTZMouseButtonsMask) {
-       STZFlags flags = dirtyFlags & kSTZMouseButtonsMask;
-       if (flags == 1) {flags = 0;}
-
-       if (outDescription) {
-           if (flags == kSTZMouseButtonMiddle) {
-               *outDescription = CFSTR("\U0001f5b1 Mid");
-           } else {
-               static CFStringRef const format = CFSTR("\U0001f5b1 %u");
-               CFStringRef desc = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, format, flags);
-               *outDescription = CFAutorelease(desc);
-           }
-       }
-
-       return flags;
-
-    } else {
-        STZFlags flags = dirtyFlags & ~kSTZMouseButtonsMask;
-
-        if (outDescription) {
-            static struct {
-                uint16_t        symbol;
-                STZFlags        flag;
-            } const items[] = {
-                {u'⌃', kSTZModifierControl},
-                {u'⌥', kSTZModifierOption},
-                {u'⇧', kSTZModifierShift},
-                {u'⌘', kSTZModifierCommand},
-            };
-
-            static const size_t itemCount = sizeof(items) / sizeof(*items);
-
-            uint16_t characters[itemCount];
-            size_t characterCount = 0;
-
-            for (size_t i = 0; i < itemCount; ++i) {
-                if (flags & items[i].flag) {
-                    characters[characterCount] = items[i].symbol;
-                    characterCount += 1;
-                }
-            }
-
-            CFStringRef desc = CFStringCreateWithCharacters(kCFAllocatorDefault, characters, characterCount);
-            *outDescription = CFAutorelease(desc);
+void STZCacheRemoveAll(STZCacheRef cache) {
+    for (int i = 0; i < cache->count; ++i) {
+        _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, i);
+        if (entry->accessedAt != 0) {
+            entry->accessedAt = 0;
+            cache->valueDisposeCallback(&entry[1]);
         }
-
-        return flags;
     }
+}
+
+
+void STZCacheEnumerateValues(STZCacheRef cache, void (*valueEnumerateCallback)(void *valueAddr, void *context), void *context) {
+    CGEventTimestamp now = CGEventTimestampNow();
+
+    for (int i = 0; i < cache->count; ++i) {
+        _STZCacheEntryStub *entry = STZCacheGetEntryAtIndex(cache, i);
+        if (entry->accessedAt == 0) {continue;}
+        if ((now - entry->accessedAt) >= cache->valueLifetime) {continue;}
+        valueEnumerateCallback(&entry[1], context);
+    }
+}
+
+
+//  MARK: -
+
+//  `CGGesturePhase` and `CGScrollPhase` are compatible.
+
+static char const *nameOfPhase(CGGesturePhase phase) {
+    switch (phase) {
+    case kCGGesturePhaseNone:       return "none";
+    case kCGGesturePhaseBegan:      return "began";
+    case kCGGesturePhaseChanged:    return "changed";
+    case kCGGesturePhaseEnded:      return "ended";
+    case kCGGesturePhaseCancelled:  return "cancelled";
+    case kCGGesturePhaseMayBegin:   return "may begin";
+    default:                        return "unknown";
+    }
+}
+
+
+static char const *nameOfMomentumPhase(CGMomentumScrollPhase phase) {
+    switch (phase) {
+    case kCGMomentumScrollPhaseNone:        return "no momentum";
+    case kCGMomentumScrollPhaseBegin:       return "inertia began";
+    case kCGMomentumScrollPhaseContinue:    return "inertia changed";
+    case kCGMomentumScrollPhaseEnd:         return "inertia ended";
+    default:                                return "momentum unknown";
+    }
+}
+
+
+void STZUnknownEnumCase(char const *type, int64_t value) {
+    if (!STZIsLoggingEnabled()) {return;}
+    STZDebugLog("Unknown enum %s case %lld", type, value);
 }
 
 
@@ -248,210 +284,67 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
     if (!STZIsLoggingEnabled()) {return;}
 
     uint64_t senderID = CGEventGetRegistryID(event);
-    CFStringRef flagDesc;
-    STZValidateFlags(CGEventGetFlags(event) & kSTZModifiersMask, &flagDesc);
+    CFStringRef flagDesc = STZFlagsCopyDescription(CGEventGetFlags(event) & kSTZPrintableModifiersMask);
 
     if (CFStringGetLength(flagDesc) == 0) {
-        flagDesc = CFSTR("no flags");
+        CFRelease(flagDesc);
+        flagDesc = CFRetain(CFSTR("no flag"));
     }
 
-    CGFloat data;
-    STZPhase phase;
-    bool byMomentum;
-    CFStringRef desc;
+    int64_t i;
+    double f;
+    CGGesturePhase phase;
+    CFStringRef buttonDesc;
 
     switch (CGEventGetType(event)) {
     case kCGEventFlagsChanged:
-        STZDebugLog("%s flags changed from [%llx] with %@", prefix, senderID, flagDesc);
+        STZDebugLog("%s flags changed [%llx] with %@", prefix, senderID, flagDesc);
         break;
 
     case kCGEventScrollWheel:
-        data = STZGetScrollWheelPrimaryDelta(event);
-        phase = STZGetPhaseFromScrollWheelEvent(event, &byMomentum);
-        char const *phaseTag = byMomentum ? "momentum" : "smooth";
-        char const *tail = STZIsScrollWheelFlipped(event) ? ", flipped" : "";
-        STZDebugLog("%s scroll wheel from [%llx] with %@, %s %s, moved %0.2fpx%s",
-                    prefix, senderID, flagDesc, phaseTag, nameOfPhase(phase), data, tail);
+        i = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
+        f = CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis1);
+        phase = (uint32_t)CGEventGetIntegerValueField(event, kCGScrollWheelEventScrollPhase);
+        CGMomentumScrollPhase mPhase = (uint32_t)CGEventGetIntegerValueField(event, kCGScrollWheelEventMomentumPhase);
+        char const *tail = CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) ? ", flipped" : "";
+
+        if (phase && mPhase) {
+            STZDebugLog("%s scroll wheel [%llx] with %@, phase %s, %s, by %lld (%0.1f) px%s",
+                        prefix, senderID, flagDesc, nameOfPhase(phase), nameOfMomentumPhase(mPhase), i, f, tail);
+        } else if (mPhase) {
+            STZDebugLog("%s scroll wheel [%llx] with %@, %s, by %lld (%0.1f) px%s",
+                        prefix, senderID, flagDesc, nameOfMomentumPhase(mPhase), i, f, tail);
+        } else {
+            STZDebugLog("%s scroll wheel [%llx] with %@, phase %s, by %lld (%0.1f) px%s",
+                        prefix, senderID, flagDesc, nameOfPhase(phase), i, f, tail);
+        }
         break;
 
     case kCGEventGesture:
-        data = CGEventGetDoubleValueField(event, kCGGestureEventZoomValue);
-        phase = STZGetPhaseFromGestureEvent(event);
-        STZDebugLog("%s zoom gesture from [%llx] with %@, gesture %s, scaled %0.02f%%",
-                    prefix, senderID, flagDesc, nameOfPhase(phase), (1 + data) * 100);
+        f = CGEventGetDoubleValueField(event, kCGGestureEventZoomValue);
+        phase = (CGGesturePhase)CGEventGetIntegerValueField(event, kCGGestureEventPhase);
+        STZDebugLog("%s zoom gesture [%llx] with %@, gesture %s, scaled by %0.02f%%",
+                    prefix, senderID, flagDesc, nameOfPhase(phase), (1 + f) * 100);
         break;
 
     case kCGEventOtherMouseDown:
-        STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
-        STZDebugLog("%s mouse down from [%llx] of %@ button",
-                    prefix, senderID, desc);
+        buttonDesc = STZFlagsCopyDescription((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber));
+        STZDebugLog("%s mouse down [%llx] of %@ button",
+                    prefix, senderID, buttonDesc);
+        CFRelease(buttonDesc);
         break;
 
     case kCGEventOtherMouseUp:
-        STZValidateFlags((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber), &desc);
-        STZDebugLog("%s mouse up from [%llx] of %@ button",
-                    prefix, senderID, desc);
+        buttonDesc = STZFlagsCopyDescription((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber));
+        STZDebugLog("%s mouse up [%llx] of %@ button",
+                    prefix, senderID, buttonDesc);
+        CFRelease(buttonDesc);
         break;
 
     default:
-        STZDebugLog("%s unexpected event from [%llx] with %@", prefix, senderID, flagDesc);
+        STZDebugLog("%s unknown event [%llx] with %@", prefix, senderID, flagDesc);
         break;
     }
-}
 
-
-bool STZIsScrollWheelFlipped(CGEventRef event) {
-    assert(CGEventGetType(event) == kCGEventScrollWheel);
-    return CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) != 0;
-}
-
-
-double STZGetScrollWheelPrimaryDelta(CGEventRef event) {
-    double data = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
-    if (data == 0) {
-        data = CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis1);
-    }
-    return data;
-}
-
-
-STZPhase STZGetPhaseFromScrollWheelEvent(CGEventRef event, bool *outByMomentum) {
-    assert(CGEventGetType(event) == kCGEventScrollWheel);
-
-    CGScrollPhase sPhase = (CGScrollPhase)CGEventGetIntegerValueField(event, kCGScrollWheelEventScrollPhase);
-    CGMomentumScrollPhase pPhase = (CGMomentumScrollPhase)CGEventGetIntegerValueField(event, kCGScrollWheelEventMomentumPhase);
-
-    if (pPhase == kCGMomentumScrollPhaseNone) {
-        if (outByMomentum) {
-            *outByMomentum = false;
-        }
-
-        switch (sPhase) {
-        case 0 /* Non-continuous */:            return kSTZPhaseNone;
-        case kCGScrollPhaseMayBegin:            return kSTZPhaseMayBegin;
-        case kCGScrollPhaseBegan:               return kSTZPhaseBegan;
-        case kCGScrollPhaseChanged:             return kSTZPhaseChanged;
-        case kCGScrollPhaseEnded:               return kSTZPhaseEnded;
-        case kCGScrollPhaseCancelled:           return kSTZPhaseCancelled;
-        default:
-            STZUnknownEnumCase("CGScrollPhase", sPhase);
-            return kSTZPhaseChanged;
-        }
-
-    } else {
-        if (outByMomentum) {
-            *outByMomentum = true;
-        }
-
-        switch (pPhase) {
-        case kCGMomentumScrollPhaseBegin:       return kSTZPhaseBegan;
-        case kCGMomentumScrollPhaseContinue:    return kSTZPhaseChanged;
-        case kCGMomentumScrollPhaseEnd:         return kSTZPhaseEnded;
-        default:
-            STZUnknownEnumCase("CGMomentumScrollPhase", pPhase);
-            return kSTZPhaseChanged;
-        }
-    }
-}
-
-
-STZPhase STZGetPhaseFromGestureEvent(CGEventRef event) {
-    assert(CGEventGetType(event) == kCGEventGesture);
-
-    CGGesturePhase phase = (CGGesturePhase)CGEventGetIntegerValueField(event, kCGGestureEventPhase);
-
-    switch (phase) {
-    case kCGGesturePhaseNone:               return kSTZPhaseNone;
-    case kCGGesturePhaseBegan:              return kSTZPhaseBegan;
-    case kCGGesturePhaseChanged:            return kSTZPhaseChanged;
-    case kCGGesturePhaseEnded:              return kSTZPhaseEnded;
-    case kCGGesturePhaseCancelled:          return kSTZPhaseCancelled;
-    case kCGGesturePhaseMayBegin:           return kSTZPhaseMayBegin;
-    default:
-        STZUnknownEnumCase("CGGesturePhase", phase);
-        return kSTZPhaseChanged;
-    }
-}
-
-
-void STZAdaptScrollWheelEvent(CGEventRef event, STZPhase phase, bool byMomentum) {
-    assert(CGEventGetType(event) == kCGEventScrollWheel);
-
-    CGScrollPhase sPhase;
-    CGScrollPhase pPhase;
-
-    if (byMomentum) {
-        switch (phase) {
-        case kSTZPhaseMayBegin:
-        case kSTZPhaseNone:         pPhase = kCGMomentumScrollPhaseNone; break;
-        case kSTZPhaseBegan:        pPhase = kCGMomentumScrollPhaseBegin; break;
-        case kSTZPhaseChanged:      pPhase = kCGMomentumScrollPhaseContinue; break;
-        case kSTZPhaseEnded:
-        case kSTZPhaseCancelled:    pPhase = kCGMomentumScrollPhaseEnd; break;
-        }
-        sPhase = 0;
-
-    } else {
-        switch (phase) {
-        case kSTZPhaseNone:         sPhase = 0; break;
-        case kSTZPhaseMayBegin:     sPhase = kCGScrollPhaseMayBegin; break;
-        case kSTZPhaseBegan:        sPhase = kCGScrollPhaseBegan; break;
-        case kSTZPhaseChanged:      sPhase = kCGScrollPhaseChanged; break;
-        case kSTZPhaseEnded:        sPhase = kCGScrollPhaseEnded; break;
-        case kSTZPhaseCancelled:    sPhase = kCGScrollPhaseCancelled; break;
-        }
-        pPhase = kCGMomentumScrollPhaseNone;
-    }
-
-
-    CGEventSetIntegerValueField(event, kCGScrollWheelEventScrollPhase, sPhase);
-    CGEventSetIntegerValueField(event, kCGScrollWheelEventMomentumPhase, pPhase);
-}
-
-
-void STZAdaptGestureEvent(CGEventRef event, STZPhase phase, double scale) {
-    assert(CGEventGetType(event) == kCGEventGesture);
-
-    CGGesturePhase gPhase;
-
-    switch (phase) {
-    case kSTZPhaseNone:         gPhase = kCGGesturePhaseNone; break;
-    case kSTZPhaseMayBegin:     gPhase = kCGGesturePhaseMayBegin; break;
-    case kSTZPhaseBegan:        gPhase = kCGGesturePhaseBegan; break;
-    case kSTZPhaseChanged:      gPhase = kCGGesturePhaseChanged; break;
-    case kSTZPhaseEnded:        gPhase = kCGGesturePhaseEnded; break;
-    case kSTZPhaseCancelled:    gPhase = kCGGesturePhaseCancelled; break;
-    }
-
-    CGEventSetIntegerValueField(event, kCGGestureEventPhase, gPhase);
-    CGEventSetDoubleValueField(event, kCGGestureEventZoomValue, scale);
-}
-
-
-CGEventRef STZCreateScrollWheelEvent(CGEventRef sample) {
-    CGEventSourceRef source = CGEventCreateSourceFromEvent(sample);
-    CGEventRef event = CGEventCreate(source);
-    if (source) {CFRelease(source);}
-
-    CGEventSetType(event, kCGEventScrollWheel);
-    CGEventSetFlags(event, CGEventGetFlags(sample));
-    CGEventSetLocation(event, CGEventGetLocation(sample));
-    CGEventSetTimestamp(event, CGEventGetTimestamp(sample));
-
-    return event;
-}
-
-
-CGEventRef STZCreateZoomGestureEvent(CGEventRef sample) {
-    CGEventSourceRef source = CGEventCreateSourceFromEvent(sample);
-    CGEventRef event = CGEventCreate(source);
-    if (source) {CFRelease(source);}
-
-    CGEventSetType(event, kCGEventGesture);
-    CGEventSetFlags(event, CGEventGetFlags(sample));
-    CGEventSetLocation(event, CGEventGetLocation(sample));
-    CGEventSetTimestamp(event, CGEventGetTimestamp(sample));
-    CGEventSetIntegerValueField(event, kCGGestureEventHIDType, kIOHIDEventTypeZoom);
-
-    return event;
+    CFRelease(flagDesc);
 }

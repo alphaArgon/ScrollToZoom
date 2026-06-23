@@ -13,13 +13,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🖱 中键"
+            "value" : "🖱 中"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🖱 中鍵"
+            "value" : "🖱 中"
           }
         }
       }
@@ -68,46 +68,24 @@
         }
       }
     },
-    "dot-dash-drag-to-zoom" : {
+    "enable-magic-zoom" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Allow Magic Mouse gestures"
+            "value" : "Use Magic Mouse gesture to zoom"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "允许妙控鼠标手势"
+            "value" : "使用妙控鼠标手势来缩放"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "允許巧控滑鼠手勢"
-          }
-        }
-      }
-    },
-    "dot-dash-drag-to-zoom-message" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double-tap with one finger and hold, then scroll to zoom."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "单指轻点两下并保持，然后滚动来缩放。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
+            "value" : "使用巧控滑鼠來縮放"
           }
         }
       }
@@ -195,7 +173,7 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一些應用程序在按下變更鍵時會有不同的動作。選取該項將從模擬的縮放事件中抹掉變更鍵標記。"
+            "value" : "一些應用程式在按下變更鍵時會有不同的動作。選取該項將從模擬的縮放事件中抹掉變更鍵標記。"
           }
         }
       }
@@ -284,6 +262,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "登入時開啟捲動來縮放"
+          }
+        }
+      }
+    },
+    "magic-zoom-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-tap with one finger and hold, then scroll to zoom."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单指轻点两下并保持，然后滚动来缩放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
           }
         }
       }
@@ -403,19 +403,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Accessibility permission is required to enable “scroll to zoom”."
+            "value" : "The Accessibility permission is required to enable scroll-to-zoom."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要 “辅助功能” 权限以启用 “滚动来缩放”。"
+            "value" : "需要 “辅助功能” 权限以启用滚动缩放功能。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要「輔助使用」權限以啟用「捲動來縮放」。"
+            "value" : "需要「輔助使用」權限以啟用捲動縮放功能。"
           }
         }
       }
@@ -425,19 +425,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When “scroll to zoom” is enabled, removing the permission may cause the computer unresponsive."
+            "value" : "When scroll-to-zoom is enabled, removing permission may cause the computer to become unresponsive."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当 “滚动来缩放” 启用时，移除权限可能会导致电脑不能响应。"
+            "value" : "当滚动缩放功能启用时，移除权限可能会导致电脑不能响应。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "當「捲動來縮放」啟用時，移除權限可能會導致電腦不能回應。"
+            "value" : "當捲動縮放功能啟用時，移除權限可能會導致電腦不能回應。"
           }
         }
       }
@@ -535,19 +535,19 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "To enable automatic launch, quit and move this app to the Applications folder."
+            "value" : "To enable automatic launch, quit and move this app into the Applications folder."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "要允许自动启动，请退出此应用，再将其移动至 “应用程序” 文件夹。"
+            "value" : "要允许自动启动，请退出此应用，再将其移入 “应用程序” 文件夹。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "要允許自動開啟，請結束此應用，然後將其移動至「應用程序」檔案夾。"
+            "value" : "要允許自動開啟，請結束此應用，然後將其移入「應用程式」檔案夾。"
           }
         }
       }
@@ -629,13 +629,57 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "托管于 GitHub"
+            "value" : "GitHub上的源码"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "發佈於 GitHub"
+            "value" : "GitHub上的原始碼"
+          }
+        }
+      }
+    },
+    "wants-dictatorship" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Work with other mouse optimization tools"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "配合其他鼠标优化工具使用"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "與其他滑鼠最佳化工具協同運作"
+          }
+        }
+      }
+    },
+    "wants-dictatorship-message" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This may cause slight delays and increase power consumption. If you don’t use other tools, you can safely disable it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "可能会造成轻微延迟并增加功耗。如果没有使用其他工具，你可以放心禁用此选项。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "這可能會導致輕微延遲並增加耗電量。如果沒有使用其他工具，你可以放心將其停用。"
           }
         }
       }

@@ -48,7 +48,7 @@ static bool legacySetEnabled(bool enable) {
     bool win = false;
 
     LSSharedFileListRef list = LSSharedFileListCreate(kCFAllocatorDefault, kLSSharedFileListSessionLoginItems, NULL);
-    if (!list) {return false;}
+    if (!list) {goto RELEASE_NONE;}
 
     if (enable) {
         LSSharedFileListItemRef item = LSSharedFileListInsertItemURL(list, kLSSharedFileListItemLast, NULL, NULL, appURL, NULL, NULL);

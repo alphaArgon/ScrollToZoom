@@ -6,8 +6,9 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import <CoreFoundation/CoreFoundation.h>
-#import <IOKit/IOKitLib.h>
+#pragma once
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOKitLib.h>
 
 CF_IMPLICIT_BRIDGING_ENABLED
 CF_ASSUME_NONNULL_BEGIN

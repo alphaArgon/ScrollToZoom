@@ -41,11 +41,6 @@ void STZDebugLog(char const *message, ...) {
 }
 
 
-void STZUnknownEnumCase(char const *type, int64_t value) {
-    STZDebugLog("Unknown enum %s case %lld", type, value);
-}
-
-
 @implementation STZConsolePanel {
     BOOL                _sharedPanel;
     BOOL                _loggingEnabled;

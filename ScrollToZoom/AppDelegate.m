@@ -7,14 +7,14 @@
  */
 
 #import "AppDelegate.h"
-#import "STZScrollToZoom.h"
-#import "STZSettings.h"
-#import "STZWindow.h"
+#import "STZEventHandling.h"
 #import "STZProcessManager.h"
+#import "STZWindow.h"
 #import "GeneratedAssetSymbols.h"
 
 
 static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZoom";
+static NSUInteger const HEADER_ITEM_TAG = 110105;
 
 
 @implementation AppDelegate {
@@ -25,31 +25,67 @@ static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZ
     [[NSApplication sharedApplication] setActivationPolicy:NSApplicationActivationPolicyAccessory];
 
     _statusItem = [[NSStatusBar systemStatusBar] statusItemWithLength:NSVariableStatusItemLength];
-    [[_statusItem button] setImage:[NSImage imageNamed:ACImageNameStatusIcon]];
 
     NSArray *nibObjects;
     [[NSBundle mainBundle] loadNibNamed:@"StatusMenu" owner:self topLevelObjects:&nibObjects];
 
     for (id object in nibObjects) {
         if ([object isKindOfClass:[NSMenu self]]) {
+            if (@available(macOS 14, *)) {
+                NSInteger headerItemIndex = [(NSMenu *)object indexOfItemWithTag:HEADER_ITEM_TAG];
+                if (headerItemIndex != -1) {
+                    NSString *header = [[(NSMenu *)object itemAtIndex:headerItemIndex] title];
+                    NSMenuItem *headerItem = [NSMenuItem sectionHeaderWithTitle:header];
+                    [headerItem setTag:HEADER_ITEM_TAG];
+                    [(NSMenu *)object removeItemAtIndex:headerItemIndex];
+                    [(NSMenu *)object insertItem:headerItem atIndex:headerItemIndex];
+                }
+            }
             [_statusItem setMenu:object];
             break;
         }
     }
 
-    STZLoadArgumentsFromUserDefaults();
-    if (!STZSetScrollToZoomEnabled(true)) {
-        [STZWindow orderFrontSharedWindow];
+    if (!STZSetWorkingModes(STZGetPreferredModes())) {
+        [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
     }
+
+    [self updateStatusItem:nil];
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateStatusItem:)
+                                                 name:(__bridge id)kSTZWorkingModesDidChangeNotification
+                                               object:nil];
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
-    [STZWindow orderFrontSharedWindow];
+    [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
     return NO;
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication *)sender {
-    return !STZGetScrollToZoomEnabled();
+    STZModes modes = STZGetWorkingModes();
+    return !(modes & kSTZPracticalModesMask);
+}
+
+- (void)updateStatusItem:(id)sender {
+    STZModes modes = STZGetWorkingModes();
+    if (!(modes & kSTZPracticalModesMask)) {
+        [[_statusItem button] setImage:[NSImage imageNamed:ACImageNameStatusIconDisabled]];
+    } else if (modes & kSTZTriggerFlagsEnabled) {
+        [[_statusItem button] setImage:[NSImage imageNamed:ACImageNameStatusIcon]];
+    } else {
+        [[_statusItem button] setImage:[NSImage imageNamed:ACImageNameStatusIconMagic]];
+    }
+
+    bool hideItems = !(modes & kSTZTriggerFlagsEnabled);
+    for (NSMenuItem *item in [[_statusItem menu] itemArray]) {
+        if ([item tag] == HEADER_ITEM_TAG
+         || [item action] == @selector(toggleEnabledForKeyApplication:)
+         || [item action] == @selector(toggleExcludingFlagsForKeyApplication:)) {
+            [item setHidden:hideItems];
+        }
+    }
 }
 
 - (void)orderFrontAboutPanel:(id)sender {
@@ -64,31 +100,35 @@ static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZ
 }
 
 - (void)orderFrontSharedWindow:(id)sender {
-    [STZWindow orderFrontSharedWindow];
+    [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
+}
+
+- (void)orderFrontSharedWindowAlternate:(id)sender {
+    [STZWindow orderFrontSharedWindowWithAdvanceSettings:YES];
 }
 
 static NSRunningApplication *keyApplication(void) {
     return [[NSWorkspace sharedWorkspace] frontmostApplication] ?: [NSRunningApplication currentApplication];
 }
 
-static void toggleSTZEventTapOptionsForKeyApplication(STZEventTapOptions flag) {
+static void toggleOptionsForKeyApplication(STZAppOptions flag) {
     NSRunningApplication *app = keyApplication();
     CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-    STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
+    STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
     if (options & flag) {
         options &= ~flag;
     } else {
         options |= flag;
     }
-    STZSetEventTapOptionsForBundleIdentifier(bundleID, options);
+    STZSetAppOptionsForBundleIdentifier(bundleID, options);
 }
 
 - (void)toggleEnabledForKeyApplication:(id)sender {
-    toggleSTZEventTapOptionsForKeyApplication(kSTZEventTapDisabled);
+    toggleOptionsForKeyApplication(kSTZDisabledForApp);
 }
 
 - (void)toggleExcludingFlagsForKeyApplication:(id)sender {
-    toggleSTZEventTapOptionsForKeyApplication(kSTZEventTapExcludeFlags);
+    toggleOptionsForKeyApplication(kSTZFlagsExcludedForApp);
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
@@ -96,17 +136,18 @@ static void toggleSTZEventTapOptionsForKeyApplication(STZEventTapOptions flag) {
         NSRunningApplication *app = keyApplication();
         [menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-%@", nil), [app localizedName]]];
         CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-        STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
-        [menuItem setState:!(options & kSTZEventTapDisabled)];
+        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
+        [menuItem setState:!(options & kSTZDisabledForApp)];
         return YES;
     }
 
     if ([menuItem action] == @selector(toggleExcludingFlagsForKeyApplication:)) {
         NSRunningApplication *app = keyApplication();
         CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-        STZEventTapOptions options = STZGetEventTapOptionsForBundleIdentifier(bundleID);
-        [menuItem setState:!!(options & kSTZEventTapExcludeFlags)];
-        return !(options & kSTZEventTapDisabled);
+        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
+        [menuItem setEnabled:!(options & kSTZDisabledForApp)];
+        [menuItem setState:!!(options & kSTZFlagsExcludedForApp)];
+        return !(options & kSTZDisabledForApp);
     }
 
     return YES;

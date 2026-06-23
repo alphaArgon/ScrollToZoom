@@ -8,7 +8,7 @@
 
 #import "STZWindow.h"
 #import "STZPermissionView.h"
-#import "STZScrollToZoom.h"
+#import "STZEventHandling.h"
 #import "STZSettings.h"
 #import "STZLaunchAtLogin.h"
 #import "STZControls.h"
@@ -20,7 +20,7 @@
 
 @interface STZConfigViewController : NSViewController
 
-- (void)setShowsConsoleButton:(BOOL)flag;
+- (void)setShowsAdvancedSettings:(BOOL)flag;
 
 @end
 
@@ -46,9 +46,17 @@ static NSString *trim(NSString *string) {
     return window;
 }
 
-+ (void)orderFrontSharedWindow {
++ (void)orderFrontSharedWindowWithAdvanceSettings:(BOOL)advanced {
+    STZWindow *sharedWindow = [self sharedWindow];
+
+    STZConfigViewController *viewController = (STZConfigViewController *)[sharedWindow contentViewController];
+    [viewController setShowsAdvancedSettings:advanced];
+
+    NSRect frame = [sharedWindow frame];
+    [sharedWindow setFrame:NSMakeRect(NSMinX(frame), NSMaxY(frame), 0, 0) display:YES];
+
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
-    [[self sharedWindow] makeKeyAndOrderFront:nil];
+    [sharedWindow makeKeyAndOrderFront:nil];
 }
 
 - (instancetype)initWithContentRect:(NSRect)contentRect
@@ -61,31 +69,31 @@ static NSString *trim(NSString *string) {
     return self;
 }
 
-- (void)orderWindow:(NSWindowOrderingMode)place relativeTo:(NSInteger)otherWin {
-    [super orderWindow:place relativeTo:otherWin];
-    BOOL showConsoleButton = !!([NSEvent modifierFlags] & NSEventModifierFlagOption);
-    [(STZConfigViewController *)[self contentViewController] setShowsConsoleButton:showConsoleButton];
-}
-
 @end
 
 
 @implementation STZConfigViewController {
-    NSButton           *_checkbox;
-    STZModifierField   *_field;
+    NSButton           *_triggerFlagsCheckbox;
+    STZModifierField   *_triggerFlagsField;
+    NSButton           *_magicZoomCheckbox;
     NSButton           *_zoomInRadio;
     NSButton           *_zoomOutRadio;
     NSSlider           *_speedSlider;
     NSSlider           *_inertiaSlider;
-    NSButton           *_dotDashCheckbox;
     NSButton           *_launchCheckbox;
+    NSButton           *_dictatorshipCheckbox;
+    NSTextField        *_dictatorshipMessageLabel;
     NSButton           *_optionsButton;
     NSButton           *_consoleButton;
+    NSLayoutConstraint *_optionsBelowLaunchConstraint;
+    NSLayoutConstraint *_optionsBelowDictatorshipConstraint;
     NSTimer            *_enableRetryTimer;
+    STZModes            _pendingModes;
+    BOOL                _showsAdvancedSettings;
 }
 
-static double const STZScrollToZoomMagnifierRange[] = {0.0005, 0.0105};
-static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
+static double const STZMagnificationScalarRange[] = {0.0005, 0.0105};
+static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
 - (instancetype)initWithNibName:(NSNibName)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
@@ -99,13 +107,24 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 
     NSArray *checkboxTitles = [NSLocalizedString(@"enable-with-#", nil) componentsSeparatedByString:@"#"];
 
-    _checkbox = [NSButton checkboxWithTitle:trim([checkboxTitles firstObject])
-                                     target:self action:@selector(toggleScrollToZoom:)];
+    _triggerFlagsCheckbox = [NSButton checkboxWithTitle:trim([checkboxTitles firstObject])
+                                     target:self action:@selector(toggleTriggerFlags:)];
     NSTextField *checkboxTail = [checkboxTitles count] > 1
         ? [NSTextField labelWithString:trim([checkboxTitles objectAtIndex:1])] : nil;
 
-    _field = [STZModifierField fieldWithModifiers:0
+    _triggerFlagsField = [STZModifierField fieldWithModifiers:0
                                            target:self action:@selector(updateFlags:)];
+
+    _magicZoomCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"enable-magic-zoom", nil)
+                                            target:self action:@selector(toggleMagicZoom:)];
+
+    NSTextField *magicZoomMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"magic-zoom-message", nil)];
+    [magicZoomMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
+    [magicZoomMessageLabel setTextColor:[NSColor secondaryLabelColor]];
+    [magicZoomMessageLabel setSelectable:NO];
+
+    NSBox *box = [[NSBox alloc] init];
+    [box setTitlePosition:NSNoTitle];
 
     NSTextField *directionLabel = [NSTextField labelWithString:NSLocalizedString(@"swipe-up-to", nil)];
 
@@ -116,15 +135,15 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 
     NSTextField *speedLabel = [NSTextField labelWithString:NSLocalizedString(@"speed", nil)];
     _speedSlider = [NSSlider sliderWithValue:0
-                                    minValue:STZScrollToZoomMagnifierRange[0]
-                                    maxValue:STZScrollToZoomMagnifierRange[1]
+                                    minValue:STZMagnificationScalarRange[0]
+                                    maxValue:STZMagnificationScalarRange[1]
                                       target:self action:@selector(updateSpeed:)];
     [_speedSlider setNumberOfTickMarks:11];
 
     NSTextField *inertiaLabel = [NSTextField labelWithString:NSLocalizedString(@"inertia", nil)];
     _inertiaSlider = [NSSlider sliderWithValue:0
-                                      minValue:STZScrollMomentumToZoomAttenuationRange[0]
-                                      maxValue:STZScrollMomentumToZoomAttenuationRange[1]
+                                      minValue:STZMomentumZoomAttenuationRange[0]
+                                      maxValue:STZMomentumZoomAttenuationRange[1]
                                         target:self action:@selector(updateInertia:)];
     [_inertiaSlider setNumberOfTickMarks:11];
 
@@ -132,14 +151,6 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     [inertiaMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
     [inertiaMessageLabel setTextColor:[NSColor secondaryLabelColor]];
     [inertiaMessageLabel setSelectable:NO];
-
-    _dotDashCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"dot-dash-drag-to-zoom", nil)
-                                            target:self action:@selector(toggleDotDashDrag:)];
-
-    NSTextField *dotDashMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"dot-dash-drag-to-zoom-message", nil)];
-    [dotDashMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-    [dotDashMessageLabel setTextColor:[NSColor secondaryLabelColor]];
-    [dotDashMessageLabel setSelectable:NO];
 
     _launchCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"launch-at-login", nil)
                                            target:self action:@selector(toggleLaunchAtLogin:)];
@@ -156,6 +167,14 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
         [_launchCheckbox setTag:0];
     }
 
+    _dictatorshipCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"wants-dictatorship", nil)
+                                                 target:self action:@selector(toggleDictatorship:)];
+
+    _dictatorshipMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"wants-dictatorship-message", nil)];
+    [_dictatorshipMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
+    [_dictatorshipMessageLabel setTextColor:[NSColor secondaryLabelColor]];
+    [_dictatorshipMessageLabel setSelectable:NO];
+
     _optionsButton = [NSButton buttonWithTitle:NSLocalizedString(@"open-options-for-apps", nil)
                                         target:self action:@selector(openOptionsForApps:)];
 
@@ -164,13 +183,21 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     [_consoleButton setBezelStyle:NSBezelStyleCircular];
     [_consoleButton setToolTip:NSLocalizedString(@"open-console", nil)];
 
-    [view setSubviews:@[_checkbox, _field, directionLabel, _zoomInRadio, _zoomOutRadio,
-                        speedLabel, _speedSlider, inertiaLabel, _inertiaSlider, inertiaMessageLabel,
-                        _dotDashCheckbox, dotDashMessageLabel,
-                        _launchCheckbox, _optionsButton, _consoleButton]];
+    [view setSubviews:@[_triggerFlagsCheckbox, _triggerFlagsField,
+                        _magicZoomCheckbox, magicZoomMessageLabel,
+                        box, _launchCheckbox, _dictatorshipCheckbox, _dictatorshipMessageLabel,
+                        _optionsButton, _consoleButton]];
+    [[box contentView] setSubviews:@[directionLabel, _zoomInRadio, _zoomOutRadio,
+                                     speedLabel, _speedSlider,
+                                     inertiaLabel, _inertiaSlider, inertiaMessageLabel]];
+
     if (checkboxTail) {[view addSubview:checkboxTail];}
     if (launchMessageLabel) {[view addSubview:launchMessageLabel];}
+
     for (NSView *subviews in [view subviews]) {
+        [subviews setTranslatesAutoresizingMaskIntoConstraints:NO];
+    }
+    for (NSView *subviews in [[box contentView] subviews]) {
         [subviews setTranslatesAutoresizingMaskIntoConstraints:NO];
     }
 
@@ -179,15 +206,29 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
         [_inertiaSlider setControlSize:NSControlSizeSmall];
     }
 
+    _optionsBelowLaunchConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
+    _optionsBelowDictatorshipConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[_dictatorshipMessageLabel bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
+
     [NSLayoutConstraint activateConstraints:@[
-        [[_checkbox topAnchor] constraintEqualToAnchor:[view topAnchor] constant:kSTZUINormalSpacing],
-        [[_checkbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
+        [[_triggerFlagsCheckbox topAnchor] constraintEqualToAnchor:[view topAnchor] constant:kSTZUINormalSpacing],
+        [[_triggerFlagsCheckbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
 
-        [[_field firstBaselineAnchor] constraintEqualToAnchor:[_checkbox firstBaselineAnchor]],
-        [[_field leadingAnchor] constraintEqualToAnchor:[_checkbox trailingAnchor] constant:kSTZUIInlineSpacing + kSTZUIFixCheckboxTrailing],
+        [[_triggerFlagsField firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]],
+        [[_triggerFlagsField leadingAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox trailingAnchor] constant:kSTZUIInlineSpacing + kSTZUIFixCheckboxTrailing],
 
-        [[directionLabel topAnchor] constraintEqualToAnchor:[_checkbox bottomAnchor] constant:kSTZUISmallSpacing],
-        [[directionLabel leadingAnchor] constraintEqualToAnchor:[_checkbox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[_magicZoomCheckbox topAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_magicZoomCheckbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
+
+        [[magicZoomMessageLabel topAnchor] constraintEqualToAnchor:[_magicZoomCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[magicZoomMessageLabel leadingAnchor] constraintEqualToAnchor:[_magicZoomCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[magicZoomMessageLabel trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
+
+        [[box topAnchor] constraintEqualToAnchor:[magicZoomMessageLabel bottomAnchor] constant:kSTZUISmallSpacing],
+        [[box leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
+        [[box trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
+
+        [[directionLabel topAnchor] constraintEqualToAnchor:[box topAnchor] constant:kSTZUISmallSpacing],
+        [[directionLabel leadingAnchor] constraintEqualToAnchor:[box leadingAnchor] constant:kSTZUICheckboxWidth],
 
         [[_zoomInRadio firstBaselineAnchor] constraintEqualToAnchor:[directionLabel firstBaselineAnchor]],
         [[_zoomInRadio leadingAnchor] constraintEqualToAnchor:[directionLabel trailingAnchor] constant:kSTZUIInlineSpacing],
@@ -200,32 +241,32 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 
         [[_speedSlider firstBaselineAnchor] constraintEqualToAnchor:[speedLabel firstBaselineAnchor] constant:kSTZUISliderBaselineOffset],
         [[_speedSlider leadingAnchor] constraintEqualToAnchor:[speedLabel trailingAnchor] constant:kSTZUISmallSpacing],
-        [[_speedSlider trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
+        [[_speedSlider trailingAnchor] constraintEqualToAnchor:[box trailingAnchor] constant:-kSTZUINormalSpacing],
 
         [[inertiaLabel topAnchor] constraintEqualToAnchor:[speedLabel bottomAnchor] constant:kSTZUISmallSpacing],
         [[inertiaLabel trailingAnchor] constraintEqualToAnchor:[speedLabel trailingAnchor]],
 
         [[_inertiaSlider firstBaselineAnchor] constraintEqualToAnchor:[inertiaLabel firstBaselineAnchor] constant:kSTZUISliderBaselineOffset],
         [[_inertiaSlider leadingAnchor] constraintEqualToAnchor:[inertiaLabel trailingAnchor] constant:kSTZUISmallSpacing],
-        [[_inertiaSlider trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
+        [[_inertiaSlider trailingAnchor] constraintEqualToAnchor:[box trailingAnchor] constant:-kSTZUINormalSpacing],
         [[_inertiaSlider widthAnchor] constraintGreaterThanOrEqualToConstant:240],
 
         [[inertiaMessageLabel topAnchor] constraintEqualToAnchor:[inertiaLabel bottomAnchor] constant:kSTZUIInlineSpacing - kSTZUISliderBaselineOffset],
         [[inertiaMessageLabel leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor]],
         [[inertiaMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
+        [[inertiaMessageLabel bottomAnchor] constraintEqualToAnchor:[box bottomAnchor] constant:-kSTZUISmallSpacing],
 
-        [[_dotDashCheckbox leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor] constant:-kSTZUICheckboxWidth],
-        [[_dotDashCheckbox topAnchor] constraintEqualToAnchor:[inertiaMessageLabel bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_launchCheckbox topAnchor] constraintEqualToAnchor:[box bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_launchCheckbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
 
-        [[dotDashMessageLabel leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor]],
-        [[dotDashMessageLabel topAnchor] constraintEqualToAnchor:[_dotDashCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
-        [[dotDashMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
+        [[_dictatorshipCheckbox topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing],
+        [[_dictatorshipCheckbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
 
-        [[_launchCheckbox leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor] constant:-kSTZUICheckboxWidth],
-        [[_launchCheckbox topAnchor] constraintEqualToAnchor:[dotDashMessageLabel bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_dictatorshipMessageLabel topAnchor] constraintEqualToAnchor:[_dictatorshipCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[_dictatorshipMessageLabel leadingAnchor] constraintEqualToAnchor:[_dictatorshipCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[_dictatorshipMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
 
         [[_optionsButton trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
-        [[_optionsButton topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing],
         [[_optionsButton bottomAnchor] constraintEqualToAnchor:[view bottomAnchor] constant:-kSTZUINormalSpacing],
 
         [[_consoleButton leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
@@ -234,22 +275,40 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 
     if (checkboxTail) {
         [NSLayoutConstraint activateConstraints:@[
-            [[checkboxTail firstBaselineAnchor] constraintEqualToAnchor:[_checkbox firstBaselineAnchor]],
-            [[checkboxTail leadingAnchor] constraintEqualToAnchor:[_field trailingAnchor] constant:kSTZUIInlineSpacing],
+            [[checkboxTail firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]],
+            [[checkboxTail leadingAnchor] constraintEqualToAnchor:[_triggerFlagsField trailingAnchor] constant:kSTZUIInlineSpacing],
         ]];
     }
 
     if (launchMessageLabel) {
         [NSLayoutConstraint activateConstraints:@[
-            [[launchMessageLabel leadingAnchor] constraintEqualToAnchor:[_inertiaSlider leadingAnchor]],
+            [[launchMessageLabel leadingAnchor] constraintEqualToAnchor:[_launchCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
             [[launchMessageLabel topAnchor] constraintEqualToAnchor:[_launchCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
-            [[launchMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
+            [[launchMessageLabel trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
         ]];
     }
+
+    [self updateAdvancedSettingsVisibility];
 }
 
-- (void)setShowsConsoleButton:(BOOL)flag {
-    [_consoleButton setHidden:!flag];
+- (void)setShowsAdvancedSettings:(BOOL)flag {
+    _showsAdvancedSettings = flag;
+    [self updateAdvancedSettingsVisibility];
+}
+
+- (void)updateAdvancedSettingsVisibility {
+    [_consoleButton setHidden:!_showsAdvancedSettings];
+    [_dictatorshipCheckbox setHidden:!_showsAdvancedSettings];
+
+    if (_showsAdvancedSettings) {
+        [_dictatorshipMessageLabel setHidden:NO];
+        [_optionsBelowLaunchConstraint setActive:NO];
+        [_optionsBelowDictatorshipConstraint setActive:YES];
+    } else {
+        [_optionsBelowDictatorshipConstraint setActive:NO];
+        [_optionsBelowLaunchConstraint setActive:YES];
+        [_dictatorshipMessageLabel setHidden:YES];
+    }
 }
 
 - (void)viewWillAppear {
@@ -257,27 +316,32 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 }
 
 - (void)reloadData {
-    bool enabled = STZGetScrollToZoomEnabled();
-    [self setControlsEnabled:enabled];
-    [_checkbox setState:enabled];
-    [_field setFlags:STZGetScrollToZoomFlags()];
-    [_zoomInRadio setState:STZGetScrollToZoomMagnifier() > 0];
-    [_zoomOutRadio setState:STZGetScrollToZoomMagnifier() < 0];
-    [_speedSlider setDoubleValue:fabs(STZGetScrollToZoomMagnifier())];
-    [_inertiaSlider setDoubleValue:1 - STZGetScrollMomentumToZoomAttenuation()];
-    [_dotDashCheckbox setState:STZGetDotDashDragToZoomEnabled()];
+    STZModes modes = STZGetWorkingModes();
+    [self setControlsEnabledForModes:modes];
+    [_triggerFlagsCheckbox setState:(modes & kSTZTriggerFlagsEnabled) != 0];
+    [_triggerFlagsField setFlags:STZGetTriggerFlags()];
+    [_zoomInRadio setState:STZGetMagnificationScalar() > 0];
+    [_zoomOutRadio setState:STZGetMagnificationScalar() < 0];
+    [_speedSlider setDoubleValue:fabs(STZGetMagnificationScalar())];
+    [_inertiaSlider setDoubleValue:1 - STZGetMomentumZoomAttenuation()];
+    [_magicZoomCheckbox setState:(modes & kSTZMagicZoomEnabled) != 0];
+    [_dictatorshipCheckbox setState:(modes & kSTZWantsDictatorship) != 0];
     [_launchCheckbox setState:STZGetLaunchAtLoginEnabled()];
 }
 
-- (void)setControlsEnabled:(BOOL)enabled {
-    [_field setEnabled:enabled];
-    [_zoomInRadio setEnabled:enabled];
-    [_zoomOutRadio setEnabled:enabled];
-    [_speedSlider setEnabled:enabled];
-    [_inertiaSlider setEnabled:enabled];
-    [_optionsButton setEnabled:enabled];
-    [_dotDashCheckbox setEnabled:enabled];
-    [_launchCheckbox setEnabled:enabled && [_launchCheckbox tag] != -1];
+- (void)setControlsEnabledForModes:(STZModes)modes {
+    BOOL triggerFlagsEnabled = (modes & kSTZTriggerFlagsEnabled) != 0;
+    BOOL magicZoomEnabled = (modes & kSTZMagicZoomEnabled) != 0;
+    BOOL zoomSettingsEnabled = triggerFlagsEnabled || magicZoomEnabled;
+
+    [_triggerFlagsField setEnabled:triggerFlagsEnabled];
+    [_zoomInRadio setEnabled:zoomSettingsEnabled];
+    [_zoomOutRadio setEnabled:zoomSettingsEnabled];
+    [_speedSlider setEnabled:zoomSettingsEnabled];
+    [_inertiaSlider setEnabled:zoomSettingsEnabled];
+    [_optionsButton setEnabled:triggerFlagsEnabled];
+    [_launchCheckbox setEnabled:[_launchCheckbox tag] != -1];
+    [_dictatorshipCheckbox setEnabled:zoomSettingsEnabled];
 }
 
 - (void)openOptionsForApps:(id)sender {
@@ -293,26 +357,42 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
     STZSetLaunchAtLoginEnabled(enable);
 }
 
-- (void)toggleDotDashDrag:(id)sender {
-    BOOL enable = [_dotDashCheckbox state] != NSOffState;
-    STZSetDotDashDragToZoomEnabled(enable);
+- (void)toggleTriggerFlags:(id)sender {
+    [self toggleMode:kSTZTriggerFlagsEnabled presentingFromView:_triggerFlagsCheckbox];
 }
 
-- (void)toggleScrollToZoom:(id)sender {
-    BOOL enable = [_checkbox state] != NSOffState;
+- (void)toggleMagicZoom:(id)sender {
+    [self toggleMode:kSTZMagicZoomEnabled presentingFromView:_magicZoomCheckbox];
+}
 
-    if (STZSetScrollToZoomEnabled(enable)) {
-        [self setControlsEnabled:enable];
+- (void)toggleDictatorship:(id)sender {
+    [self toggleMode:kSTZWantsDictatorship presentingFromView:_dictatorshipCheckbox];
+}
+
+- (void)toggleMode:(STZModes)mode presentingFromView:(NSView *)view {
+    STZModes modes = STZGetPreferredModes() ^ mode;
+    if ([self commitModes:modes presentingFromView:view]) {
         [_enableRetryTimer invalidate];
         _enableRetryTimer = nil;
-
-    } else {
-        [self presentViewController:[[STZPermissionViewController alloc] init]
-            asPopoverRelativeToRect:[_checkbox bounds]
-                             ofView:_checkbox
-                      preferredEdge:NSRectEdgeMinY
-                           behavior:NSPopoverBehaviorTransient];
     }
+}
+
+- (BOOL)commitModes:(STZModes)modes presentingFromView:(NSView *)view {
+    BOOL committed = STZSetWorkingModes(modes);
+    if (committed || !(modes & kSTZPracticalModesMask)) {
+        STZSetPreferredModes(modes);
+        [self reloadData];
+        return YES;
+    }
+
+    _pendingModes = modes;
+    [self reloadData];
+    [self presentViewController:[[STZPermissionViewController alloc] init]
+        asPopoverRelativeToRect:[view bounds]
+                         ofView:view
+                  preferredEdge:NSRectEdgeMinY
+                       behavior:NSPopoverBehaviorTransient];
+    return NO;
 }
 
 - (void)dismissViewController:(NSViewController *)viewController {
@@ -331,9 +411,9 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
                 [timer invalidate];
                 STZDebugLog("Cancel checking permission");
 
-            } else if (STZSetScrollToZoomEnabled(true)) {
-                [this setControlsEnabled:YES];
-                [this->_checkbox setState:NSControlStateValueOn];
+            } else if (STZSetWorkingModes(this->_pendingModes)) {
+                STZSetPreferredModes(this->_pendingModes);
+                [this reloadData];
                 [this->_enableRetryTimer invalidate];
                 this->_enableRetryTimer = nil;
                 STZDebugLog("End checking permission");
@@ -343,15 +423,15 @@ static double const STZScrollMomentumToZoomAttenuationRange[] = {0, 1};
 }
 
 - (void)updateFlags:(id)sender {
-    STZSetScrollToZoomFlags([_field flags]);
+    STZSetTriggerFlags([_triggerFlagsField flags]);
 }
 
 - (void)updateSpeed:(id)sender {
-    STZSetScrollToZoomMagnifier(([_zoomOutRadio state] ? -1 : 1) * [_speedSlider doubleValue]);
+    STZSetMagnificationScalar(([_zoomOutRadio state] ? -1 : 1) * [_speedSlider doubleValue]);
 }
 
 - (void)updateInertia:(id)sender {
-    STZSetScrollMomentumToZoomAttenuation(1 - [_inertiaSlider doubleValue]);
+    STZSetMomentumZoomAttenuation(1 - [_inertiaSlider doubleValue]);
 }
 
 @end

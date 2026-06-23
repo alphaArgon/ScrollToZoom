@@ -32,7 +32,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
         CFRelease(descs);
     }
 
-    return [NSFont fontWithDescriptor:(__bridge id)desc size:size];
+    return (__bridge_transfer id)CTFontCreateWithFontDescriptor(desc, size, NULL);
 }
 
 
@@ -47,9 +47,8 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 - (instancetype)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
 
-    CFStringRef description;
-    STZValidateFlags(kSTZModifiersMask, &description);
-    _symbolLabel = [NSTextField labelWithString:(__bridge id)description];
+    CFStringRef desc = STZFlagsCopyDescription(kSTZModifiersMask);
+    _symbolLabel = [NSTextField labelWithString:(__bridge_transfer id)desc];
     [_symbolLabel setRefusesFirstResponder:YES];
     [_symbolLabel setEditable:NO];
     [_symbolLabel setSelectable:NO];
@@ -99,7 +98,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
         return [super mouseDown:event];
     }
 
-    if (!STZValidateFlags([event modifierFlags] & kSTZModifiersMask, NULL)) {
+    if (!STZFlagsValidate([event modifierFlags] & kSTZModifiersMask)) {
         [self setEditing:!_editing];
         [[self window] makeFirstResponder:self];
     }
@@ -127,7 +126,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
         return [super flagsChanged:event];
     }
 
-    STZFlags flags = STZValidateFlags([event modifierFlags] & kSTZModifiersMask, NULL);
+    STZFlags flags = STZFlagsValidate([event modifierFlags] & kSTZModifiersMask);
 
     if (flags) {
         _accumulatedFlags |= flags;
@@ -148,7 +147,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
         return [super otherMouseDown:event];
     }
 
-    STZFlags flags = STZValidateFlags([event buttonNumber] & kSTZMouseButtonsMask, NULL);
+    STZFlags flags = STZFlagsValidate([event buttonNumber] & kSTZMouseButtonsMask);
 
     if (flags) {
         _flags = flags;
@@ -162,15 +161,13 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 
 - (void)setFlags:(STZFlags)flags {
     if (flags == _flags) {return;}
-    CFStringRef description;
-    _flags = STZValidateFlags(flags, &description);
-    [_symbolLabel setStringValue:NSLocalizedString((__bridge id)description, nil)];
+    _flags = STZFlagsValidate(flags);
+    [self setDisplayedSymbols:_flags];
 }
 
 - (void)setDisplayedSymbols:(STZFlags)flags {
-    CFStringRef description;
-    STZValidateFlags(flags, &description);
-    [_symbolLabel setStringValue:NSLocalizedString((__bridge id)description, nil)];
+    CFStringRef desc = STZFlagsCopyDescription(flags);
+    [_symbolLabel setStringValue:NSLocalizedString((__bridge_transfer id)desc, nil)];
 }
 
 - (void)setEditing:(BOOL)editing {

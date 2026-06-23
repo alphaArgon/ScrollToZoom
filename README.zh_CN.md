@@ -11,11 +11,11 @@
 - 自定义方向、速度、各 app 单独的配置
 - 兼容其他鼠标优化工具
 
-### <img src="MagicZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@1x.png" width="64" align="right"> 妙控鼠标特供
+### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> 妙控鼠标特供
 
 轻点两下然后滚动（手指触碰—抬起—触碰—移动）来放大和缩小。这个交互方式和在 iPhone 上缩放 Apple 地图是一样的。如果同时启用了轻点两下来智能缩放，这个操作会很自然。
 
-如果你只需要这个功能，并且没有安装其他鼠标优化 app，可以自行编译本 repo 下的 MagicZoom.xcodeproj。独立的 app 在性能上有一定提升。
+先前专门开发的 app「妙控缩放」只提供这个功能，现在它已经集成进「滚动来缩放」了。如果不需要鼠键触发的缩放，可以在设置中关闭它。
 
 ## 简介
 
