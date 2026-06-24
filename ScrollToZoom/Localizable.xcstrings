@@ -1,13 +1,147 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "-zoom-in" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hineinzoomen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zoom in"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "acercar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "agrandir"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "拡大"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "увеличить"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放大"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放大"
+          }
+        }
+      }
+    },
+    "-zoom-out" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Herauszoomen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "zoom out"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "alejar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "réduire"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "縮小"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "уменьшить"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "缩小"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "縮小"
+          }
+        }
+      }
+    },
     "🖱 Mid" : {
       "extractionState" : "manual",
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🖱 Mitte"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "🖱 Mid"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🖱 Medio"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🖱 Milieu"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🖱 中"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "🖱 Средняя"
           }
         },
         "zh-Hans" : {
@@ -26,10 +160,40 @@
     },
     "cancel" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abbrechen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cancel"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cancelar"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuler"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "キャンセル"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Отменить"
           }
         },
         "zh-Hans" : {
@@ -46,12 +210,42 @@
         }
       }
     },
-    "configured" : {
+    "configured-apps" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konfiguriert"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configured"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configuradas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Configurées"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "設定済み"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настроенные"
           }
         },
         "zh-Hans" : {
@@ -70,10 +264,40 @@
     },
     "enable-magic-zoom" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magic Mouse-Geste zum Zoomen verwenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Use Magic Mouse gesture to zoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar gesto del Magic Mouse para hacer zoom"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser les gestes de la Magic Mouse pour zoomer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Magic Mouseのジェスチャでズーム"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Использовать жест Magic Mouse для увеличения"
           }
         },
         "zh-Hans" : {
@@ -85,39 +309,99 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "使用巧控滑鼠來縮放"
+            "value" : "使用巧控滑鼠手勢來縮放"
           }
         }
       }
     },
-    "enable-with-#" : {
+    "enable-with-key-or-button-#" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scrollrad mit # zum Zoomen verwenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Use scroll gesture to zoom with #"
+            "value" : "Use scroll wheel to zoom with #"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar rueda del ratón para hacer zoom con #"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Faire défiler avec touches # pour zoomer"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#とスクロールホイールでズーム"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Увеличивать, используя колёсико мыши с #"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "按下#时，使用滚动手势来缩放"
+            "value" : "按下#时，使用滚轮来缩放"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "按下#時，使用捲動手勢來縮放"
+            "value" : "按下#時，使用滾輪來縮放"
           }
         }
       }
     },
-    "enabled-for-%@" : {
+    "enabled-for-app-name-%@" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für „%@“ aktivieren"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enable for %@"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activar para «%@»"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Activer pour « %@ »"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「%@」で有効にする"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Включить для «%@»"
           }
         },
         "zh-Hans" : {
@@ -136,10 +420,40 @@
     },
     "exclude-flags" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sondertasten entfernen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Erase Modifier Keys"
+            "value" : "Erase modifier keys"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Borrar teclas modificadoras"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Effacer les touches de modification"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "修飾キーを消去"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Удалять клавиши-модификаторы"
           }
         },
         "zh-Hans" : {
@@ -158,76 +472,144 @@
     },
     "exclude-flags-message" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Manche Apps verhalten sich anders, wenn Sondertasten gedrückt sind. Aktiviere diese Option, um die Sondertasten aus den simulierten Zoomereignissen zu entfernen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Some applications behave differently when modifier keys are pressed. Enable this option to wipe out the modifier flags from the simulated zooming events."
+            "value" : "Some applications behave differently when modifier keys are pressed. Enable this option to wipe out the triggering modifier flags from the simulated zooming events."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Algunas apps se comportan de forma diferente cuando se pulsan teclas modificadoras. Activa esta opción para quitarlas de los eventos de zoom simulados."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Certaines apps réagissent différemment lorsque des touches de modification sont enfoncées. Activez cette option pour retirer ces touches des événements de zoom simulés."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アプリケーションによっては、修飾キーが押されていると動作が変わります。このオプションをオンにすると、トリガーとなった修飾キーの情報が、シミュレートされたズームイベントから取り除かれます。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Некоторые приложения работают иначе, когда нажаты клавиши-модификаторы. Включите этот параметр, чтобы удалять эти клавиши из имитируемых событий масштабирования."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一些应用程序在按下修饰键时会有不同的行为。启用该项将从模拟的缩放事件中抹去修饰键标记。"
+            "value" : "一些应用程序在按下修饰键时会有不同的行为。启用该项将从模拟的缩放事件中抹去触发缩放的修饰键标记。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "一些應用程式在按下變更鍵時會有不同的動作。選取該項將從模擬的縮放事件中抹掉變更鍵標記。"
+            "value" : "一些應用程式在按下變更鍵時會有不同的動作。選取該項將從模擬的縮放事件中抹掉觸發縮放變更鍵標記。"
           }
         }
       }
     },
     "grant-permission" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zulassen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Grant Permission"
+            "value" : "Grant"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Permitir"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autoriser"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "許可"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Разрешить"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授予权限"
+            "value" : "授权"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "授予權限"
-          }
-        }
-      }
-    },
-    "inertia" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inertia:"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "惯性："
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "慣性："
+            "value" : "授權"
           }
         }
       }
     },
     "inertia-message" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Die Trägheitseinstellung gilt für integrierte Trackpads sowie Magic Trackpad und Magic Mouse."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inertia setting applies to built-in trackpads, Magic Trackpads, and Magic Mice."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "El ajuste de inercia se aplica a los trackpads integrados, al Magic Trackpad y al Magic Mouse."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le réglage d’inertie s’applique aux trackpads intégrés, au Magic Trackpad et à la Magic Mouse."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性の設定は、内蔵トラックパッド、Magic Trackpad、Magic Mouseに適用されます。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Настройка инерции применяется к встроенным трекпадам, Magic Trackpad и Magic Mouse."
           }
         },
         "zh-Hans" : {
@@ -244,12 +626,94 @@
         }
       }
     },
+    "inertia:" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trägheit:"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inertia:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inercia:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inertie :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Инерция:"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "惯性："
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "慣性："
+          }
+        }
+      }
+    },
     "launch-at-login" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom bei der Anmeldung öffnen"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Launch Scroll to Zoom at login"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir Scroll to Zoom al iniciar sesión"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir Scroll to Zoom à l'ouverture de session"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ログイン時にスクロールでズームを開く"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открывать Scroll to Zoom при входе"
           }
         },
         "zh-Hans" : {
@@ -266,34 +730,42 @@
         }
       }
     },
-    "magic-zoom-message" : {
+    "log-message" : {
       "localizations" : {
-        "en" : {
+        "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Double-tap with one finger and hold, then scroll to zoom."
+            "value" : "Nachricht"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "单指轻点两下并保持，然后滚动来缩放。"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
-          }
-        }
-      }
-    },
-    "message" : {
-      "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Message"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mensaje"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "メッセージ"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сообщение"
           }
         },
         "zh-Hans" : {
@@ -310,12 +782,146 @@
         }
       }
     },
+    "log-time" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zeit"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Time"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hora"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heure"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時刻"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Время"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "时间"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "時間"
+          }
+        }
+      }
+    },
+    "magic-zoom-message" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tippe zweimal mit einem Finger und halte den Finger auf der Oberfläche, scrolle dann zum Zoomen."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-tap with one finger and hold, then scroll to zoom."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toca dos veces con un dedo y mantenlo apoyado; después desplázate para hacer zoom."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Touchez deux fois avec un doigt et maintenez le contact, puis faites défiler pour zoomer."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "1本指でダブルタップしてそのまま触れ続け、スクロールしてズームします。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Дважды коснитесь одним пальцем и удерживайте его, затем прокрутите для масштабирования."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "单指轻点两下并保持，然后滚动来缩放。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "用一指輕點兩下並保持，然後捲動來縮放。"
+          }
+        }
+      }
+    },
     "open-console" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Konsole öffnen …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Open Console…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abrir consola…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvrir la console…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コンソールを開く…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открыть консоль…"
           }
         },
         "zh-Hans" : {
@@ -334,10 +940,40 @@
     },
     "open-options-for-apps" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen für Apps …"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options for Apps…"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones para apps…"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options des apps…"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各アプリのオプション…"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметры приложений…"
           }
         },
         "zh-Hans" : {
@@ -356,10 +992,40 @@
     },
     "options-for-apps" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optionen für Apps"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Options for Apps"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opciones para apps"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Options des apps"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "各アプリのオプション"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Параметры приложений"
           }
         },
         "zh-Hans" : {
@@ -378,76 +1044,196 @@
     },
     "permission-message" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Öffne die „Systemeinstellungen“ und erlaube dieser App, den Computer zu steuern. Wenn der Eintrag für diese App bereits in der Liste angezeigt und aktiviert ist, entferne ihn und versuche es erneut."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open System Settings and allow this application’s control. If the item for the application is already presented in the list, please remove it and retry."
+            "value" : "Allow this application to control the computer in System Settings. If the item for this application is already listed and turned on, remove it and retry."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "En «Ajustes del Sistema», permite que esta app controle el ordenador. Si el elemento de esta app ya aparece en la lista y está activado, elimínalo e inténtalo de nuevo."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dans « Réglages Système », autorisez cette app à contrôler l’ordinateur. Si l’élément de cette app apparaît déjà dans la liste et qu’il est activé, supprimez-le, puis réessayez."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "「システム設定」で、このアプリケーションによる制御を許可してください。このアプリの項目が既にリストに表示され、有効になっている場合は、削除してからやり直してください。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "В «Системных настройках» разрешите этому приложению управлять компьютером. Если элемент этого приложения уже есть в списке и включен, удалите его и повторите попытку."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打开 “系统设置” 并允许此应用程序的控制。如果该应用程序项已在列表中，请将其移除后重试。"
+            "value" : "在 “系统设置” 中允许此应用程序控制电脑。如果此应用程序项已在列表中启用，将其移除后重试。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "打開「系統設定」並允許此應用程式的控制。如果該應用程式項已在列表中啟用，請將其移除後再試一次。"
+            "value" : "在「系統設定」中允許此應用程式控制電腦。如果此應用程式項已在列表中啟用，將其移除後再試一次。"
           }
         }
       }
     },
     "permission-title" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bedienungshilfen-Berechtigung erforderlich"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The Accessibility permission is required to enable scroll-to-zoom."
+            "value" : "Accessibility Permission Required"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Se requiere permiso de accesibilidad"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Autorisation d’accessibilité requise"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセシビリティのアクセス権が必要"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Требуется разрешение универсальный доступ"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要 “辅助功能” 权限以启用滚动缩放功能。"
+            "value" : "需要辅助功能权限"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "需要「輔助使用」權限以啟用捲動縮放功能。"
+            "value" : "需要輔助使用權限"
           }
         }
       }
     },
     "permission-warning" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wenn Scroll to Zoom aktiviert ist, kann das Entfernen der Berechtigung dazu führen, dass der Computer nicht mehr reagiert."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "When scroll-to-zoom is enabled, removing permission may cause the computer to become unresponsive."
+            "value" : "When the scroll-to-zoom is enabled, removing permission may cause the computer to become unresponsive."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cuando el zoom con desplazamiento está activado, retirar el permiso puede hacer que el ordenador deje de responder."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lorsque le zoom par défilement est activé, retirer l’autorisation peut empêcher l’ordinateur de répondre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクロールでズームする機能が有効なときにアクセス権を削除すると、コンピュータが応答しなくなる場合があります。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Если масштабирование прокруткой включено, отзыв разрешения может привести к тому, что компьютер перестанет отвечать."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "当滚动缩放功能启用时，移除权限可能会导致电脑不能响应。"
+            "value" : "当滚动来缩放功能启用时，移除权限可能会导致电脑不能响应。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "當捲動縮放功能啟用時，移除權限可能會導致電腦不能回應。"
+            "value" : "當捲動來縮放功能啟用時，移除權限可能會導致電腦不能回應。"
           }
         }
       }
     },
     "recommended-for-this-app" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Für diese App empfohlen."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Recommend for this app."
+            "value" : "Recommended for this app."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recomendado para esta app."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Recommandé pour cette app."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "このアプリに推奨されます。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Рекомендуется для этого приложения."
           }
         },
         "zh-Hans" : {
@@ -459,17 +1245,47 @@
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "推薦為此應用選取。"
+            "value" : "推薦為此應用啟用。"
           }
         }
       }
     },
-    "running" : {
+    "running-apps" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geöffnet"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Opened"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Abiertas"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvertes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "開いている"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Открытые"
           }
         },
         "zh-Hans" : {
@@ -488,7 +1304,37 @@
     },
     "scroll-to-zoom" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom"
+          }
+        },
         "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクロールでズーム"
+          }
+        },
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scroll to Zoom"
@@ -510,10 +1356,40 @@
     },
     "scroll-to-zoom-console" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Scroll to Zoom-Konsole"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Scroll to Zoom Console"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Consola de Scroll to Zoom"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Console de Scroll to Zoom"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクロールでズームのコンソール"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Консоль Scroll to Zoom"
           }
         },
         "zh-Hans" : {
@@ -532,10 +1408,40 @@
     },
     "should-not-launch-at-login-message" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Um das automatische Öffnen zu aktivieren, beende diese App und verschiebe sie in den Ordner „Programme“."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "To enable automatic launch, quit and move this app into the Applications folder."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Para activar la apertura automática, sal de esta app y muévela a la carpeta Aplicaciones."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pour activer l’ouverture automatique, quittez cette app et placez-la dans le dossier « Applications »."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動起動を有効にするには、このアプリを終了してから「アプリケーション」フォルダに移動してください。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Чтобы включить автоматическое открытие, завершите это приложение и переместите его в папку «Программы»."
           }
         },
         "zh-Hans" : {
@@ -552,12 +1458,42 @@
         }
       }
     },
-    "speed" : {
+    "speed:" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschwindigkeit:"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Speed:"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Velocidad:"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vitesse :"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "速度:"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Скорость:"
           }
         },
         "zh-Hans" : {
@@ -576,10 +1512,40 @@
     },
     "swipe-up-to" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Finger hoch zum"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Fingers up to"
+            "value" : "Slide finger up to"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deslizar el dedo hacia arriba para"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le doigt vers le haut pour"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "指を上にスライドして"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Проведите пальцем вверх, чтобы"
           }
         },
         "zh-Hans" : {
@@ -596,34 +1562,42 @@
         }
       }
     },
-    "time" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Time"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "时间"
-          }
-        },
-        "zh-Hant" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "時間"
-          }
-        }
-      }
-    },
     "view-source-on-github" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Quellcode auf GitHub"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source on GitHub"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Código fuente en GitHub"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code source sur GitHub"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GitHubのソースコード"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Исходный код на GitHub"
           }
         },
         "zh-Hans" : {
@@ -642,10 +1616,40 @@
     },
     "wants-dictatorship" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mit anderen Tools zur Mausoptimierung verwenden"
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Work with other mouse optimization tools"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar con otras herramientas de optimización del ratón"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser avec d’autres outils d’optimisation de la souris"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "他のマウス最適化ツールと併用"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Использовать с другими инструментами оптимизации мыши"
           }
         },
         "zh-Hans" : {
@@ -664,66 +1668,52 @@
     },
     "wants-dictatorship-message" : {
       "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dies kann zu leichten Verzögerungen führen und den Stromverbrauch erhöhen. Wenn du keine anderen Tools verwendest, kannst du diese Option bedenkenlos deaktivieren."
+          }
+        },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "This may cause slight delays and increase power consumption. If you don’t use other tools, you can safely disable it."
           }
         },
-        "zh-Hans" : {
+        "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "可能会造成轻微延迟并增加功耗。如果没有使用其他工具，你可以放心禁用此选项。"
+            "value" : "Esto puede causar ligeros retrasos y aumentar el consumo de energía. Si no usas otras herramientas, puedes desactivar esta opción sin problema."
           }
         },
-        "zh-Hant" : {
+        "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這可能會導致輕微延遲並增加耗電量。如果沒有使用其他工具，你可以放心將其停用。"
-          }
-        }
-      }
-    },
-    "zoom-in" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zoom in"
+            "value" : "Cela peut entraîner de légers retards et augmenter la consommation d’énergie. Si vous n’utilisez pas d’autres outils, vous pouvez désactiver cette option sans risque."
           }
         },
-        "zh-Hans" : {
+        "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "放大"
+            "value" : "わずかな遅延が発生し、消費電力が増える場合があります。ほかのツールを使っていない場合は、このオプションをオフにしても問題ありません。"
           }
         },
-        "zh-Hant" : {
+        "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "放大"
-          }
-        }
-      }
-    },
-    "zoom-out" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "zoom out"
+            "value" : "Это может вызвать небольшие задержки и увеличить энергопотребление. Если вы не используете другие инструменты, этот параметр можно спокойно отключить."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "缩小"
+            "value" : "可能会造成轻微延迟并增加功耗。如果不使用其他工具，你可以放心禁用此选项。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "縮小"
+            "value" : "這可能會導致輕微延遲並增加耗電量。如果不使用其他工具，你可以放心將其停用。"
           }
         }
       }

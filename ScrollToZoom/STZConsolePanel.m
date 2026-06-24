@@ -104,13 +104,13 @@ void STZDebugLog(char const *message, ...) {
     [_logList setUsesAlternatingRowBackgroundColors:YES];
 
     NSTableColumn *messageColumn = [[NSTableColumn alloc] initWithIdentifier:@"STZLogMessages"];
-    [messageColumn setTitle:NSLocalizedString(@"message", nil)];
+    [messageColumn setTitle:NSLocalizedString(@"log-message", nil)];
     [messageColumn setResizingMask:NSTableColumnAutoresizingMask];
     [_logList addTableColumn:messageColumn];
     [_logList sizeLastColumnToFit];
 
     NSTableColumn *dateColumn = [[NSTableColumn alloc] initWithIdentifier:@"STZLogDates"];
-    [dateColumn setTitle:NSLocalizedString(@"time", nil)];
+    [dateColumn setTitle:NSLocalizedString(@"log-time", nil)];
     [dateColumn setWidth:80];
     [dateColumn setResizingMask:NSTableColumnUserResizingMask];
     [_logList addTableColumn:dateColumn];

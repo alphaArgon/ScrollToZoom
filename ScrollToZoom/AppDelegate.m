@@ -134,7 +134,7 @@ static void toggleOptionsForKeyApplication(STZAppOptions flag) {
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
     if ([menuItem action] == @selector(toggleEnabledForKeyApplication:)) {
         NSRunningApplication *app = keyApplication();
-        [menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-%@", nil), [app localizedName]]];
+        [menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-app-name-%@", nil), [app localizedName]]];
         CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
         STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
         [menuItem setState:!(options & kSTZDisabledForApp)];

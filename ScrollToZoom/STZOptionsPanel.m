@@ -359,12 +359,12 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     }
 
     if (item == _runningBundleIDs) {
-        [[cellView textField] setStringValue:NSLocalizedString(@"running", nil)];
+        [[cellView textField] setStringValue:NSLocalizedString(@"running-apps", nil)];
         [[cellView imageView] setImage:nil];
         [cellView setImageView:nil];
 
     } else if (item == _configuredBundleIDs) {
-        [[cellView textField] setStringValue:NSLocalizedString(@"configured", nil)];
+        [[cellView textField] setStringValue:NSLocalizedString(@"configured-apps", nil)];
         [[cellView imageView] setImage:nil];
         [cellView setImageView:nil];
 
@@ -396,7 +396,7 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     STZApplicationEntry *entry = [self selectedEntry];
     if (!entry) {return;}
 
-    [_enabledCheckbox setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-%@", nil), [entry localizedName]]];
+    [_enabledCheckbox setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-app-name-%@", nil), [entry localizedName]]];
     STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
 
     [_enabledCheckbox setState:!(options & kSTZDisabledForApp)];

@@ -20,7 +20,7 @@
 
 @interface STZConfigViewController : NSViewController
 
-- (void)setShowsAdvancedSettings:(BOOL)flag;
+@property(nonatomic) BOOL showsAdvancedSettings;
 
 @end
 
@@ -36,7 +36,7 @@ static NSString *trim(NSString *string) {
     static STZWindow __weak *weakWindow = nil;
     if (weakWindow) {return weakWindow;}
 
-    STZWindow *window = [[STZWindow alloc] initWithContentRect:NSMakeRect(0, 0, 1, 1)
+    STZWindow *window = [[STZWindow alloc] initWithContentRect:NSMakeRect(0, 0, 200, 200)
                                                                  styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
                                                                    backing:NSBackingStoreBuffered
                                                                      defer:YES];
@@ -50,10 +50,13 @@ static NSString *trim(NSString *string) {
     STZWindow *sharedWindow = [self sharedWindow];
 
     STZConfigViewController *viewController = (STZConfigViewController *)[sharedWindow contentViewController];
-    [viewController setShowsAdvancedSettings:advanced];
-
-    NSRect frame = [sharedWindow frame];
-    [sharedWindow setFrame:NSMakeRect(NSMinX(frame), NSMaxY(frame), 0, 0) display:YES];
+    if ([viewController showsAdvancedSettings] != advanced) {
+        [viewController setShowsAdvancedSettings:advanced];
+        if (!advanced) {
+            NSRect frame = [sharedWindow frame];
+            [sharedWindow setFrame:NSMakeRect(NSMinX(frame), NSMaxY(frame) - 200, NSWidth(frame), 200) display:NO];
+        }
+    }
 
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
     [sharedWindow makeKeyAndOrderFront:nil];
@@ -89,7 +92,6 @@ static NSString *trim(NSString *string) {
     NSLayoutConstraint *_optionsBelowDictatorshipConstraint;
     NSTimer            *_enableRetryTimer;
     STZModes            _pendingModes;
-    BOOL                _showsAdvancedSettings;
 }
 
 static double const STZMagnificationScalarRange[] = {0.0005, 0.0105};
@@ -105,7 +107,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     NSView *view = [[NSView alloc] init];
     [self setView:view];
 
-    NSArray *checkboxTitles = [NSLocalizedString(@"enable-with-#", nil) componentsSeparatedByString:@"#"];
+    NSArray *checkboxTitles = [NSLocalizedString(@"enable-with-key-or-button-#", nil) componentsSeparatedByString:@"#"];
 
     _triggerFlagsCheckbox = [NSButton checkboxWithTitle:trim([checkboxTitles firstObject])
                                      target:self action:@selector(toggleTriggerFlags:)];
@@ -128,19 +130,19 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
     NSTextField *directionLabel = [NSTextField labelWithString:NSLocalizedString(@"swipe-up-to", nil)];
 
-    _zoomInRadio = [NSButton radioButtonWithTitle:NSLocalizedString(@"zoom-in", nil)
+    _zoomInRadio = [NSButton radioButtonWithTitle:NSLocalizedString(@"-zoom-in", nil)
                                            target:self action:@selector(updateSpeed:)];
-    _zoomOutRadio = [NSButton radioButtonWithTitle:NSLocalizedString(@"zoom-out", nil)
+    _zoomOutRadio = [NSButton radioButtonWithTitle:NSLocalizedString(@"-zoom-out", nil)
                                             target:self action:@selector(updateSpeed:)];
 
-    NSTextField *speedLabel = [NSTextField labelWithString:NSLocalizedString(@"speed", nil)];
+    NSTextField *speedLabel = [NSTextField labelWithString:NSLocalizedString(@"speed:", nil)];
     _speedSlider = [NSSlider sliderWithValue:0
                                     minValue:STZMagnificationScalarRange[0]
                                     maxValue:STZMagnificationScalarRange[1]
                                       target:self action:@selector(updateSpeed:)];
     [_speedSlider setNumberOfTickMarks:11];
 
-    NSTextField *inertiaLabel = [NSTextField labelWithString:NSLocalizedString(@"inertia", nil)];
+    NSTextField *inertiaLabel = [NSTextField labelWithString:NSLocalizedString(@"inertia:", nil)];
     _inertiaSlider = [NSSlider sliderWithValue:0
                                       minValue:STZMomentumZoomAttenuationRange[0]
                                       maxValue:STZMomentumZoomAttenuationRange[1]
@@ -209,11 +211,16 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     _optionsBelowLaunchConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
     _optionsBelowDictatorshipConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[_dictatorshipMessageLabel bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
 
+    if ([[_triggerFlagsCheckbox title] length]) {
+        [[[_triggerFlagsField firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]] setActive:YES];
+    } else {
+        [[[_triggerFlagsField centerYAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox centerYAnchor]] setActive:YES];
+    }
+
     [NSLayoutConstraint activateConstraints:@[
         [[_triggerFlagsCheckbox topAnchor] constraintEqualToAnchor:[view topAnchor] constant:kSTZUINormalSpacing],
         [[_triggerFlagsCheckbox leadingAnchor] constraintEqualToAnchor:[view leadingAnchor] constant:kSTZUINormalSpacing],
 
-        [[_triggerFlagsField firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]],
         [[_triggerFlagsField leadingAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox trailingAnchor] constant:kSTZUIInlineSpacing + kSTZUIFixCheckboxTrailing],
 
         [[_magicZoomCheckbox topAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox bottomAnchor] constant:kSTZUISmallSpacing],
@@ -235,6 +242,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
         [[_zoomOutRadio firstBaselineAnchor] constraintEqualToAnchor:[_zoomInRadio firstBaselineAnchor]],
         [[_zoomOutRadio leadingAnchor] constraintEqualToAnchor:[_zoomInRadio trailingAnchor] constant:kSTZUIInlineSpacing + kSTZUIFixCheckboxTrailing],
+        [[_zoomOutRadio trailingAnchor] constraintLessThanOrEqualToAnchor:[box trailingAnchor] constant:-kSTZUISmallSpacing],
 
         [[speedLabel topAnchor] constraintEqualToAnchor:[directionLabel bottomAnchor] constant:kSTZUISmallSpacing],
         [[speedLabel leadingAnchor] constraintEqualToAnchor:[directionLabel leadingAnchor]],
@@ -275,7 +283,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
     if (checkboxTail) {
         [NSLayoutConstraint activateConstraints:@[
-            [[checkboxTail firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]],
+            [[checkboxTail firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsField firstBaselineAnchor]],
             [[checkboxTail leadingAnchor] constraintEqualToAnchor:[_triggerFlagsField trailingAnchor] constant:kSTZUIInlineSpacing],
         ]];
     }
@@ -387,8 +395,18 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
     _pendingModes = modes;
     [self reloadData];
+
+    NSRect anchorRect = [view bounds];
+    NSView *checkView = [[view subviews] firstObject];
+    if (checkView) {
+        NSRect checkFrame = [checkView frame];
+        if (checkFrame.size.width == checkFrame.size.height) {
+            anchorRect = checkFrame;
+        }
+    }
+
     [self presentViewController:[[STZPermissionViewController alloc] init]
-        asPopoverRelativeToRect:[view bounds]
+        asPopoverRelativeToRect:anchorRect
                          ofView:view
                   preferredEdge:NSRectEdgeMinY
                        behavior:NSPopoverBehaviorTransient];

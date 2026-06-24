@@ -71,12 +71,12 @@
 
         [[openButton topAnchor] constraintEqualToAnchor:[warningLabel bottomAnchor] constant:kSTZUINormalSpacing],
         [[openButton trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
-        [[openButton widthAnchor] constraintGreaterThanOrEqualToConstant:60],
+        [[openButton widthAnchor] constraintGreaterThanOrEqualToConstant:80],
         [[openButton bottomAnchor] constraintEqualToAnchor:[view bottomAnchor] constant:-kSTZUINormalSpacing],
 
         [[cancelButton topAnchor] constraintEqualToAnchor:[openButton topAnchor]],
         [[cancelButton trailingAnchor] constraintEqualToAnchor:[openButton leadingAnchor] constant:-kSTZUISmallSpacing],
-        [[cancelButton widthAnchor] constraintGreaterThanOrEqualToConstant:60],
+        [[cancelButton widthAnchor] constraintGreaterThanOrEqualToConstant:80],
 
         [[titleLabel widthAnchor] constraintGreaterThanOrEqualToConstant:320],
     ]];

@@ -23,7 +23,7 @@
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="PGh-Av-fCS"/>
-                <menuItem title="Options for App" tag="110105" enabled="NO" id="XMk-VA-xDX">
+                <menuItem title="Options for Current App" tag="110105" enabled="NO" id="XMk-VA-xDX">
                     <attributedString key="attributedTitle"/>
                     <modifierMask key="keyEquivalentModifierMask"/>
                 </menuItem>
