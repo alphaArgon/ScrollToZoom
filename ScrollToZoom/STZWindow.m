@@ -114,7 +114,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     NSTextField *checkboxTail = [checkboxTitles count] > 1
         ? [NSTextField labelWithString:trim([checkboxTitles objectAtIndex:1])] : nil;
 
-    _triggerFlagsField = [STZModifierField fieldWithModifiers:0
+    _triggerFlagsField = [STZModifierField fieldWithFlags:0
                                            target:self action:@selector(updateFlags:)];
 
     _magicZoomCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"enable-magic-zoom", nil)

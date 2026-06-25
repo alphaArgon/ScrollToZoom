@@ -13,6 +13,12 @@
 #define TAHOE_CONTROL_RADIUS ((CGFloat)5.0)
 
 
+static NSString *localizedFlags(STZFlags flags) {
+    CFStringRef desc = STZFlagsCopyDescription(flags);
+    return NSLocalizedString((__bridge_transfer id)desc, nil);
+}
+
+
 NSFont *STZSymbolsFontOfSize(CGFloat size) {
     static CTFontDescriptorRef desc = NULL;
     if (!desc) {
@@ -47,14 +53,15 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 - (instancetype)initWithFrame:(NSRect)frame {
     self = [super initWithFrame:frame];
 
-    CFStringRef desc = STZFlagsCopyDescription(kSTZModifiersMask);
-    _symbolLabel = [NSTextField labelWithString:(__bridge_transfer id)desc];
+    _symbolLabel = [NSTextField labelWithString:@""];
     [_symbolLabel setRefusesFirstResponder:YES];
     [_symbolLabel setEditable:NO];
     [_symbolLabel setSelectable:NO];
     [_symbolLabel setFont:STZSymbolsFontOfSize(0)];
 
-    _symbolMaxWidth = [_symbolLabel intrinsicContentSize].width;
+    NSDictionary *symbolAttrs = @{NSFontAttributeName: [_symbolLabel font]};
+    _symbolMaxWidth = MAX([localizedFlags(kSTZModifiersMask) sizeWithAttributes:symbolAttrs].width,
+                          [localizedFlags(kSTZMouseButtonMiddle) sizeWithAttributes:symbolAttrs].width);
 
     [self addSubview:_symbolLabel];
     [_symbolLabel setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -67,7 +74,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
     return self;
 }
 
-+ (instancetype)fieldWithModifiers:(STZFlags)flags target:(id)target action:(SEL)action {
++ (instancetype)fieldWithFlags:(STZFlags)flags target:(id)target action:(SEL)action {
     STZModifierField *field = [[self alloc] init];
     [field setFlags:flags];
     [field setTarget:target];
@@ -166,8 +173,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 }
 
 - (void)setDisplayedSymbols:(STZFlags)flags {
-    CFStringRef desc = STZFlagsCopyDescription(flags);
-    [_symbolLabel setStringValue:NSLocalizedString((__bridge_transfer id)desc, nil)];
+    [_symbolLabel setStringValue:localizedFlags(flags)];
 }
 
 - (void)setEditing:(BOOL)editing {

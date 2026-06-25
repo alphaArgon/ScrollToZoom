@@ -17,7 +17,7 @@ NSFont *STZSymbolsFontOfSize(CGFloat size);
 
 @interface STZModifierField : NSControl
 
-+ (instancetype)fieldWithModifiers:(STZFlags)flags target:(nullable id)target action:(nullable SEL)action;
++ (instancetype)fieldWithFlags:(STZFlags)flags target:(nullable id)target action:(nullable SEL)action;
 @property(nonatomic) STZFlags flags;
 
 @end

@@ -117,7 +117,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🖱 Mid"
+            "value" : "🖱 Middle"
           }
         },
         "es" : {
@@ -147,13 +147,13 @@
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🖱 中"
+            "value" : "🖱 中键"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "🖱 中"
+            "value" : "🖱 中鍵"
           }
         }
       }
@@ -1670,8 +1670,8 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Dies kann zu leichten Verzögerungen führen und den Stromverbrauch erhöhen. Wenn du keine anderen Tools verwendest, kannst du diese Option bedenkenlos deaktivieren."
+            "state" : "translated",
+            "value" : "Dies kann zu leichten Verzögerungen beim Zoomen führen und den Stromverbrauch erhöhen. Wenn du keine anderen Tools verwendest, kannst du diese Option bedenkenlos deaktivieren."
           }
         },
         "en" : {
@@ -1682,26 +1682,26 @@
         },
         "es" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Esto puede causar ligeros retrasos y aumentar el consumo de energía. Si no usas otras herramientas, puedes desactivar esta opción sin problema."
+            "state" : "translated",
+            "value" : "Esto puede causar ligeros retrasos al usar el zoom y aumentar el consumo de energía. Si no usas otras herramientas, puedes desactivar esta opción sin problema."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Cela peut entraîner de légers retards et augmenter la consommation d’énergie. Si vous n’utilisez pas d’autres outils, vous pouvez désactiver cette option sans risque."
+            "state" : "translated",
+            "value" : "Cela peut entraîner de légers retards lors du zoom et augmenter la consommation d’énergie. Si vous n’utilisez pas d’autres outils, vous pouvez désactiver cette option sans risque."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "わずかな遅延が発生し、消費電力が増える場合があります。ほかのツールを使っていない場合は、このオプションをオフにしても問題ありません。"
+            "state" : "translated",
+            "value" : "ズーム時にわずかな遅延が発生し、消費電力が増える場合があります。ほかのツールを使っていない場合は、このオプションをオフにしても問題ありません。"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "needs_review",
-            "value" : "Это может вызвать небольшие задержки и увеличить энергопотребление. Если вы не используете другие инструменты, этот параметр можно спокойно отключить."
+            "state" : "translated",
+            "value" : "Это может вызвать небольшие задержки при увеличении и увеличить энергопотребление. Если вы не используете другие инструменты, этот параметр можно спокойно отключить."
           }
         },
         "zh-Hans" : {

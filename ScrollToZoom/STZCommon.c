@@ -52,8 +52,11 @@ CFStringRef STZFlagsCopyDescription(uint32_t anyFlags) {
     }
 
     if (anyFlags & kSTZModifierFn) {
-        characters[characterCount++] = 'f';
-        characters[characterCount++] = 'n';
+        if (characterCount) {
+            characters[characterCount++] = u'\u200a';
+        }
+        characters[characterCount++] = u'f';
+        characters[characterCount++] = u'n';
     }
 
     return CFStringCreateWithCharacters(kCFAllocatorDefault, characters, characterCount);
