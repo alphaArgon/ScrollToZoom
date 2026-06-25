@@ -145,8 +145,8 @@ static bool createEventTap(STZEventTap *tap, CGEventTapCallBack callback, CGEven
 static void magicZoomActivationCallback(uint64_t registryID, bool active, void *refcon);
 static CGEventRef flagsTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
 static CGEventRef hardWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
-static CGEventRef passiveWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
-static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
+static CGEventRef passiveSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
+static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon);
 static void periodicUpdateCallback(CFRunLoopTimerRef timer, void *refcon);
 
 
@@ -165,14 +165,15 @@ static STZCacheRef wheelContexts = NULL;
 
 
 static STZEventTap flagsTap = {NULL, NULL};
-static STZEventTap hardWheelTap = {NULL, NULL};
-static STZEventTap passiveWheelTap = {NULL, NULL};
-static STZEventTap mutableWheelTap = {NULL, NULL};
+static STZEventTap passiveHardWheelTap = {NULL, NULL};
+static STZEventTap mutableHardWheelTap = {NULL, NULL};
+static STZEventTap passiveSoftWheelTap = {NULL, NULL};
+static STZEventTap mutableSoftWheelTap = {NULL, NULL};
 
 
 static bool stabWantsDictatorship = false;
 static bool magicZooms = false;
-static bool wheelTapMutable = false;
+static bool wheelTapsMutable = false;
 static bool triggerFlagsDown = false;
 static CFRunLoopTimerRef periodicTimer = NULL;
 
@@ -217,7 +218,7 @@ STZModes STZGetWorkingModes(void) {
     if (flagsTap.port) {
         modes |= kSTZTriggerFlagsEnabled;
     }
-    if (hardWheelTap.port || stabWantsDictatorship) {
+    if (passiveHardWheelTap.port || stabWantsDictatorship) {
         modes |= kSTZWantsDictatorship;
     }
     return modes;
@@ -236,17 +237,23 @@ bool STZSetWorkingModes(STZModes modes) {
     //  This value is like Cocoa KVO’s context pointer.
     static void const *tapAddedOrRemovedObserver = &anyEventTapAddedOrRemoved;
 
-    if (!hardWheelTap.port != !(modes & kSTZWantsDictatorship)) {
-        releaseEventTap(&passiveWheelTap);
-        releaseEventTap(&mutableWheelTap);
+    if (!passiveHardWheelTap.port != !(modes & kSTZWantsDictatorship)) {
+        releaseEventTap(&passiveSoftWheelTap);
+        releaseEventTap(&mutableSoftWheelTap);
 
-        if (hardWheelTap.port) {
-            releaseEventTap(&hardWheelTap);
+        if (passiveHardWheelTap.port) {
+            releaseEventTap(&passiveHardWheelTap);
+            releaseEventTap(&mutableHardWheelTap);
             CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(),
                                                tapAddedOrRemovedObserver,
                                                CFSTR(kCGNotifyEventTapAdded), NULL);
         } else {
-            if (!createEventTap(&hardWheelTap, hardWheelTapCallback,
+            if (!createEventTap(&passiveHardWheelTap, hardWheelTapCallback,
+                                1 << kCGEventScrollWheel,
+                                kCGEventTapOptionListenOnly, kCGHIDEventTap)) {
+                goto RESET;
+            }
+            if (!createEventTap(&mutableHardWheelTap, hardWheelTapCallback,
                                 1 << kCGEventScrollWheel,
                                 kCGEventTapOptionDefault, kCGHIDEventTap)) {
                 goto RESET;
@@ -275,11 +282,11 @@ bool STZSetWorkingModes(STZModes modes) {
 
     bool anySoftEventNewlyAdded = false;
 
-    if (!passiveWheelTap.port != !(modes & (kSTZWantsDictatorship | kSTZTriggerFlagsEnabled))) {
-        if (passiveWheelTap.port) {
-            releaseEventTap(&passiveWheelTap);
+    if (!passiveSoftWheelTap.port != !(modes & (kSTZWantsDictatorship | kSTZTriggerFlagsEnabled))) {
+        if (passiveSoftWheelTap.port) {
+            releaseEventTap(&passiveSoftWheelTap);
         } else {
-            if (!createEventTap(&passiveWheelTap, passiveWheelTapCallback,
+            if (!createEventTap(&passiveSoftWheelTap, passiveSoftWheelTapCallback,
                                 1 << kCGEventScrollWheel,
                                 kCGEventTapOptionListenOnly, softTapLocation)) {
                 goto RESET;
@@ -288,11 +295,11 @@ bool STZSetWorkingModes(STZModes modes) {
         }
     }
 
-    if (!mutableWheelTap.port != !modes) {
-        if (mutableWheelTap.port) {
-            releaseEventTap(&mutableWheelTap);
+    if (!mutableSoftWheelTap.port != !modes) {
+        if (mutableSoftWheelTap.port) {
+            releaseEventTap(&mutableSoftWheelTap);
         } else {
-            if (!createEventTap(&mutableWheelTap, mutableWheelTapCallback,
+            if (!createEventTap(&mutableSoftWheelTap, mutableSoftWheelTapCallback,
                                 1 << kCGEventScrollWheel,
                                 kCGEventTapOptionDefault, softTapLocation)) {
                 goto RESET;
@@ -316,23 +323,24 @@ bool STZSetWorkingModes(STZModes modes) {
         }
     }
 
-    if (!mutableWheelTap.port) {
-        wheelTapMutable = false;
+    if (!mutableSoftWheelTap.port) {
+        wheelTapsMutable = false;
 
     } else {
-        CGEventTapEnable(mutableWheelTap.port, wheelTapMutable);
-        if (passiveWheelTap.port) {
-            CGEventTapEnable(passiveWheelTap.port, !wheelTapMutable);
+        CGEventTapEnable(mutableSoftWheelTap.port, wheelTapsMutable);
+        if (passiveSoftWheelTap.port) {
+            CGEventTapEnable(passiveSoftWheelTap.port, !wheelTapsMutable);
         }
     }
 
-    if (hardWheelTap.port) {
+    if (passiveHardWheelTap.port) {
         //  When toggling dictatorship, `anySoftEventNewlyAdded` must be true becauze we
         //  discard the old soft event taps and recreate new ones.
         if (anySoftEventNewlyAdded) {
             checkNewSoftWheelTapPrepended();
         }
-        CGEventTapEnable(hardWheelTap.port, wheelTapMutable);
+        CGEventTapEnable(mutableHardWheelTap.port, wheelTapsMutable);
+        CGEventTapEnable(passiveHardWheelTap.port, !wheelTapsMutable);
     }
 
     if (!wheelContexts) {
@@ -348,8 +356,9 @@ bool STZSetWorkingModes(STZModes modes) {
     return true;
 
 RESET:
-    if (hardWheelTap.port) {
-        releaseEventTap(&hardWheelTap);
+    if (passiveHardWheelTap.port) {
+        releaseEventTap(&passiveHardWheelTap);
+        releaseEventTap(&mutableHardWheelTap);
         CFNotificationCenterRemoveObserver(CFNotificationCenterGetDarwinNotifyCenter(),
                                            tapAddedOrRemovedObserver,
                                            CFSTR(kCGNotifyEventTapAdded), NULL);
@@ -360,9 +369,8 @@ RESET:
     releaseEventTap(&flagsTap);
     triggerFlagsDown = false;
 
-    releaseEventTap(&hardWheelTap);
-    releaseEventTap(&passiveWheelTap);
-    releaseEventTap(&mutableWheelTap);
+    releaseEventTap(&passiveSoftWheelTap);
+    releaseEventTap(&mutableSoftWheelTap);
 
     if (magicZooms) {
         magicZooms = false;
@@ -370,7 +378,7 @@ RESET:
         STZMagicZoomObserveActivation(NULL, NULL);
     }
 
-    wheelTapMutable = false;
+    wheelTapsMutable = false;
     if (wheelContexts) {
         STZCacheRemoveAll(wheelContexts);
     }
@@ -395,7 +403,7 @@ static void eventTapTimeout(void) {
 
 
 static void reinsertTapsIfNeeded(void) {
-    if (hardWheelTap.port == NULL) {return;}
+    if (passiveHardWheelTap.port == NULL) {return;}
 
     if (!needsReinsertTaps) {return;}
     STZDebugLog("Checking dictatorship due to environment change");
@@ -406,9 +414,10 @@ static void reinsertTapsIfNeeded(void) {
     }
 
     STZModes modes = STZGetWorkingModes();
-    releaseEventTap(&hardWheelTap);
-    releaseEventTap(&passiveWheelTap);
-    releaseEventTap(&mutableWheelTap);
+    releaseEventTap(&passiveHardWheelTap);
+    releaseEventTap(&mutableHardWheelTap);
+    releaseEventTap(&passiveSoftWheelTap);
+    releaseEventTap(&mutableSoftWheelTap);
 
     if (STZSetWorkingModes(modes)) {
         STZDebugLog("Successfully reinserted event taps");
@@ -425,15 +434,16 @@ static void clearTriggerFlagsForEvent(CGEventRef event) {
 
 
 static void beginWheelTapMutations(void) {
-    if (wheelTapMutable) {return;}
-    CGEventTapEnable(mutableWheelTap.port, true);
-    if (passiveWheelTap.port) {
-        CGEventTapEnable(passiveWheelTap.port, false);
+    if (wheelTapsMutable) {return;}
+    CGEventTapEnable(mutableSoftWheelTap.port, true);
+    if (passiveSoftWheelTap.port) {
+        CGEventTapEnable(passiveSoftWheelTap.port, false);
     }
-    if (hardWheelTap.port) {
-        CGEventTapEnable(hardWheelTap.port, true);
+    if (passiveHardWheelTap.port) {
+        CGEventTapEnable(mutableHardWheelTap.port, true);
+        CGEventTapEnable(passiveHardWheelTap.port, false);
     }
-    wheelTapMutable = true;
+    wheelTapsMutable = true;
     STZDebugLog("\tswitched to mutating scroll wheel taps");
 }
 
@@ -511,7 +521,7 @@ static void wheelContextDo(void *addr, void *refcon) {
 static void forEachStateDo(WheelContextActions actions, CGEventRef event) {
     assert(!(actions & kDiscardTriggerFlags) || event);
 
-    if (!wheelTapMutable || triggerFlagsDown) {
+    if (!wheelTapsMutable || triggerFlagsDown) {
         actions = actions & ~kTryToEndWheelTapMutations;
     }
 
@@ -526,14 +536,15 @@ static void forEachStateDo(WheelContextActions actions, CGEventRef event) {
     STZCacheEnumerateValues(wheelContexts, wheelContextDo, &env);
 
     if (env.canEndMutations) {
-        CGEventTapEnable(mutableWheelTap.port, false);
-        if (passiveWheelTap.port) {
-            CGEventTapEnable(passiveWheelTap.port, true);
+        CGEventTapEnable(mutableSoftWheelTap.port, false);
+        if (passiveSoftWheelTap.port) {
+            CGEventTapEnable(passiveSoftWheelTap.port, true);
         }
-        if (hardWheelTap.port) {
-            CGEventTapEnable(hardWheelTap.port, false);
+        if (passiveHardWheelTap.port) {
+            CGEventTapEnable(mutableHardWheelTap.port, false);
+            CGEventTapEnable(passiveHardWheelTap.port, true);
         }
-        wheelTapMutable = false;
+        wheelTapsMutable = false;
         STZDebugLog("\tswitched to passive scroll wheel taps");
     }
 
@@ -628,22 +639,30 @@ static CGEventRef hardWheelTapCallback(CGEventTapProxy proxy, CGEventType type, 
     default: assert(type == kCGEventScrollWheel); break;
     }
 
-    STZDebugLogEvent("Hard", event);
+    if (wheelTapsMutable) {
+        STZDebugLogEvent("Mutable hard", event);
+    } else {
+        STZDebugLogEvent("Passive hard", event);
+    }
 
+    //  Stashing when not mutable is a no-op, but we can store the fallback scroll direction.
+    //  When using Mos, etc., a hard event may be followed by a sequence of periodic soft events.
+    //  If the user presses the trigger flags during that sequence, the zoom direction may
+    //  be out-of-date without this fallback value.
     WheelContext *context = wheelContextWithFallback(CGEventGetRegistryID(event));
     context->hardScrollDir = STZStashScrollDirectionIntoEvent(event);
     return event;
 }
 
 
-static CGEventRef passiveWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+static CGEventRef passiveSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     switch (type) {
     case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
     case kCGEventTapDisabledByUserInput:    return NULL;
     default: assert(type == kCGEventScrollWheel); break;
     }
 
-    STZDebugLogEvent("Passive", event);
+    STZDebugLogEvent("Passive soft", event);
 
     WheelContext *context = wheelContextWithFallback(CGEventGetRegistryID(event));
     STZStateReadScrollEvent(context->state, event);
@@ -651,14 +670,14 @@ static CGEventRef passiveWheelTapCallback(CGEventTapProxy proxy, CGEventType typ
 }
 
 
-static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
+static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     switch (type) {
     case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
     case kCGEventTapDisabledByUserInput:    return NULL;
     default: assert(type == kCGEventScrollWheel); break;
     }
 
-    STZDebugLogEvent("Mutable", event);
+    STZDebugLogEvent("Mutable soft", event);
 
     WheelContext *context = wheelContextWithFallback(CGEventGetRegistryID(event));
     context->magicZoomPending = false;
@@ -690,7 +709,7 @@ static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType typ
         }
     }
 
-    bool underDictatorship = hardWheelTap.port != NULL;
+    bool underDictatorship = passiveHardWheelTap.port != NULL;
     uint64_t fallbackScrollDir = underDictatorship ? context->hardScrollDir : 0;
 
     STZEventPlacement auxPlacement;
