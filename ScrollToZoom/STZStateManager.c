@@ -41,10 +41,17 @@ static inline EventResult prependEvent(CGEventRef event) {
 static const CGEventTimestamp kCGEventDistantFuture = UINT64_MAX;
 
 
-static int64_t const kPositiveSignum   = ((int64_t)'STZ.' << 32) | 'SIG+';
-static int64_t const kNegativeSignum   = ((int64_t)'STZ.' << 32) | 'SIG-';
-static int64_t const kZeroSignum       = ((int64_t)'STZ.' << 32) | 'SIG0';
-static int32_t const kSignumField      = kCGEventSourceUserData;
+//  FIXME: We should find a more appropriate way to store the direction.
+//  Mos has been using `kCGEventSourceUserData` since around March 2026. If we set this field,
+//  scroll events could be completely discarded by Mos! I think it’s a bad idea from Claude.
+//  The alternative field is noted as “not used” in the documentation. It should be a 16.16
+//  fixed-point value if it follows the same convention as other axes. In case this field is
+//  actually used, the payloads below are very small and should not have a significant impact.
+//  Currently, no code on GitHub utilizes this field.
+static int32_t const kSignumField      = kCGScrollWheelEventFixedPtDeltaAxis3;
+static int64_t const kPositiveSignum   = 5722;
+static int64_t const kNegativeSignum   = 5721;
+static int64_t const kZeroSignum       = 5720;
 
 
 static bool isScrollFlipped(CGEventRef event) {
@@ -68,6 +75,7 @@ uint64_t STZStashScrollDirectionIntoEvent(CGEventRef event) {
     double delta = primaryScrollDelta(event) * (isScrollFlipped(event) ? -1 : 1);
     payload = (delta > 0) ? kPositiveSignum : (delta < 0) ? kNegativeSignum : kZeroSignum;
     CGEventSetIntegerValueField(event, kSignumField, payload);
+//    CGEventSetIntegerValueField(event, kSignumField, 0);
     return payload;
 }
 

@@ -10,6 +10,7 @@
 #import "STZEventHandling.h"
 #import "STZProcessManager.h"
 #import "STZWindow.h"
+#import "STZConsolePanel.h"
 #import "GeneratedAssetSymbols.h"
 
 
@@ -56,10 +57,17 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
                                              selector:@selector(updateStatusItem:)
                                                  name:(__bridge id)kSTZWorkingModesDidChangeNotification
                                                object:nil];
+
+#if DEBUG
+    if (([NSEvent modifierFlags] & (NSEventModifierFlagOption))) {
+        [STZConsolePanel orderFrontSharedPanel];
+    }
+#endif
 }
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
-    [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
+    BOOL optionDown = !!([NSEvent modifierFlags] & NSEventModifierFlagOption);
+    [STZWindow orderFrontSharedWindowWithAdvanceSettings:optionDown];
     return NO;
 }
 

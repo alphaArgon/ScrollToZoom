@@ -6,9 +6,10 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import "STZMagicZoom.h"
-#import "MTSupportSPI.h"
-#import <os/lock.h>
+#include "STZMagicZoom.h"
+#include "MTSupportSPI.h"
+#include <IOKit/hid/IOHIDLib.h>
+#include <os/lock.h>
 
 
 typedef union {
@@ -24,7 +25,7 @@ typedef union {
 typedef struct {
     TouchStatus         touches[10];
     uint8_t             goodTouchCount;
-    bool                isRecognized;
+    bool                recognized;
     uint8_t             tappedNTimes;
     MTPoint             tapLocation;
     CGEventTimestamp    tapTimestamp;
@@ -237,7 +238,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         TapContext newValue = {
             .touches = {{0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}, {0}},
             .goodTouchCount = 0,
-            .isRecognized = false,
+            .recognized = false,
             .tappedNTimes = 0,
             .tapLocation = {0, 0},
             .tapTimestamp = 0,
@@ -313,8 +314,8 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         context->goodTouchCount = goodTouchCount;
 
         bool recognized = goodTouchCount && context->tappedNTimes == 2;
-        if (context->isRecognized != recognized) {
-            context->isRecognized = recognized;
+        if (context->recognized != recognized) {
+            context->recognized = recognized;
             os_unfair_lock_unlock(&tapContextLock);
 
             //  Must be sync for lock balance.
@@ -347,7 +348,7 @@ bool STZShouldBeginMagicZoom(uint64_t registryID) {
     os_unfair_lock_lock(&tapContextLock);
 
     TapContext *context = tapContexts ? STZCacheGetValue(tapContexts, registryID) : NULL;
-    if (context && context->isRecognized) {
+    if (context && context->recognized) {
         CGEventTimestamp now = CGEventTimestampNow();
         active = (now - context->tapTimestamp) < timeout;
     }

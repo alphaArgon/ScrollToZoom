@@ -1670,50 +1670,50 @@
       "localizations" : {
         "de" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Dies kann zu leichten Verzögerungen führen und den Stromverbrauch erhöhen. Wenn du keine anderen Tools verwendest, kannst du diese Option bedenkenlos deaktivieren."
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "This may cause slight delays and increase power consumption. If you don’t use other tools, you can safely disable it."
+            "value" : "This may cause slight delays when zooming and increase power consumption. If you don’t use other tools, you can safely disable it."
           }
         },
         "es" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Esto puede causar ligeros retrasos y aumentar el consumo de energía. Si no usas otras herramientas, puedes desactivar esta opción sin problema."
           }
         },
         "fr" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Cela peut entraîner de légers retards et augmenter la consommation d’énergie. Si vous n’utilisez pas d’autres outils, vous pouvez désactiver cette option sans risque."
           }
         },
         "ja" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "わずかな遅延が発生し、消費電力が増える場合があります。ほかのツールを使っていない場合は、このオプションをオフにしても問題ありません。"
           }
         },
         "ru" : {
           "stringUnit" : {
-            "state" : "translated",
+            "state" : "needs_review",
             "value" : "Это может вызвать небольшие задержки и увеличить энергопотребление. Если вы не используете другие инструменты, этот параметр можно спокойно отключить."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "可能会造成轻微延迟并增加功耗。如果不使用其他工具，你可以放心禁用此选项。"
+            "value" : "可能会在缩放时造成轻微延迟并增加功耗。如果不使用其他工具，你可以放心禁用此选项。"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "這可能會導致輕微延遲並增加耗電量。如果不使用其他工具，你可以放心將其停用。"
+            "value" : "這可能會在縮放時導致輕微延遲並增加耗電量。如果不使用其他工具，你可以放心將其停用。"
           }
         }
       }

@@ -6,8 +6,9 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import <CoreFoundation/CoreFoundation.h>
-#import "STZCommon.h"
+#pragma once
+#include <CoreFoundation/CoreFoundation.h>
+#include "STZCommon.h"
 
 CF_ASSUME_NONNULL_BEGIN
 

@@ -52,13 +52,11 @@ static void _loadUserDefaultsIfNeeded(void) {
     static bool loaded = false;
     if (loaded) {return;}
 
-    //  Concurrent loading from multiple threads is OK.
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
 
     NSNumber *modes = [userDefaults objectForKey:STZModesKey];
     if (modes && [modes isKindOfClass:[NSNumber self]]) {
         STZPreferredModes = [modes intValue] & kSTZModesAll;
-
     } else if ([userDefaults boolForKey:STZLegacyDisablesMagicZoomKey]) {
         [userDefaults removeObjectForKey:STZLegacyDisablesMagicZoomKey];
         STZPreferredModes = kSTZModesAll & ~kSTZMagicZoomEnabled;
@@ -119,7 +117,6 @@ static void _loadUserDefaultsIfNeeded(void) {
 
     loaded = true;
 }
-
 
 
 STZModes STZGetPreferredModes(void) {

@@ -6,15 +6,14 @@
  *  Copyright © 2025 alphaArgon.
  */
 
-#import "STZCommon.h"
-#import "CGEventSPI.h"
+#include "STZCommon.h"
+#include "CGEventSPI.h"
 
 
 STZFlags STZFlagsValidate(uint32_t dirtyFlags) {
     if (dirtyFlags & kSTZMouseButtonsMask) {
         STZFlags flags = dirtyFlags & kSTZMouseButtonsMask;
         return flags == 1 ? 0 : flags;
-
     } else {
         return dirtyFlags & kSTZModifiersMask;
     }
@@ -250,26 +249,26 @@ void STZCacheEnumerateValues(STZCacheRef cache, void (*valueEnumerateCallback)(v
 
 //  `CGGesturePhase` and `CGScrollPhase` are compatible.
 
-static char const *nameOfPhase(CGGesturePhase phase) {
+static char const *commaPhaseName(CGGesturePhase phase) {
     switch (phase) {
-    case kCGGesturePhaseNone:       return "none";
-    case kCGGesturePhaseBegan:      return "began";
-    case kCGGesturePhaseChanged:    return "changed";
-    case kCGGesturePhaseEnded:      return "ended";
-    case kCGGesturePhaseCancelled:  return "cancelled";
-    case kCGGesturePhaseMayBegin:   return "may begin";
-    default:                        return "unknown";
+    case kCGGesturePhaseNone:       return ", no phase";
+    case kCGGesturePhaseBegan:      return ", gesture began";
+    case kCGGesturePhaseChanged:    return ", gesture changed";
+    case kCGGesturePhaseEnded:      return ", gesture ended";
+    case kCGGesturePhaseCancelled:  return ", gesture cancelled";
+    case kCGGesturePhaseMayBegin:   return ", gesture may begin";
+    default:                        return ", phase unknown";
     }
 }
 
 
-static char const *nameOfMomentumPhase(CGMomentumScrollPhase phase) {
+static char const *commaMomentumPhaseName(CGMomentumScrollPhase phase) {
     switch (phase) {
-    case kCGMomentumScrollPhaseNone:        return "no momentum";
-    case kCGMomentumScrollPhaseBegin:       return "inertia began";
-    case kCGMomentumScrollPhaseContinue:    return "inertia changed";
-    case kCGMomentumScrollPhaseEnd:         return "inertia ended";
-    default:                                return "momentum unknown";
+    case kCGMomentumScrollPhaseNone:        return ", no momentum";
+    case kCGMomentumScrollPhaseBegin:       return ", inertia began";
+    case kCGMomentumScrollPhaseContinue:    return ", inertia changed";
+    case kCGMomentumScrollPhaseEnd:         return ", inertia ended";
+    default:                                return ", momentum unknown";
     }
 }
 
@@ -285,11 +284,15 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 
     uint64_t senderID = CGEventGetRegistryID(event);
     CFStringRef flagDesc = STZFlagsCopyDescription(CGEventGetFlags(event) & kSTZPrintableModifiersMask);
+    CFStringRef spaceFlagDesc;
 
     if (CFStringGetLength(flagDesc) == 0) {
-        CFRelease(flagDesc);
-        flagDesc = CFRetain(CFSTR("no flag"));
+        spaceFlagDesc = CFRetain(CFSTR(""));
+    } else {
+        spaceFlagDesc = CFStringCreateWithFormat(kCFAllocatorDefault, NULL, CFSTR(" with %@"), flagDesc);
     }
+
+    CFRelease(flagDesc);
 
     int64_t i;
     double f;
@@ -298,53 +301,57 @@ void STZDebugLogEvent(char const *prefix, CGEventRef event) {
 
     switch (CGEventGetType(event)) {
     case kCGEventFlagsChanged:
-        STZDebugLog("%s flags changed [%llx] with %@", prefix, senderID, flagDesc);
+        STZDebugLog("%s flags changed [%llx]%@", prefix, senderID, spaceFlagDesc);
         break;
 
     case kCGEventScrollWheel:
         i = CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1);
         f = CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis1);
+
         phase = (uint32_t)CGEventGetIntegerValueField(event, kCGScrollWheelEventScrollPhase);
         CGMomentumScrollPhase mPhase = (uint32_t)CGEventGetIntegerValueField(event, kCGScrollWheelEventMomentumPhase);
-        char const *tail = CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) ? ", flipped" : "";
 
+        char const *commaPhase = "";
+        char const *commaMPhase = "";
         if (phase && mPhase) {
-            STZDebugLog("%s scroll wheel [%llx] with %@, phase %s, %s, by %lld (%0.1f) px%s",
-                        prefix, senderID, flagDesc, nameOfPhase(phase), nameOfMomentumPhase(mPhase), i, f, tail);
+            commaPhase = commaPhaseName(phase);
+            commaMPhase = commaMomentumPhaseName(mPhase);
         } else if (mPhase) {
-            STZDebugLog("%s scroll wheel [%llx] with %@, %s, by %lld (%0.1f) px%s",
-                        prefix, senderID, flagDesc, nameOfMomentumPhase(mPhase), i, f, tail);
+            commaMPhase = commaMomentumPhaseName(mPhase);
         } else {
-            STZDebugLog("%s scroll wheel [%llx] with %@, phase %s, by %lld (%0.1f) px%s",
-                        prefix, senderID, flagDesc, nameOfPhase(phase), i, f, tail);
+            commaPhase = commaPhaseName(phase);
         }
+
+        char const *tail = CGEventGetIntegerValueField(event, kCGScrollEventIsDirectionInverted) ? ", flipped" : "";
+        STZDebugLog("%s scroll wheel [%llx]%@%s%s, by %lld or %0.1f px%s",
+                    prefix, senderID, spaceFlagDesc, commaPhase, commaMPhase, i, f, tail);
         break;
 
     case kCGEventGesture:
         f = CGEventGetDoubleValueField(event, kCGGestureEventZoomValue);
         phase = (CGGesturePhase)CGEventGetIntegerValueField(event, kCGGestureEventPhase);
-        STZDebugLog("%s zoom gesture [%llx] with %@, gesture %s, scaled by %0.02f%%",
-                    prefix, senderID, flagDesc, nameOfPhase(phase), (1 + f) * 100);
+        STZDebugLog("%s zoom gesture [%llx]%@%s, scaled to %0.02f%%",
+                    prefix, senderID, spaceFlagDesc, commaPhaseName(phase), (1 + f) * 100);
         break;
 
     case kCGEventOtherMouseDown:
         buttonDesc = STZFlagsCopyDescription((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber));
-        STZDebugLog("%s mouse down [%llx] of %@ button",
-                    prefix, senderID, buttonDesc);
+        STZDebugLog("%s mouse down [%llx]%@ of %@ button",
+                    prefix, senderID, spaceFlagDesc, buttonDesc);
         CFRelease(buttonDesc);
         break;
 
     case kCGEventOtherMouseUp:
         buttonDesc = STZFlagsCopyDescription((uint32_t)CGEventGetIntegerValueField(event, kCGMouseEventButtonNumber));
-        STZDebugLog("%s mouse up [%llx] of %@ button",
-                    prefix, senderID, buttonDesc);
+        STZDebugLog("%s mouse up [%llx]%@ of %@ button",
+                    prefix, senderID, spaceFlagDesc, buttonDesc);
         CFRelease(buttonDesc);
         break;
 
     default:
-        STZDebugLog("%s unknown event [%llx] with %@", prefix, senderID, flagDesc);
+        STZDebugLog("%s unknown event [%llx]%@", prefix, senderID, spaceFlagDesc);
         break;
     }
 
-    CFRelease(flagDesc);
+    CFRelease(spaceFlagDesc);
 }

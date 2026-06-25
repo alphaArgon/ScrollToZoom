@@ -366,20 +366,26 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 }
 
 - (void)toggleTriggerFlags:(id)sender {
-    [self toggleMode:kSTZTriggerFlagsEnabled presentingFromView:_triggerFlagsCheckbox];
+    [self toggleMode:kSTZTriggerFlagsEnabled byCheckbox:_triggerFlagsCheckbox];
 }
 
 - (void)toggleMagicZoom:(id)sender {
-    [self toggleMode:kSTZMagicZoomEnabled presentingFromView:_magicZoomCheckbox];
+    [self toggleMode:kSTZMagicZoomEnabled byCheckbox:_magicZoomCheckbox];
 }
 
 - (void)toggleDictatorship:(id)sender {
-    [self toggleMode:kSTZWantsDictatorship presentingFromView:_dictatorshipCheckbox];
+    [self toggleMode:kSTZWantsDictatorship byCheckbox:_dictatorshipCheckbox];
 }
 
-- (void)toggleMode:(STZModes)mode presentingFromView:(NSView *)view {
-    STZModes modes = STZGetPreferredModes() ^ mode;
-    if ([self commitModes:modes presentingFromView:view]) {
+- (void)toggleMode:(STZModes)mode byCheckbox:(NSButton *)checkbox {
+    STZModes modes = STZGetPreferredModes();
+    if ([checkbox state]) {
+        modes |= mode;
+    } else {
+        modes &= ~mode;
+    }
+
+    if ([self commitModes:modes presentingFromView:checkbox]) {
         [_enableRetryTimer invalidate];
         _enableRetryTimer = nil;
     }

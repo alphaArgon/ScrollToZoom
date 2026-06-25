@@ -14,47 +14,99 @@
 #include "STZProcessManager.h"
 
 
+// The order of event taps reported by `CGGetEventTapList` is not documented.
+// In `STZSetWorkingModes`, soft event taps are always created after the hard one;
+// if it is observed that soft event taps are prepended to the list, we can assume
+// that the system sorts event taps by creation time in descending order.
+static bool newEventTapsPrependsToList = false;
+
+
+static bool isForeignEventTapIrrelevantToWheel(CGEventTapInformation const *info) {
+    if (!(info->eventsOfInterest & (1 << kCGEventScrollWheel))) {return true;}
+    if (info->options & kCGEventTapOptionListenOnly) {return true;}
+    return false;
+}
+
+
 static bool isSystemProcess(pid_t pid) {
     CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
     return !bundleID || CFStringHasPrefix(bundleID, CFSTR("com.apple."));
 }
 
 
-static bool isUnderDictatorship(void) {
+static bool isWheelUnderDictatorship(void) {
     uint32_t count;
     CGGetEventTapList(0, NULL, &count);
 
     CGEventTapInformation *infos = malloc(sizeof(CGEventTapInformation) * count);
     CGGetEventTapList(count, infos, &count);
 
+    if (STZIsLoggingEnabled()) {
+        for (uint32_t i = 0; i < count; ++i) {
+            if (isForeignEventTapIrrelevantToWheel(&infos[i])) {continue;}
+
+            char const *locName = "";
+            switch (infos[i].tapPoint) {
+            case kCGHIDEventTap: locName = "HID"; break;
+            case kCGSessionEventTap: locName = "session"; break;
+            case kCGAnnotatedSessionEventTap: locName = "annotated session"; break;
+            default: locName = "unknown"; break;
+            }
+            CFStringRef bundleID = STZGetBundleIdentifierForProcessID(infos[i].tappingProcess);
+            STZDebugLog("\ttap [%u] from %@ at %s", infos[i].eventTapID, bundleID, locName);
+        }
+    }
+
     pid_t selfPID = getpid();
-    pid_t lastPID = 0;
-    bool firstSelf = false;
 
     for (uint32_t i = 0; i < count; ++i) {
-        if (!(infos[i].eventsOfInterest & (1 << kCGEventScrollWheel))) {continue;}
-        if (infos[i].options & kCGEventTapOptionListenOnly) {continue;}
-        if (infos[i].processBeingTapped != 0) {continue;}
+        if (isForeignEventTapIrrelevantToWheel(&infos[i])) {continue;}
 
-        if (!firstSelf && infos[i].tapPoint == kCGHIDEventTap) {
-            if (isSystemProcess(infos[i].tappingProcess)) {continue;}
+        if (newEventTapsPrependsToList) {
             if (infos[i].tappingProcess == selfPID) {
-                firstSelf = true;
-                continue;
-            } else {
+                free(infos);
+                return true;
+            } else if (!isSystemProcess(infos[i].tappingProcess)) {
+                free(infos);
+                return false;
+            }
+
+        } else {
+            if (infos[i].tappingProcess != selfPID && !isSystemProcess(infos[i].tappingProcess)) {
                 free(infos);
                 return false;
             }
         }
-
-        if (infos[i].tapPoint == kCGAnnotatedSessionEventTap) {
-            if (isSystemProcess(infos[i].tappingProcess)) {continue;}
-            lastPID = infos[i].tappingProcess;
-        }
     }
 
     free(infos);
-    return lastPID == selfPID;
+    return false;
+}
+
+
+static void checkNewSoftWheelTapPrepended(void) {
+    newEventTapsPrependsToList = false;
+
+    uint32_t count;
+    CGGetEventTapList(0, NULL, &count);
+    if (count <= 1) {return;}
+
+    CGEventTapInformation *infos = malloc(sizeof(CGEventTapInformation) * count);
+    CGGetEventTapList(count, infos, &count);
+
+    if (infos[0].tappingProcess == getpid()) {
+        newEventTapsPrependsToList = infos[0].tapPoint != kCGHIDEventTap;
+    } else {
+        newEventTapsPrependsToList = false;
+    }
+
+    if (newEventTapsPrependsToList) {
+        STZDebugLog("\tnew event taps are known to be prepended to the system list");
+    } else {
+        STZDebugLog("\tcannot determine where new event taps are inserted into the system list");
+    }
+    free(infos);
+    return;
 }
 
 
@@ -69,6 +121,7 @@ static void releaseEventTap(STZEventTap *tap) {
     if (!tap->port) {return;}
     CFRunLoopRemoveSource(CFRunLoopGetMain(), tap->source, kCFRunLoopCommonModes);
     CGEventTapEnable(tap->port, false);
+    CFMachPortInvalidate(tap->port);
     CFRelease(tap->source);
     CFRelease(tap->port);
     tap->source = NULL;
@@ -198,7 +251,6 @@ bool STZSetWorkingModes(STZModes modes) {
                                 kCGEventTapOptionDefault, kCGHIDEventTap)) {
                 goto RESET;
             }
-            CGEventTapEnable(hardWheelTap.port, true);
             CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
                                             tapAddedOrRemovedObserver,
                                             anyEventTapAddedOrRemoved,
@@ -221,6 +273,8 @@ bool STZSetWorkingModes(STZModes modes) {
         }
     }
 
+    bool anySoftEventNewlyAdded = false;
+
     if (!passiveWheelTap.port != !(modes & (kSTZWantsDictatorship | kSTZTriggerFlagsEnabled))) {
         if (passiveWheelTap.port) {
             releaseEventTap(&passiveWheelTap);
@@ -230,6 +284,7 @@ bool STZSetWorkingModes(STZModes modes) {
                                 kCGEventTapOptionListenOnly, softTapLocation)) {
                 goto RESET;
             }
+            anySoftEventNewlyAdded = true;
         }
     }
 
@@ -242,6 +297,7 @@ bool STZSetWorkingModes(STZModes modes) {
                                 kCGEventTapOptionDefault, softTapLocation)) {
                 goto RESET;
             }
+            anySoftEventNewlyAdded = true;
         }
     }
 
@@ -268,6 +324,15 @@ bool STZSetWorkingModes(STZModes modes) {
         if (passiveWheelTap.port) {
             CGEventTapEnable(passiveWheelTap.port, !wheelTapMutable);
         }
+    }
+
+    if (hardWheelTap.port) {
+        //  When toggling dictatorship, `anySoftEventNewlyAdded` must be true becauze we
+        //  discard the old soft event taps and recreate new ones.
+        if (anySoftEventNewlyAdded) {
+            checkNewSoftWheelTapPrepended();
+        }
+        CGEventTapEnable(hardWheelTap.port, wheelTapMutable);
     }
 
     if (!wheelContexts) {
@@ -335,7 +400,7 @@ static void reinsertTapsIfNeeded(void) {
     if (!needsReinsertTaps) {return;}
     STZDebugLog("Checking dictatorship due to environment change");
 
-    if (isUnderDictatorship()) {
+    if (isWheelUnderDictatorship()) {
         needsReinsertTaps = false;
         return;
     }
@@ -346,7 +411,7 @@ static void reinsertTapsIfNeeded(void) {
     releaseEventTap(&mutableWheelTap);
 
     if (STZSetWorkingModes(modes)) {
-        STZDebugLog("Successfully reinserted event tap");
+        STZDebugLog("Successfully reinserted event taps");
     } else {
         STZDebugLog("Failed to reinsert event taps");
     }
@@ -365,8 +430,11 @@ static void beginWheelTapMutations(void) {
     if (passiveWheelTap.port) {
         CGEventTapEnable(passiveWheelTap.port, false);
     }
+    if (hardWheelTap.port) {
+        CGEventTapEnable(hardWheelTap.port, true);
+    }
     wheelTapMutable = true;
-    STZDebugLog("Switched to mutating scroll wheel tap");
+    STZDebugLog("\tswitched to mutating scroll wheel taps");
 }
 
 
@@ -462,8 +530,11 @@ static void forEachStateDo(WheelContextActions actions, CGEventRef event) {
         if (passiveWheelTap.port) {
             CGEventTapEnable(passiveWheelTap.port, true);
         }
+        if (hardWheelTap.port) {
+            CGEventTapEnable(hardWheelTap.port, false);
+        }
         wheelTapMutable = false;
-        STZDebugLog("Switched to passive scroll wheel tap");
+        STZDebugLog("\tswitched to passive scroll wheel taps");
     }
 
     if (actions & kRescheduleTimer) {
@@ -491,8 +562,6 @@ static void forEachStateDo(WheelContextActions actions, CGEventRef event) {
 
 
 static void magicZoomActivationCallback(uint64_t registryID, bool active, void *refcon) {
-    reinsertTapsIfNeeded();
-
     WheelContext *context = wheelContextWithFallback(registryID);
     context->magicZoomPending = active;
 
@@ -503,6 +572,8 @@ static void magicZoomActivationCallback(uint64_t registryID, bool active, void *
         STZDebugLog("Magic zoom finger up for [%llx]", registryID);
         forEachStateDo(kTryToEndWheelTapMutations, NULL);
     }
+
+    reinsertTapsIfNeeded();
 }
 
 
@@ -538,10 +609,9 @@ static CGEventRef flagsTapCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     if (triggerFlagsDown != flagsDown) {
         triggerFlagsDown = flagsDown;
 
-        reinsertTapsIfNeeded();
-
         if (triggerFlagsDown) {
             beginWheelTapMutations();
+            reinsertTapsIfNeeded();
         } else {
             forEachStateDo(kTryToEndWheelTapMutations | kDiscardTriggerFlags, event);
         }
@@ -625,27 +695,27 @@ static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType typ
 
     STZEventPlacement auxPlacement;
     CGEventRef auxEvent = STZStateTransformScrollEvent(context->state, event, gesture, fallbackScrollDir, &data, &auxPlacement);
-    forEachStateDo(kTryToEndWheelTapMutations | kRescheduleTimer, NULL);
-
     if (underDictatorship) {
         STZReadScrollDeltaFromEvent(event, 0, true);
     }
 
+    CGEventRef returnValue;
+#define RETURNS(x) returnValue = x; break
     if (auxEvent == NULL) {
         switch (auxPlacement) {
         case kSTZReplaceEvent:
             STZDebugLog("\tdiscarded");
-            return NULL;
+            RETURNS(NULL);
         case kSTZAppendEvent:
         case kSTZPrependEvent:
-            return event;
+            STZDebugLogEvent("\tupdated to", event);
+            RETURNS(event);
         }
 
     } else {
         if (appOptions & kSTZFlagsExcludedForApp) {
             clearTriggerFlagsForEvent(auxEvent);
         }
-
         switch (auxPlacement) {
         case kSTZReplaceEvent:
             STZDebugLogEvent("\treplaced by", auxEvent);
@@ -655,8 +725,9 @@ static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType typ
                 CGEventTapPostEvent(proxy, auxEvent);
             }
             CFRelease(auxEvent);
-            return NULL;
+            RETURNS(NULL);
         case kSTZAppendEvent:
+            STZDebugLogEvent("\tupdated to", event);
             STZDebugLogEvent("\tfollowed by", auxEvent);
             CGEventTapPostEvent(proxy, event);
             if (underDictatorship) {
@@ -665,18 +736,22 @@ static CGEventRef mutableWheelTapCallback(CGEventTapProxy proxy, CGEventType typ
                 CGEventTapPostEvent(proxy, auxEvent);
             }
             CFRelease(auxEvent);
-            return NULL;
+            RETURNS(NULL);
         case kSTZPrependEvent:
             STZDebugLogEvent("\tpreempted by", auxEvent);
+            STZDebugLogEvent("\tupdated to", event);
             if (underDictatorship) {
                 CGEventPost(kCGSessionEventTap, auxEvent);
             } else {
                 CGEventTapPostEvent(proxy, auxEvent);
             }
             CFRelease(auxEvent);
-            return event;
+            RETURNS(event);
         }
     }
+#undef RETURNS
+    forEachStateDo(kTryToEndWheelTapMutations | kRescheduleTimer, NULL);
+    return returnValue;
 }
 
 

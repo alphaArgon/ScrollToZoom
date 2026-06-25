@@ -51,7 +51,7 @@ English (US), Simplified Chinese (Mainland), and Traditional Chinese (Taiwan) ar
 
 ## Technologies
 
-The core functionality is written in C for zero-cost abstraction. Since this app supports down to High Sierra, where Swift ABI is not stable and an external runtime library is required, the app is written in Objective-C.
+The core functionality is written in C for ultimate performance. Since this app supports down to High Sierra, where Swift ABI is not stable and an external runtime library is required, the app is written in Objective-C.
 
 This app has a built-in logging panel. Open the settings window while holding the Option key (⌥). A ladybug button will appear in the bottom-left corner. Clicking it opens the logging panel. For performance reasons, logging is enabled only if the panel is shown, and the panel records up to a thousand recent logs.
 
