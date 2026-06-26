@@ -227,6 +227,8 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
     uint64_t registryID = 0;
     MTDeviceGetRegistryID(device, &registryID);
 
+    bool notify = false;
+    CGEventTimestamp now = CGEventTimestampNow();
     os_unfair_lock_lock(&tapContextLock);
 
     if (!tapContexts) {
@@ -293,8 +295,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
             }
 
         } else {
-            CGEventTimestamp now = CGEventTimestampNow();
-            CGEventTimestamp delta = CGEventTimestampNow() - context->tapTimestamp;
+            CGEventTimestamp delta = now - context->tapTimestamp;
             if (delta > (0.25 * NSEC_PER_SEC)
              || pointDistanceSquare(touches[lastTouchIndex].location, context->tapLocation) > SQUARE(0.25)) {
                 context->tapLocation = touches[lastTouchIndex].location;
@@ -314,29 +315,33 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         context->goodTouchCount = goodTouchCount;
 
         bool recognized = goodTouchCount && context->tappedNTimes == 2;
-        if (context->recognized != recognized) {
-            context->recognized = recognized;
-            os_unfair_lock_unlock(&tapContextLock);
+        notify = recognized != context->recognized;
+        context->recognized = recognized;
 
-            //  Must be sync for lock balance.
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                if (activationCallback) {
-                    activationCallback(registryID, recognized, activationCallbackRefcon);
-                }
-            });
-
-            os_unfair_lock_lock(&tapContextLock);
-        }
-
-    } else if (goodTouchCount == 1 && context->tappedNTimes == 1) {
+    } else {
         //  If a finger moved during the touch, reset the tap count.
-        if (pointDistanceSquare(touches[lastTouchIndex].location, context->tapLocation) > SQUARE(0.1)) {
+        if (goodTouchCount == 1 && context->tappedNTimes == 1
+         && pointDistanceSquare(touches[lastTouchIndex].location, context->tapLocation) > SQUARE(0.1)) {
             context->tapLocation = touches[lastTouchIndex].location;
             context->tappedNTimes = 0;
         }
     }
 
     os_unfair_lock_unlock(&tapContextLock);
+
+    if (notify) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            os_unfair_lock_lock(&tapContextLock);
+            TapContext *context_ = STZCacheGetValue(tapContexts, registryID);
+            bool recognized = context_ ? context_->recognized : false;
+            os_unfair_lock_unlock(&tapContextLock);
+
+            if (activationCallback) {
+                activationCallback(registryID, recognized, activationCallbackRefcon);
+            }
+        });
+    }
+
     return 0;
 }
 

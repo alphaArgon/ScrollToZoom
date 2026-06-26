@@ -431,7 +431,7 @@
 				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N8933HAGDL;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -445,7 +445,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0b1;
+				MARKETING_VERSION = 2.0b2;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -466,7 +466,7 @@
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 26;
+				CURRENT_PROJECT_VERSION = 27;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -479,7 +479,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0b1;
+				MARKETING_VERSION = 2.0b2;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
