@@ -1,7 +1,7 @@
 
 <small>[English (US)](README.md)・**简体中文（大陆）**</small>
 
-# <img src="ScrollToZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@2x.png" width="128" align="right"> 滚动来缩放
+# <img src="images/scroll_to_zoom.png" width="128" align="right"> 滚动来缩放
 
 让鼠标滚轮可以精准缩放的 Mac 小工具。
 
@@ -11,7 +11,7 @@
 - 自定义方向、速度、各 app 单独的配置
 - 兼容其他鼠标优化工具
 
-### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> 妙控鼠标特供
+### <img src="images/magic_zoom.png" width="64" align="right"> 妙控鼠标特供
 
 轻点两下然后滚动（手指触碰—抬起—触碰—移动）来放大和缩小。这个交互方式和在 iPhone 上缩放 Apple 地图是一样的。如果在系统设置中启用了轻点两下来智能缩放，这个操作会很自然。
 
@@ -21,7 +21,7 @@
 
 当按住设置的修饰键，或按下鼠标侧边键（或中键）时，可以在任何 app 中用鼠标滚轮来精准缩放。「滚动来缩放」在后台运行，将滚轮事件模拟为缩放手势。体积轻巧（约 1 MB），性能高效。
 
-<img src="images/window.zh_CN.png" width="443" title="主窗口截图">
+<img src="images/window_v2.zh_CN.png" width="476" title="主窗口截图">
 
 「滚动来缩放」可以与 [Mos](https://github.com/Caldis/Mos)、[LinearMouse](https://github.com/linearmouse/linearmouse) 或其他你想用的工具无缝配合使用。如果这些工具提供了滚动平滑支持，「滚动来缩放」也能从中揩油，提供平滑的缩放。
 

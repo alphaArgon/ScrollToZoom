@@ -1,6 +1,6 @@
 <small>**English (US)**・[简体中文（大陆）](README.zh_CN.md)</small>
 
-# <img src="ScrollToZoom/Assets.xcassets/AppIcon.appiconset/AppIcon.128@2x.png" width="128" align="right"> Scroll to Zoom
+# <img src="images/scroll_to_zoom.png" width="128" align="right"> Scroll to Zoom
 
 A Mac utility for precisely zooming in or out using the mouse wheel.
 
@@ -10,7 +10,7 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 - Customizable direction, speed, and per-application configuration.
 - Compatible with other mouse optimization tools.
 
-### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> Bonus for Magic Mouse users
+### <img src="images/magic_zoom.png" width="64" align="right"> Bonus for Magic Mouse users
 
 You can double tap and scroll — that is, put your finger on the surface, lift it, put it down again, and move it up or down — to zoom in and out, just like how you zoom in Apple Maps on your iPhone. This works naturally if you also enable double-tap-to-smart-zoom in System Settings.
 
@@ -20,7 +20,7 @@ Previously, a specialized app, Magic Zoom, was developed solely for this feature
 
 With the specified modifier keys held or an auxiliary mouse button pressed, you can perform precise zooming in any app with your mouse wheel. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
 
-<img src="images/window.png" width="447" title="Screenshot of the main window">
+<img src="images/window_v2.png" width="485" title="Screenshot of the main window">
 
 Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/Caldis/Mos), [LinearMouse](https://github.com/linearmouse/linearmouse), or others you love. If that tool provides a smooth scrolling experience, Scroll to Zoom will benefit from it, giving a smooth zooming experience.
 

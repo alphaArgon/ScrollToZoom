@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		DE0B33852E01E48000DE9BA5 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DE0B33842E01E48000DE9BA5 /* AppIcon.icon */; };
 		DE14D3072DB600CE00CA3032 /* STZUIConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = DE14D3062DB600CE00CA3032 /* STZUIConstants.m */; };
 		DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */; };
 		DE3ACC3D2FE59445009735EF /* STZEventHandling.c in Sources */ = {isa = PBXBuildFile; fileRef = DE3ACC3C2FE59443009735EF /* STZEventHandling.c */; };
@@ -28,12 +27,27 @@
 		DE9B15332D43948F00E92ECE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = DE9B15322D43948F00E92ECE /* main.m */; };
 		DEA162EC2FC88A1B00CD45E5 /* STZStateManager.c in Sources */ = {isa = PBXBuildFile; fileRef = DEA162EB2FC88A1A00CD45E5 /* STZStateManager.c */; };
 		DEA454602DBE48B9005B046B /* STZLaunchAtLogin.m in Sources */ = {isa = PBXBuildFile; fileRef = DEA4545F2DBE48B9005B046B /* STZLaunchAtLogin.m */; };
+		DEBCF9882FEE6DBE00BF0D43 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = DEDA16442FEE69CE00AD166A /* AppIcon.icon */; };
 		DEC39DF32DAFBFB00034654C /* STZOptionsPanel.m in Sources */ = {isa = PBXBuildFile; fileRef = DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */; };
+		DEDA16482FEE6A5600AD166A /* AppIconMagic.icns in Resources */ = {isa = PBXBuildFile; fileRef = DEDA163F2FEE621900AD166A /* AppIconMagic.icns */; };
+		DEDA164B2FEE700800AD166A /* AppIcon.icns in CopyFiles */ = {isa = PBXBuildFile; fileRef = DEDA163E2FEE621900AD166A /* AppIcon.icns */; };
 		DEE3050F2E39014000E4429A /* STZPermissionView.m in Sources */ = {isa = PBXBuildFile; fileRef = DEE3050E2E39013B00E4429A /* STZPermissionView.m */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		DEDA16462FEE6A1A00AD166A /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				DEDA164B2FEE700800AD166A /* AppIcon.icns in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
-		DE0B33842E01E48000DE9BA5 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		DE14D3052DB600CE00CA3032 /* STZUIConstants.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZUIConstants.h; sourceTree = "<group>"; };
 		DE14D3062DB600CE00CA3032 /* STZUIConstants.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZUIConstants.m; sourceTree = "<group>"; };
 		DE2F28882DB960A400C6DB0F /* STZSymbols.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = STZSymbols.ttf; sourceTree = "<group>"; };
@@ -72,6 +86,9 @@
 		DEC39DF02DAF8E040034654C /* CGEventSPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CGEventSPI.h; sourceTree = "<group>"; };
 		DEC39DF12DAFBFB00034654C /* STZOptionsPanel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZOptionsPanel.h; sourceTree = "<group>"; };
 		DEC39DF22DAFBFB00034654C /* STZOptionsPanel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZOptionsPanel.m; sourceTree = "<group>"; };
+		DEDA163E2FEE621900AD166A /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
+		DEDA163F2FEE621900AD166A /* AppIconMagic.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIconMagic.icns; sourceTree = "<group>"; };
+		DEDA16442FEE69CE00AD166A /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper; path = AppIcon.icon; sourceTree = "<group>"; };
 		DEE3050D2E39012900E4429A /* STZPermissionView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STZPermissionView.h; sourceTree = "<group>"; };
 		DEE3050E2E39013B00E4429A /* STZPermissionView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = STZPermissionView.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -122,7 +139,9 @@
 				DE70F1612D4532270034F3F6 /* Localizable.xcstrings */,
 				DE5EEF9B2DA6DCE700FAC19A /* InfoPlist.xcstrings */,
 				DE9B152D2D43948F00E92ECE /* Assets.xcassets */,
-				DE0B33842E01E48000DE9BA5 /* AppIcon.icon */,
+				DEDA163E2FEE621900AD166A /* AppIcon.icns */,
+				DEDA163F2FEE621900AD166A /* AppIconMagic.icns */,
+				DEDA16442FEE69CE00AD166A /* AppIcon.icon */,
 			);
 			name = GUI;
 			sourceTree = "<group>";
@@ -200,6 +219,7 @@
 				DE9B15232D43948E00E92ECE /* Sources */,
 				DE9B15242D43948E00E92ECE /* Frameworks */,
 				DE9B15252D43948E00E92ECE /* Resources */,
+				DEDA16462FEE6A1A00AD166A /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -254,7 +274,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DE0B33852E01E48000DE9BA5 /* AppIcon.icon in Resources */,
+				DEBCF9882FEE6DBE00BF0D43 /* AppIcon.icon in Resources */,
+				DEDA16482FEE6A5600AD166A /* AppIconMagic.icns in Resources */,
 				DE5EEFA22DA79E3700FAC19A /* StatusMenu.xib in Resources */,
 				DE5EEF9C2DA6DCE700FAC19A /* InfoPlist.xcstrings in Resources */,
 				DE2F28892DB9636700C6DB0F /* STZSymbols.ttf in Resources */,
@@ -428,10 +449,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = AppIconMagic;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = none;
 				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = N8933HAGDL;
 				ENABLE_HARDENED_RUNTIME = NO;
@@ -445,7 +467,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0b2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -462,11 +484,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = AppIconMagic;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_STANDALONE_ICON_BEHAVIOR = none;
 				CODE_SIGN_ENTITLEMENTS = ScrollToZoom/ScrollToZoom.entitlements;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 27;
+				CURRENT_PROJECT_VERSION = 30;
 				DEAD_CODE_STRIPPING = YES;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -479,7 +502,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 2.0b2;
+				MARKETING_VERSION = 2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = red.argon.scrolltozoom;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

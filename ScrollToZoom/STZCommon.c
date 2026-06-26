@@ -40,16 +40,17 @@ CFStringRef STZFlagsCopyDescription(uint32_t anyFlags) {
         {u'⇪', kCGEventFlagMaskAlphaShift},
     };
 
-    static const size_t itemCount = sizeof(items) / sizeof(*items);
+    #define itemCount (sizeof(items) / sizeof(*items))
     uint16_t characters[itemCount + 2];
     size_t characterCount = 0;
 
-    for (size_t i = 0; i < 5; ++i) {
+    for (size_t i = 0; i < itemCount; ++i) {
         if (anyFlags & items[i].flag) {
             characters[characterCount] = items[i].symbol;
             characterCount += 1;
         }
     }
+    #undef itemCount
 
     if (anyFlags & kSTZModifierFn) {
         if (characterCount) {
