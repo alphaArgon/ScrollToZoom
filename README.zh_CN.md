@@ -13,7 +13,7 @@
 
 ### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> 妙控鼠标特供
 
-轻点两下然后滚动（手指触碰—抬起—触碰—移动）来放大和缩小。这个交互方式和在 iPhone 上缩放 Apple 地图是一样的。如果同时启用了轻点两下来智能缩放，这个操作会很自然。
+轻点两下然后滚动（手指触碰—抬起—触碰—移动）来放大和缩小。这个交互方式和在 iPhone 上缩放 Apple 地图是一样的。如果在系统设置中启用了轻点两下来智能缩放，这个操作会很自然。
 
 先前专门开发的 app「妙控缩放」只提供这个功能，现在它已经集成进「滚动来缩放」了。如果不需要鼠键触发的缩放，可以在设置中关闭它。
 
@@ -29,6 +29,10 @@
 
 支持控制在哪些 app 中启用「滚动来缩放」。如果修饰键破坏了正常的缩放行为，可以选择对某 app 移除模拟滚动事件中的修饰键标记。比如按下修饰键时，Firefox 总是不缩放，因此可以在设置中对它启用「擦除修饰键」。
 
+## 本地化
+
+支持英语、西班牙语、法语、德语、俄语、日语、简体中文（大陆）和繁体中文（台湾）。然而，维护者并不熟悉所有语言，翻译 UI 文案耗费了他大量精力，所以 README 仅提供英语和简体中文版本。欢迎为本地化提供帮助。
+
 ## 安装
 
 需要：
@@ -36,7 +40,7 @@
 - macOS 10.13 High Sierra 或更高版本
 - 支持滚动的可点击设备
 
-下载 [latest release](https://github.com/alphaArgon/ScrollToZoom/releases)，然后将解压的内容移动到「应用程序」文件夹。在 macOS Sequoia 或更高系统中，需要在终端中运行下列命令来绕过 Gatekeeper（如果你确实信任此 app）：
+下载 [latest release](https://github.com/alphaArgon/ScrollToZoom/releases)，然后将解压的内容移动到「应用程序」文件夹。在 macOS Sequoia 或更高系统中，需要在终端中运行下列命令来绕过 Gatekeeper（如果你觉得你信任这个 app）：
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
@@ -45,10 +49,6 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 确保路径名 (/Applications/Scroll to Zoom.app) 符合 app 的实际位置，且空格被正确转义。对于首次启动，请右键点击 app，从上下文菜单中选择「打开」，并按照提示授予必要的权限。
 
 由于此 app 使用了一些受保护的技术，它不能运行在 App Sandbox 里，也不能上架 Mac App Store。
-
-## 本地化
-
-支持英语（美国）、简体中文（大陆）和繁体中文（台湾）。欢迎为本地化提供帮助。
 
 ## 技术使用
 
@@ -66,4 +66,4 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 
 ## 许可
 
-「滚动来缩放」的源代码在 MIT 许可证下发布，详情见 [LICENSE](LICENSE)。App 图标和状态栏图像是基于 macOS 附带的字体 *Zapfino* 中的一个字形创建的，可能具有不同的许可。其他资源的版权归本 repository 持有者所有。
+「滚动来缩放」的源代码在 MIT 许可证下发布，详情见 [LICENSE](LICENSE)。App 图标和状态栏图像是基于 macOS 附带的字体 *Zapfino* 中的一个字形创建的，可能具有不同的许可。其他资源（图片和字体等）的版权归本 repository 持有者所有，这意味着未经许可，你不能在自己的分发版中使用它们。

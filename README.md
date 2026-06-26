@@ -12,7 +12,7 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 
 ### <img src="ScrollToZoom/Assets.xcassets/AppIconMagic.appiconset/AppIcon.128@1x.png" width="64" align="right"> Bonus for Magic Mouse users
 
-You can double tap and scroll, that is, finger down—up—down—moves, to zoom in and out, just like how you zoom in Apple Maps on your iPhone. This works naturally if you also enable double-tap to smart zoom.
+You can double tap and scroll — that is, put your finger on the surface, lift it, put it down again, and move it up or down — to zoom in and out, just like how you zoom in Apple Maps on your iPhone. This works naturally if you also enable double-tap-to-smart-zoom in System Settings.
 
 Previously, a specialized app, Magic Zoom, was developed solely for this feature. It’s now integrated into Scroll to Zoom. If you don’t need key- or button-triggered zooming, you can disable it in the settings.
 
@@ -26,7 +26,11 @@ Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/C
 
 Regardless of how these tools configure the direction of scrolling, the zooming is always based on your finger movements. You can configure whether “fingers up” means zooming in or out in the app.
 
-You can control for what app Scroll to Zoom should be enabled. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase Modifier Keys” for it in the settings.
+You can choose which apps Scroll to Zoom is enabled for. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase Modifier Keys” for it in the settings.
+
+## Localization
+
+English, Spanish, French, German, Russian, Japanese, Simplified Chinese (the Mainland), and Traditional Chinese (Taiwan) are supported. However, the maintainer is not familiar with all languages, and UI translations took him a lot of effort, so the README is only available in English and Simplified Chinese. Contributions to localization are welcome.
 
 ## Installation
 
@@ -35,7 +39,7 @@ You’ll need:
 - macOS 10.13 High Sierra or later, and
 - A pointing device that supports scrolling.
 
-Download the [latest release](https://github.com/alphaArgon/ScrollToZoom/releases) and move the unarchived content into the Applications folder. On macOS Sequoia or later, you need to run the following command in Terminal to bypass Gatekeeper (if you do trust this app):
+Download the [latest release](https://github.com/alphaArgon/ScrollToZoom/releases) and move the unarchived content into the Applications folder. On macOS Sequoia or later, you need to run the following command in Terminal to bypass Gatekeeper if you think you trust this app:
 
 ```sh
 xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
@@ -44,10 +48,6 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 Make sure the path (/Applications/Scroll to Zoom.app) matches the actual location of the app and spaces are escaped. For the first launch, right-click the app and choose Open from the context menu. You may also need to grant the required permissions as prompted.
 
 Because this app uses some protected technologies, it cannot be sandboxed and distributed on the Mac App Store.
-
-## Localization
-
-English (US), Simplified Chinese (Mainland), and Traditional Chinese (Taiwan) are supported. Contributions to localization are welcome.
 
 ## Technologies
 
@@ -61,8 +61,8 @@ This app has a built-in logging panel. Open the settings window while holding th
 - Google Chrome: Zoom events only take effect after the accumulated scale exceeds a certain threshold. This is a design decision of Chrome.
 - Sketch: Zoom events with a small scale are ignored. This is a design decision of Sketch.
 
-You are welcome to report issues and contribute to this project.
+You are welcome to report issues and contribute to this project
 
 ## License
 
-The source code of Scroll to Zoom is released under the MIT license. See [LICENSE](LICENSE) for details. The app icon and status bar image are created from a glyph of the font *Zapfino* shipped with macOS, which may have a different license. Other assets are copyrighted by the owner of this repository.
+The source code of Scroll to Zoom is released under the MIT license. See [LICENSE](LICENSE) for details. The app icon and status bar image are created from glyphs of the font *Zapfino* shipped with macOS, which may have a different license. Other assets (images, fonts, etc.) are copyrighted by the owner of this repository, which means you cannot use them in your own distribution without permission.
