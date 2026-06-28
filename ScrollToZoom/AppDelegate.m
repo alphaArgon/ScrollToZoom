@@ -48,7 +48,7 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
     }
 
     if (!STZSetWorkingModes(STZGetPreferredModes())) {
-        [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
+        [STZWindow orderFrontSharedWindowWithAdvancedSettings:NO];
     }
 
     [self updateStatusItem:nil];
@@ -67,7 +67,7 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
 
 - (BOOL)applicationShouldHandleReopen:(NSApplication *)sender hasVisibleWindows:(BOOL)flag {
     BOOL optionDown = !!([NSEvent modifierFlags] & NSEventModifierFlagOption);
-    [STZWindow orderFrontSharedWindowWithAdvanceSettings:optionDown];
+    [STZWindow orderFrontSharedWindowWithAdvancedSettings:optionDown];
     return NO;
 }
 
@@ -108,11 +108,11 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
 }
 
 - (void)orderFrontSharedWindow:(id)sender {
-    [STZWindow orderFrontSharedWindowWithAdvanceSettings:NO];
+    [STZWindow orderFrontSharedWindowWithAdvancedSettings:NO];
 }
 
 - (void)orderFrontSharedWindowAlternate:(id)sender {
-    [STZWindow orderFrontSharedWindowWithAdvanceSettings:YES];
+    [STZWindow orderFrontSharedWindowWithAdvancedSettings:YES];
 }
 
 static NSRunningApplication *keyApplication(void) {

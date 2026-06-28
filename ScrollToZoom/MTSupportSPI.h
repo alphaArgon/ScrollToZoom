@@ -24,7 +24,7 @@ bool MTDeviceIsRunning(MTDeviceRef);
 
 
 typedef CF_ENUM(uint32_t, MTDeviceFamilyID) {
-    kMTDeviceFmailyMagicMouse = 112
+    kMTDeviceFamilyMagicMouse = 112
 };
 
 OSStatus MTDeviceGetDeviceID(MTDeviceRef, uint64_t *);

@@ -50,9 +50,11 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 
 由于此 app 使用了一些受保护的技术，它不能运行在 App Sandbox 里，也不能上架 Mac App Store。
 
+如果你更喜欢「妙控鼠标特供」一节的抽象老鼠图标，可以在访达中右键点击该 app > 显示包内容 > Contents > Resources > AppIconMagic.icns 来找到它，然后替换掉「滚动来缩放」的默认图标。
+
 ## 技术使用
 
-为了零成本抽象，核心功能由 C 编写。由于要支持到 High Sierra，而 Swift ABI 在该版本上不稳定，需要额外的运行时库，所以 app 使用 Objective-C 编写。
+为了极致的性能，核心功能由 C 编写。由于要支持到 High Sierra，而 Swift ABI 在该版本上不稳定，需要额外的运行时库，所以 app 使用 Objective-C 编写。
 
 另外内置了日志面板。按住 Option 键（⌥）打开设置窗口时，左下角会出现一个瓢虫按钮。点击它会打开日志面板。出于性能考虑，仅当面板显示时，才会记录最近一千条日志。
 

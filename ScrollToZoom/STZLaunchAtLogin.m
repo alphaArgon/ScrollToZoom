@@ -7,6 +7,7 @@
  */
 
 #import "STZLaunchAtLogin.h"
+#import <ServiceManagement/SMAppService.h>
 #import <ServiceManagement/ServiceManagement.h>
 #import <ApplicationServices/ApplicationServices.h>
 #import "STZProcessManager.h"
@@ -107,7 +108,9 @@ bool STZShouldEnableLaunchAtLogin(void) {
 
 bool STZGetLaunchAtLoginEnabled(void) {
     if (@available(macOS 13, *)) {
-        return [[SMAppService mainAppService] status] == SMAppServiceStatusRequiresApproval
+        SMAppServiceStatus status = [[SMAppService mainAppService] status];
+        return status == SMAppServiceStatusEnabled
+            || status == SMAppServiceStatusRequiresApproval
             || legacyGetEnabled();
     } else {
         return legacyGetEnabled();
@@ -117,6 +120,9 @@ bool STZGetLaunchAtLoginEnabled(void) {
 
 bool STZSetLaunchAtLoginEnabled(bool enable) {
     if (@available(macOS 13, *)) {
+        if (!enable) {
+            legacySetEnabled(enable);
+        }
         return enable
             ? [[SMAppService mainAppService] registerAndReturnError:NULL]
             : [[SMAppService mainAppService] unregisterAndReturnError:NULL];

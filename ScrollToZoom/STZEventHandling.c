@@ -334,7 +334,7 @@ bool STZSetWorkingModes(STZModes modes) {
     }
 
     if (passiveHardWheelTap.port) {
-        //  When toggling dictatorship, `anySoftEventNewlyAdded` must be true becauze we
+        //  When toggling dictatorship, `anySoftEventNewlyAdded` must be true because we
         //  discard the old soft event taps and recreate new ones.
         if (anySoftEventNewlyAdded) {
             checkNewSoftWheelTapPrepended();

@@ -10,7 +10,7 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 - Customizable direction, speed, and per-application configuration.
 - Compatible with other mouse optimization tools.
 
-### <img src="images/magic_zoom.png" width="64" align="right"> Bonus for Magic Mouse users
+### <img src="images/magic_zoom.png" width="64" align="right"> Bonus for Magic Mouse Users
 
 You can double tap and scroll — that is, put your finger on the surface, lift it, put it down again, and move it up or down — to zoom in and out, just like how you zoom in Apple Maps on your iPhone. This works naturally if you also enable double-tap-to-smart-zoom in System Settings.
 
@@ -48,6 +48,8 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 Make sure the path (/Applications/Scroll to Zoom.app) matches the actual location of the app and spaces are escaped. For the first launch, right-click the app and choose Open from the context menu. You may also need to grant the required permissions as prompted.
 
 Because this app uses some protected technologies, it cannot be sandboxed and distributed on the Mac App Store.
+
+If you like the abstract mouse icon in the Bonus for Magic Mouse Users section better, you can find it by right-clicking the app in Finder > Show Package Contents > Contents > Resources > AppIconMagic.icns, and use it to replace the default icon of Scroll to Zoom.
 
 ## Technologies
 

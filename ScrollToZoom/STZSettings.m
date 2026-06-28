@@ -213,6 +213,7 @@ CFStringRef const kSTZAppOptionsDidChangeNotification = CFSTR("STZAppOptionsDidC
 
 
 CFDictionaryRef STZCopyOptionsForAllApps(void) {
+    _loadUserDefaultsIfNeeded();
     return CFDictionaryCreateCopy(kCFAllocatorDefault, STZOptionsForApps);
 }
 

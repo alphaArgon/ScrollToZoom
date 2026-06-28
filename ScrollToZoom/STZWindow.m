@@ -46,7 +46,7 @@ static NSString *trim(NSString *string) {
     return window;
 }
 
-+ (void)orderFrontSharedWindowWithAdvanceSettings:(BOOL)advanced {
++ (void)orderFrontSharedWindowWithAdvancedSettings:(BOOL)advanced {
     STZWindow *sharedWindow = [self sharedWindow];
 
     STZConfigViewController *viewController = (STZConfigViewController *)[sharedWindow contentViewController];

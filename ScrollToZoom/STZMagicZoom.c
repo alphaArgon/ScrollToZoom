@@ -8,6 +8,7 @@
 
 #include "STZMagicZoom.h"
 #include "MTSupportSPI.h"
+#include "STZCommon.h"
 #include <IOKit/hid/IOHIDLib.h>
 #include <os/lock.h>
 
@@ -22,8 +23,10 @@ typedef union {
 } TouchStatus;
 
 
+#define MAX_TOUCHES 10
+
 typedef struct {
-    TouchStatus         touches[10];
+    TouchStatus         touches[MAX_TOUCHES];
     uint8_t             goodTouchCount;
     bool                recognized;
     uint8_t             tappedNTimes;
@@ -66,6 +69,13 @@ bool STZSetListeningMagicMice(bool listen) {
         IONotificationPortDestroy(mouseNotificationPort);
         mouseNotificationPort = NULL;
         removeAllMice();
+
+        os_unfair_lock_lock(&tapContextLock);
+        if (tapContexts) {
+            STZCacheRemoveAll(tapContexts);
+        }
+        os_unfair_lock_unlock(&tapContextLock);
+
         return true;
     }
 
@@ -146,7 +156,7 @@ static void anyMouseAdded(void *refcon, io_iterator_t iterator) {
         if (device) {
             uint32_t family = 0;
             MTDeviceGetFamilyID(device, &family);
-            if (family == kMTDeviceFmailyMagicMouse) {
+            if (family == kMTDeviceFamilyMagicMouse) {
                 uint64_t registryID = 0;
                 IORegistryEntryGetRegistryEntryID(item, &registryID);
                 CFDictionarySetValue(addedMice, uint64Key(registryID), device);
@@ -253,7 +263,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
 
     for (int i = 0; i < touchCount; ++i) {
         int j = touches[i].fingerID;
-        if (j >= 8) {continue;}
+        if (j >= MAX_TOUCHES) {continue;}
 
         if (touches[i].phase < kMTTouchPhaseDidDown
          || touches[i].phase > kMTTouchPhaseWillUp) {
@@ -290,7 +300,7 @@ static int magicMouseTouched(MTDeviceRef device, MTTouch const *touches, CFIndex
         bool singleTap = goodTouchCount == 1 && context->goodTouchCount == 0;
         if (!singleTap) {
             if (goodTouchCount != 0) {
-                context->tapTimestamp = -INFINITY;
+                context->tapTimestamp = 0;
                 context->tappedNTimes = 0;
             }
 
