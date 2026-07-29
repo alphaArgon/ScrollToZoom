@@ -166,12 +166,21 @@ struct _STZState {
     CGEventTimestamp    momentumStart;
     CGPoint             zoomCenter;
     uint64_t            sessionData;
+
+    //  The speedometer is for measuring discrete scroll intervals and requires no high accuracy.
+    //  When a bunch of discrete scroll events occur in a short period of time, the timeout for
+    // `ZoomToEndAfterWaiting` will shorten.
+#define kSpeedometerCapacity 8
+    int                 speedometerNextIndex;
+    CGEventTimestamp    speedometerLastTime;
+    CGEventTimestamp    speedometerIntervals[kSpeedometerCapacity];
 };
 
 
 static const CGEventTimestamp kEventDelayDuration = (int64_t)(0.01667 * NSEC_PER_SEC);
-static const CGEventTimestamp kDiscreteScrollTimeout = (int64_t)(0.35 * NSEC_PER_SEC);
 static const CGEventTimestamp kMomentumScrollTimeout = (int64_t)(0.05 * NSEC_PER_SEC);
+static const CGEventTimestamp kMaxDiscreteScrollTimeout = (int64_t)(0.35 * NSEC_PER_SEC);
+static const CGEventTimestamp kAutoDiscreteScrollTimeout = kCGEventDistantFuture;
 
 
 static EventResult updateStateNotInSession(STZStateRef state, CGEventRef event, ScrollType scroll, STZGestureType gesture, uint64_t fallbackScrollDir);
@@ -182,10 +191,30 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
 
 
 static void setZoomToEndAfterWaiting(STZStateRef state, CGEventRef event, CGEventTimestamp timeout) {
+    CGEventTimestamp now = CGEventTimestampNow();
+
+    if (timeout == kAutoDiscreteScrollTimeout) {
+        int index = state->speedometerNextIndex;
+        state->speedometerIntervals[index] = now - state->speedometerLastTime;
+        state->speedometerNextIndex = (index + 1) % kSpeedometerCapacity;
+        state->speedometerLastTime = now;
+
+        timeout = kEventDelayDuration;
+        for (int i = 0; i < kSpeedometerCapacity; ++i) {
+            if (timeout < state->speedometerIntervals[i]) {
+                timeout = state->speedometerIntervals[i];
+            }
+        }
+        timeout = timeout / 2 * 3;
+        if (timeout > kMaxDiscreteScrollTimeout) {
+            timeout = kMaxDiscreteScrollTimeout;
+        }
+    }
+
     state->type = kStateZoomToEndAfterWaiting;
     state->refEvent = CGEventCreateCopy(event);
     //  This value is not read from the event because Mos may not report it accurately.
-    state->refTime = CGEventTimestampNow();
+    state->refTime = now;
     state->endTimeout = timeout;
 }
 
@@ -214,7 +243,14 @@ STZStateRef STZStateCreate(void){
     state->refEvent = NULL;
     state->momentumStart = kCGEventDistantFuture;
     state->sessionData = 0;
-    return (STZStateRef){state};
+
+    state->speedometerNextIndex = 0;
+    state->speedometerLastTime = 0;
+    for (int i = 0; i < kSpeedometerCapacity; ++i) {
+        state->speedometerIntervals[i] = kMaxDiscreteScrollTimeout;
+    }
+
+    return state;
 }
 
 void STZStateRelease(STZStateRef state) {
@@ -448,7 +484,7 @@ static EventResult updateStateNotInSession(STZStateRef state, CGEventRef event, 
 
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
-            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
+            setZoomToEndAfterWaiting(state, event, kAutoDiscreteScrollTimeout);
             state->delayedZoom += value;
             return replaceEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -515,7 +551,7 @@ static EventResult updateStateScrollMayBegin(STZStateRef state, CGEventRef event
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kContinuousScrollCancelled);
-            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
+            setZoomToEndAfterWaiting(state, event, kAutoDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -582,7 +618,7 @@ static EventResult updateStateScrollInProgress(STZStateRef state, CGEventRef eve
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kContinuousScrollEnded);
-            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
+            setZoomToEndAfterWaiting(state, event, kAutoDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -649,7 +685,7 @@ static EventResult updateStateMomentumScrollInProgress(STZStateRef state, CGEven
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kMomentumScrollEnded);
-            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
+            setZoomToEndAfterWaiting(state, event, kAutoDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -716,7 +752,7 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
 
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture) + pending;
-            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
+            setZoomToEndAfterWaiting(state, event, kAutoDiscreteScrollTimeout);
             return replaceEvent(createZoomEvent(event, kCGGesturePhaseChanged, state->zoomCenter, value));
         }
 
