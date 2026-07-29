@@ -7,7 +7,8 @@ A Mac utility for precisely zooming in or out using the mouse wheel.
 ## Features
 
 - Hold modifier keys or an auxiliary mouse button to zoom.
-- Customizable direction, speed, and per-application configuration.
+- Customizable direction, speed, and per-app configuration.
+- Per-app command-based zoom using ⌘+ and ⌘−.
 - Compatible with other mouse optimization tools.
 
 ### <img src="images/magic_zoom.png" width="64" align="right"> Bonus for Magic Mouse Users
@@ -27,6 +28,8 @@ Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/C
 Regardless of how these tools configure the direction of scrolling, the zooming is always based on your finger movements. You can configure whether “fingers up” means zooming in or out in the app.
 
 You can choose which apps Scroll to Zoom is enabled for. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase Modifier Keys” for it in the settings.
+
+For apps that don’t support zoom gestures well, you can enable “Use command-based zoom” in the per-app options. When enabled, each wheel step will be converted to the standard Command-Plus or Command-Minus command. Note that this option only applies to mice with a physical scroll wheel.
 
 ## Localization
 
