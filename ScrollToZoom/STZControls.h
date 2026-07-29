@@ -15,6 +15,9 @@ NS_ASSUME_NONNULL_BEGIN
 NSFont *STZSymbolsFontOfSize(CGFloat size);
 
 
+NSTextField *STZMessageLabel(NSString *message);
+
+
 @interface STZModifierField : NSControl
 
 + (instancetype)fieldWithFlags:(STZFlags)flags target:(nullable id)target action:(nullable SEL)action;

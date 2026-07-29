@@ -481,7 +481,7 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Some applications behave differently when modifier keys are pressed. Enable this option to wipe out the triggering modifier flags from the simulated zooming events."
+            "value" : "Some applications behave differently when modifier keys are pressed. Enable this option to wipe out the triggering modifier flags from the simulated zoom events."
           }
         },
         "es" : {
@@ -1610,6 +1610,110 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "手指向上滑來"
+          }
+        }
+      }
+    },
+    "use-command-based-zoom" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom per Tastaturbefehl verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Use command-based zoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar zoom basado en comandos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser le zoom par commandes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コマンドベースのズームを使用"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Масштабирование на основе команд"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用基于命令的缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用基於指令的縮放"
+          }
+        }
+      }
+    },
+    "use-command-based-zoom-message" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bei Mäusen von Drittanbietern werden Scrollereignisse in die Befehle ⌘+ oder ⌘− umgewandelt. Die Befehle werden an die aktive App gesendet, auch wenn sich der Mauszeiger über einem anderen Fenster befindet."
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "For third-party mice, scroll events will be converted to ⌘+ or ⌘− commands. Commands are sent to the active app, even if the mouse pointer is over another window."
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Con ratones de terceros, los eventos de desplazamiento se convertirán en comandos ⌘+ o ⌘−. Los comandos se envían a la app activa, aunque el puntero del ratón esté sobre otra ventana."
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Avec les souris tierces, les événements de défilement seront convertis en commandes ⌘+ ou ⌘−. Les commandes sont envoyées à l’app active, même si le pointeur de la souris se trouve sur une autre fenêtre."
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "他社製マウスでは、スクロールイベントが⌘+または⌘−コマンドに変換されます。マウスポインタが別のウインドウ上にある場合でも、コマンドはアクティブなアプリに送信されます。"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Для мышей сторонних производителей события прокрутки преобразуются в команды ⌘+ или ⌘−. Команды отправляются активному приложению, даже если указатель мыши находится над другим окном."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "对于第三方鼠标，滚动事件将被转换为 ⌘+ 或 ⌘− 命令。即使鼠标指针位于其他窗口上，命令也会发送给当前活动的应用程序。"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "對於第三方滑鼠，捲動事件會轉換為 ⌘+ 或 ⌘− 指令。即使滑鼠指標位於其他視窗上，指令仍會傳送至目前使用中的應用。"
           }
         }
       }

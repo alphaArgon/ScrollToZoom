@@ -88,9 +88,11 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
 
     bool hideItems = !(modes & kSTZTriggerFlagsEnabled);
     for (NSMenuItem *item in [[_statusItem menu] itemArray]) {
+        SEL action;
         if ([item tag] == HEADER_ITEM_TAG
-         || [item action] == @selector(toggleEnabledForKeyApplication:)
-         || [item action] == @selector(toggleExcludingFlagsForKeyApplication:)) {
+         || (action = [item action]) == @selector(toggleEnabledForKeyApplication:)
+         || action == @selector(toggleCommandBasedForKeyApplication:)
+         || action == @selector(toggleExcludingFlagsForKeyApplication:)) {
             [item setHidden:hideItems];
         }
     }
@@ -135,6 +137,10 @@ static void toggleOptionsForKeyApplication(STZAppOptions flag) {
     toggleOptionsForKeyApplication(kSTZDisabledForApp);
 }
 
+- (void)toggleCommandBasedForKeyApplication:(id)sender {
+    toggleOptionsForKeyApplication(kSTZUsesCommandBasedZoom);
+}
+
 - (void)toggleExcludingFlagsForKeyApplication:(id)sender {
     toggleOptionsForKeyApplication(kSTZFlagsExcludedForApp);
 }
@@ -147,6 +153,15 @@ static void toggleOptionsForKeyApplication(STZAppOptions flag) {
         STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
         [menuItem setState:!(options & kSTZDisabledForApp)];
         return YES;
+    }
+
+    if ([menuItem action] == @selector(toggleCommandBasedForKeyApplication:)) {
+        NSRunningApplication *app = keyApplication();
+        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
+        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
+        [menuItem setEnabled:!(options & kSTZDisabledForApp)];
+        [menuItem setState:!!(options & kSTZUsesCommandBasedZoom)];
+        return !(options & kSTZDisabledForApp);
     }
 
     if ([menuItem action] == @selector(toggleExcludingFlagsForKeyApplication:)) {

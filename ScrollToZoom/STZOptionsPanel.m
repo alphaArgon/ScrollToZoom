@@ -8,6 +8,7 @@
 
 #import "STZOptionsPanel.h"
 #import "STZSettings.h"
+#import "STZControls.h"
 #import "STZUIConstants.h"
 
 
@@ -59,9 +60,13 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
     if (STZSharedOptionsPanel) {return STZSharedOptionsPanel;}
 
     STZOptionsPanel *panel = [[STZOptionsPanel alloc] initWithContentRect:NSZeroRect
-                                                                styleMask:NSWindowStyleMaskTitled | NSWindowStyleMaskClosable
+                                                                styleMask:NSWindowStyleMaskTitled
+                                                                        | NSWindowStyleMaskClosable
+                                                                        | NSWindowStyleMaskFullSizeContentView
                                                                   backing:NSBackingStoreBuffered
                                                                     defer:YES];
+    [panel setTitleVisibility:NSWindowTitleHidden];
+    [panel setTitlebarAppearsTransparent:YES];
     [panel center];
     NSRect frame = [panel frame];
     frame.origin.x += 250;
@@ -99,6 +104,7 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
     STZArrayWrapper    *_configuredBundleIDs;
     NSOutlineView      *_entryList;
     NSButton           *_enabledCheckbox;
+    NSButton           *_commandBasedCheckbox;
     NSButton           *_excludingFlagsCheckBox;
     NSTextField        *_recommendedLabel;
     BOOL                _changesMadeBySelf;
@@ -149,20 +155,23 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 
     _enabledCheckbox = [NSButton checkboxWithTitle:@""
                                             target:self action:@selector(toggleEnabled:)];
+
+    _commandBasedCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"use-command-based-zoom", nil)
+                                                 target:self action:@selector(toggleCommandBased:)];
+    NSTextField *commandBasedLabel = STZMessageLabel(NSLocalizedString(@"use-command-based-zoom-message", nil));
+
     _excludingFlagsCheckBox = [NSButton checkboxWithTitle:NSLocalizedString(@"exclude-flags", nil)
                                                    target:self action:@selector(toggleExcludingFlags:)];
-    NSTextField *messageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"exclude-flags-message", nil)];
-    [messageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-    [messageLabel setTextColor:[NSColor secondaryLabelColor]];
-    [messageLabel setSelectable:NO];
+    NSTextField *excludingFlagsLabel = STZMessageLabel(NSLocalizedString(@"exclude-flags-message", nil));
 
-    _recommendedLabel = [NSTextField wrappingLabelWithString:@""];
-    [_recommendedLabel setHidden:YES];
-    [_recommendedLabel setFont:[messageLabel font]];
-    [_recommendedLabel setTextColor:[messageLabel textColor]];
+    _recommendedLabel = STZMessageLabel(@"");
 
     NSView *panelView = [[NSView alloc] init];
-    [panelView setSubviews:@[_enabledCheckbox, _excludingFlagsCheckBox, messageLabel, _recommendedLabel]];
+    [panelView setSubviews:@[
+        _enabledCheckbox,
+        _commandBasedCheckbox, commandBasedLabel,
+        _excludingFlagsCheckBox, excludingFlagsLabel, _recommendedLabel]];
+
     for (NSView *subviews in [panelView subviews]) {
         [subviews setTranslatesAutoresizingMaskIntoConstraints:NO];
     }
@@ -178,29 +187,39 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [panelController setView:panelView];
     NSSplitViewItem *panelItem = [NSSplitViewItem splitViewItemWithViewController:panelController];
     [panelItem setCanCollapse:NO];
-    [panelItem setMinimumThickness:250];
-    [panelItem setMaximumThickness:250];
 
     [self addSplitViewItem:listItem];
     [self addSplitViewItem:panelItem];
 
     [NSLayoutConstraint activateConstraints:@[
         [[_enabledCheckbox topAnchor] constraintEqualToAnchor:[panelView topAnchor] constant:kSTZUILargeSpacing],
-        [[_enabledCheckbox leadingAnchor] constraintEqualToAnchor:[panelView leadingAnchor] constant:kSTZUILargeSpacing],
+        [[_enabledCheckbox leadingAnchor] constraintEqualToAnchor:[panelView leadingAnchor] constant:kSTZUINormalSpacing],
+        [[_enabledCheckbox trailingAnchor] constraintLessThanOrEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[_excludingFlagsCheckBox topAnchor] constraintEqualToAnchor:[_enabledCheckbox bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_commandBasedCheckbox topAnchor] constraintEqualToAnchor:[_enabledCheckbox bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_commandBasedCheckbox leadingAnchor] constraintEqualToAnchor:[_enabledCheckbox leadingAnchor]],
+        [[_commandBasedCheckbox trailingAnchor] constraintLessThanOrEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
+
+        [[commandBasedLabel topAnchor] constraintEqualToAnchor:[_commandBasedCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[commandBasedLabel leadingAnchor] constraintEqualToAnchor:[_commandBasedCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[commandBasedLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
+
+        [[_excludingFlagsCheckBox topAnchor] constraintEqualToAnchor:[commandBasedLabel bottomAnchor] constant:kSTZUISmallSpacing],
         [[_excludingFlagsCheckBox leadingAnchor] constraintEqualToAnchor:[_enabledCheckbox leadingAnchor]],
+        [[_excludingFlagsCheckBox trailingAnchor] constraintLessThanOrEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[messageLabel topAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox bottomAnchor] constant:kSTZUIInlineSpacing],
-        [[messageLabel leadingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox leadingAnchor] constant:kSTZUICheckboxWidth],
-        [[messageLabel trailingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox trailingAnchor]],
-        [[messageLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUILargeSpacing],
+        [[excludingFlagsLabel topAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[excludingFlagsLabel leadingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox trailingAnchor]],
+        [[excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[_recommendedLabel topAnchor] constraintEqualToAnchor:[messageLabel bottomAnchor] constant:kSTZUIInlineSpacing],
-        [[_recommendedLabel leadingAnchor] constraintEqualToAnchor:[messageLabel leadingAnchor]],
-        [[_recommendedLabel trailingAnchor] constraintEqualToAnchor:[messageLabel trailingAnchor]],
+        [[_recommendedLabel topAnchor] constraintEqualToAnchor:[excludingFlagsLabel bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[_recommendedLabel leadingAnchor] constraintEqualToAnchor:[excludingFlagsLabel leadingAnchor]],
+        [[_recommendedLabel trailingAnchor] constraintEqualToAnchor:[excludingFlagsLabel trailingAnchor]],
 
-        [[panelView heightAnchor] constraintEqualToConstant:300],
+        [[panelView bottomAnchor] constraintGreaterThanOrEqualToAnchor:[_recommendedLabel bottomAnchor] constant:kSTZUINormalSpacing],
+        [[panelView heightAnchor] constraintGreaterThanOrEqualToConstant:300],
+        [[panelView widthAnchor] constraintGreaterThanOrEqualToConstant:250],
     ]];
 
     return self;
@@ -399,9 +418,12 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [_enabledCheckbox setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-app-name-%@", nil), [entry localizedName]]];
     STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
 
-    [_enabledCheckbox setState:!(options & kSTZDisabledForApp)];
+    BOOL enabled = !(options & kSTZDisabledForApp);
+    [_enabledCheckbox setState:enabled];
+    [_commandBasedCheckbox setState:!!(options & kSTZUsesCommandBasedZoom)];
+    [_commandBasedCheckbox setEnabled:enabled];
     [_excludingFlagsCheckBox setState:!!(options & kSTZFlagsExcludedForApp)];
-    [_excludingFlagsCheckBox setEnabled:!(options & kSTZDisabledForApp)];
+    [_excludingFlagsCheckBox setEnabled:enabled];
 
     if (STZGetRecommendedAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier])
         & kSTZFlagsExcludedForApp) {
@@ -414,24 +436,33 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 }
 
 - (void)toggleEnabled:(id)sender {
-    STZApplicationEntry *entry = [self selectedEntry];
-    if (!entry) {return;}
+    [self toggleOption:kSTZDisabledForApp byCheckbox:_enabledCheckbox flipped:YES];
 
-    _changesMadeBySelf = YES;
-    STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
-    options = [_enabledCheckbox state] ? options & ~kSTZDisabledForApp : options | kSTZDisabledForApp;
-    STZSetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
-    [_excludingFlagsCheckBox setEnabled:!(options & kSTZDisabledForApp)];
-    _changesMadeBySelf = NO;
+    BOOL enabled = [_enabledCheckbox state] == NSControlStateValueOn;
+    [_commandBasedCheckbox setEnabled:enabled];
+    [_excludingFlagsCheckBox setEnabled:enabled];
+}
+
+- (void)toggleCommandBased:(id)sender {
+    [self toggleOption:kSTZUsesCommandBasedZoom byCheckbox:_commandBasedCheckbox flipped:NO];
 }
 
 - (void)toggleExcludingFlags:(id)sender {
+    [self toggleOption:kSTZFlagsExcludedForApp byCheckbox:_excludingFlagsCheckBox flipped:NO];
+}
+
+- (void)toggleOption:(STZAppOptions)option byCheckbox:(NSButton *)checkbox flipped:(BOOL)flipped {
     STZApplicationEntry *entry = [self selectedEntry];
     if (!entry) {return;}
 
-    _changesMadeBySelf = YES;
     STZAppOptions options = STZGetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
-    options = [_excludingFlagsCheckBox state] ? options | kSTZFlagsExcludedForApp : options & ~kSTZFlagsExcludedForApp;
+    if (![checkbox state] != !flipped) {
+        options |= option;
+    } else {
+        options &= ~option;
+    }
+
+    _changesMadeBySelf = YES;
     STZSetAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier], options);
     _changesMadeBySelf = NO;
 }

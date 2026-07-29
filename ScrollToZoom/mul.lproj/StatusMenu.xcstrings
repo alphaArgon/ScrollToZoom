@@ -217,6 +217,60 @@
         }
       }
     },
+    "iw4-v8-n2x.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"Use Command-Based Zoom\"; ObjectID = \"iw4-v8-n2x\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoom per Tastaturbefehl verwenden"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Use Command-Based Zoom"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Usar zoom basado en comandos"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utiliser le zoom par commandes"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "コマンドベースのズームを使用"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Масштабирование на основе команд"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用基于命令的缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "使用基於指令的縮放"
+          }
+        }
+      }
+    },
     "RAd-0e-aat.title" : {
       "comment" : "Class = \"NSMenuItem\"; title = \"Quit\"; ObjectID = \"RAd-0e-aat\";",
       "extractionState" : "extracted_with_value",

@@ -42,6 +42,15 @@ NSFont *STZSymbolsFontOfSize(CGFloat size) {
 }
 
 
+NSTextField *STZMessageLabel(NSString *message) {
+    NSTextField *label = [NSTextField wrappingLabelWithString:message];
+    [label setFont:[NSFont toolTipsFontOfSize:0]];
+    [label setTextColor:[NSColor secondaryLabelColor]];
+    [label setSelectable:NO];
+    return label;
+}
+
+
 @implementation STZModifierField {
     BOOL                    _editing;
     BOOL                    _highlighted;

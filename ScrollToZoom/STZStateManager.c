@@ -878,3 +878,25 @@ static CGEventRef createZoomEvent(CGEventRef event, CGGesturePhase phase, CGPoin
 
     return zoom;
 }
+
+
+bool STZCreateCommandBasedZoomKeyEventPair(CGEventRef event, CGEventRef *outEvents) {
+    double value = magnificationFromScroll(event, 0, kCGEventDistantFuture);
+    if (value == 0) {return false;}
+
+    CGEventSourceRef source = CGEventCreateSourceFromEvent(event);
+
+    for (int i = 0; i < 2; ++i) {
+        CGEventRef key = CGEventCreate(source);
+        CGEventSetType(key, i == 0 ? kCGEventKeyDown : kCGEventKeyUp);
+        CGEventSetFlags(key, kCGEventFlagMaskCommand | (value > 0 ? kCGEventFlagMaskShift : 0));
+        CGEventSetLocation(key, CGEventGetLocation(event));
+        CGEventSetTimestamp(key, CGEventGetTimestamp(event));
+        CGEventSetIntegerValueField(key, kCGKeyboardEventKeycode, value > 0 ? 24 : 27);
+        CGEventSetIntegerValueField(key, kCGKeyboardEventKeyboardType, 43);  //  ANSI
+        outEvents[i] = key;
+    }
+
+    if (source) {CFRelease(source);}
+    return true;
+}

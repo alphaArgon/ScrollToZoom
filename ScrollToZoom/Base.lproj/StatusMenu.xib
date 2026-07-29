@@ -33,6 +33,12 @@
                         <action selector="toggleEnabledForKeyApplication:" target="-1" id="3g2-Wa-7Xr"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Use Command-Based Zoom" id="iw4-v8-n2x">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="toggleCommandBasedForKeyApplication:" target="-1" id="vxk-x8-f21"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Erase Modifier Keys" id="ZYs-BC-JC3">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>

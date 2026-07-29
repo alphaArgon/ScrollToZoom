@@ -121,10 +121,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     _magicZoomCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"enable-magic-zoom", nil)
                                             target:self action:@selector(toggleMagicZoom:)];
 
-    NSTextField *magicZoomMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"magic-zoom-message", nil)];
-    [magicZoomMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-    [magicZoomMessageLabel setTextColor:[NSColor secondaryLabelColor]];
-    [magicZoomMessageLabel setSelectable:NO];
+    NSTextField *magicZoomMessageLabel = STZMessageLabel(NSLocalizedString(@"magic-zoom-message", nil));
 
     NSBox *box = [[NSBox alloc] init];
     [box setTitlePosition:NSNoTitle];
@@ -150,10 +147,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
                                         target:self action:@selector(updateInertia:)];
     [_inertiaSlider setNumberOfTickMarks:11];
 
-    NSTextField *inertiaMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"inertia-message", nil)];
-    [inertiaMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-    [inertiaMessageLabel setTextColor:[NSColor secondaryLabelColor]];
-    [inertiaMessageLabel setSelectable:NO];
+    NSTextField *inertiaMessageLabel = STZMessageLabel(NSLocalizedString(@"inertia-message", nil));
 
     _revertImmediatelyCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"revert-to-scroll-immediately", nil)
                                                       target:self action:@selector(toggleRevertImmediately:)];
@@ -163,10 +157,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
     NSTextField *launchMessageLabel = nil;
     if (!STZShouldEnableLaunchAtLogin()) {
-        launchMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"should-not-launch-at-login-message", nil)];
-        [launchMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-        [launchMessageLabel setTextColor:[NSColor secondaryLabelColor]];
-        [launchMessageLabel setSelectable:NO];
+        launchMessageLabel = STZMessageLabel(NSLocalizedString(@"should-not-launch-at-login-message", nil));
         [_launchCheckbox setEnabled:NO];
         [_launchCheckbox setTag:-1];
     } else {
@@ -176,10 +167,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     _dictatorshipCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"wants-dictatorship", nil)
                                                  target:self action:@selector(toggleDictatorship:)];
 
-    _dictatorshipMessageLabel = [NSTextField wrappingLabelWithString:NSLocalizedString(@"wants-dictatorship-message", nil)];
-    [_dictatorshipMessageLabel setFont:[NSFont toolTipsFontOfSize:0]];
-    [_dictatorshipMessageLabel setTextColor:[NSColor secondaryLabelColor]];
-    [_dictatorshipMessageLabel setSelectable:NO];
+    _dictatorshipMessageLabel = STZMessageLabel(NSLocalizedString(@"wants-dictatorship-message", nil));
 
     _optionsButton = [NSButton buttonWithTitle:NSLocalizedString(@"open-options-for-apps", nil)
                                         target:self action:@selector(openOptionsForApps:)];

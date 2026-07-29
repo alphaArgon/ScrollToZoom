@@ -76,6 +76,12 @@ void STZSetMomentumZoomMinValue(double);
 typedef OPTION_FLAGS(uint32_t) {
     kSTZDisabledForApp          = 1 << 0,
     kSTZFlagsExcludedForApp     = 1 << 1,
+
+    /// Whether to converts discrete scroll events to Command-Plus or -Minus key events
+    /// instead of zoom gestures.
+    ///
+    /// This option might be promoted to a global mode in the future.
+    kSTZUsesCommandBasedZoom    = 1 << 2,
 } STZAppOptions;
 
 STZAppOptions STZGetAppOptionsForBundleIdentifier(CFStringRef __nullable bundleID);

@@ -37,6 +37,9 @@ bool STZIsScrollEventDiscrete(CGEventRef event);
 bool STZScrollEventMayFallIntoMomentum(CGEventRef event);
 
 
+bool STZCreateCommandBasedZoomKeyEventPair(CGEventRef event, CGEventRef __nullable outEvents[__nonnull 2]);
+
+
 typedef struct _STZState *STZStateRef;
 
 STZStateRef STZStateCreate(void);

@@ -8,6 +8,7 @@
 
 #include "STZEventHandling.h"
 #include <ApplicationServices/ApplicationServices.h>
+#include <CoreFoundation/CoreFoundation.h>
 #include "CGEventSPI.h"
 #include "STZMagicZoom.h"
 #include "STZStateManager.h"
@@ -644,6 +645,17 @@ static CGEventRef flagsTapCallback(CGEventTapProxy proxy, CGEventType type, CGEv
 }
 
 
+static void emitCommandBasedZoomKeyEventPair(CGEventRef ref) {
+    CGEventRef pair[2];
+    if (STZCreateCommandBasedZoomKeyEventPair(ref, pair)) {
+        for (int i = 0; i < 2; ++i) {
+            CGEventPost(kCGSessionEventTap, pair[i]);
+            CFRelease(pair[i]);
+        }
+    }
+}
+
+
 static CGEventRef hardWheelTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void *refcon) {
     switch (type) {
     case kCGEventTapDisabledByTimeout:      eventTapTimeout(); CF_FALLTHROUGH;
@@ -689,6 +701,17 @@ static CGEventRef hardWheelTapCallback(CGEventTapProxy proxy, CGEventType type, 
                 CGEventTapPostEvent(proxy, event);
             }
             forEachStateDo(kTryToEndWheelTapMutations, NULL);
+            return NULL;
+        }
+    }
+
+    if (wheelTapsMutable && triggerFlagsDown && STZIsScrollEventDiscrete(event)) {
+        pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
+        CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
+        STZAppOptions appOptions = STZGetAppOptionsForBundleIdentifier(bundleID);
+
+        if (!(appOptions & kSTZDisabledForApp) && (appOptions & kSTZUsesCommandBasedZoom)) {
+            emitCommandBasedZoomKeyEventPair(event);
             return NULL;
         }
     }
@@ -754,6 +777,13 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
         }
 
         if (!(context->appOptions & kSTZDisabledForApp)) {
+            if (!underDictatorship && (context->appOptions & kSTZUsesCommandBasedZoom)
+             && STZIsScrollEventDiscrete(event)) {
+                STZStashScrollDirectionIntoEvent(event);
+                emitCommandBasedZoomKeyEventPair(event);
+                return NULL;
+            }
+
             gesture = kSTZZoom;
             if (continuesTriggeredZoom) {
                 data = kStateSessionIsTriggeredZoom;
