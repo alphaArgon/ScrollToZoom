@@ -322,6 +322,14 @@ CGEventRef STZStateTransformScrollEvent(STZStateRef state, CGEventRef event, STZ
     }
 
     ScrollType scroll = scrollOf(event);
+    if (gesture == kSTZZoom && scroll == kDiscretelyScrolled && STZIsScrollEventNoOp(event)) {
+        //  Some versions of Mos emit endless trailing scroll events with zero deltas until the
+        //  left mouse button is down. In any case, such discrete scrolls are bizarre.
+        //  Discard the event so that the session will terminate due to timeout.
+        *returnEventPlacement = kSTZReplaceEvent;
+        return NULL;
+    }
+
     checkMomentumStart(state, event, scroll);
 
     EventResult result;
