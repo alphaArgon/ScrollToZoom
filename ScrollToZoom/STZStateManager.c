@@ -9,6 +9,7 @@
 #include "STZStateManager.h"
 #include "STZSettings.h"
 #include "CGEventSPI.h"
+#include <CoreGraphics/CoreGraphics.h>
 
 
 typedef struct {
@@ -75,7 +76,6 @@ uint64_t STZStashScrollDirectionIntoEvent(CGEventRef event) {
     double delta = primaryScrollDelta(event) * (isScrollFlipped(event) ? -1 : 1);
     payload = (delta > 0) ? kPositiveSignum : (delta < 0) ? kNegativeSignum : kZeroSignum;
     CGEventSetIntegerValueField(event, kSignumField, payload);
-//    CGEventSetIntegerValueField(event, kSignumField, 0);
     return payload;
 }
 
@@ -774,6 +774,19 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
 
 
 //  MARK: - Event Adaptation
+
+
+bool STZIsScrollEventDiscrete(CGEventRef event) {
+    ScrollType scroll = scrollOf(event);
+    return scroll == kDiscretelyScrolled;
+}
+
+
+bool STZScrollEventMayFallIntoMomentum(CGEventRef event) {
+    ScrollType scroll = scrollOf(event);
+    return (scroll >= kMomentumScrollBegan && scroll <= kMomentumScrollEnded)
+        || scroll == kContinuousScrollEnded;
+}
 
 
 static ScrollType scrollOf(CGEventRef event) {

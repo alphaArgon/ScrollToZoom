@@ -33,6 +33,10 @@ uint64_t STZStashScrollDirectionIntoEvent(CGEventRef);
 double STZReadScrollDeltaFromEvent(CGEventRef event, uint64_t fallback, bool unstash);
 
 
+bool STZIsScrollEventDiscrete(CGEventRef event);
+bool STZScrollEventMayFallIntoMomentum(CGEventRef event);
+
+
 typedef struct _STZState *STZStateRef;
 
 STZStateRef STZStateCreate(void);

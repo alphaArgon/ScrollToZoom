@@ -172,6 +172,7 @@ static STZEventTap mutableSoftWheelTap = {NULL, NULL};
 
 
 static bool stabWantsDictatorship = false;
+static bool continuesTriggeredZoom = false;
 static bool magicZooms = false;
 static bool wheelTapsMutable = false;
 static bool triggerFlagsDown = false;
@@ -221,11 +222,16 @@ STZModes STZGetWorkingModes(void) {
     if (passiveHardWheelTap.port || stabWantsDictatorship) {
         modes |= kSTZWantsDictatorship;
     }
+    if (!continuesTriggeredZoom) {
+        modes |= kSTZRevertsToScrollImmediately;
+    }
     return modes;
 }
 
 
 bool STZSetWorkingModes(STZModes modes) {
+    continuesTriggeredZoom = (modes & kSTZRevertsToScrollImmediately) == 0;
+
     if (!(modes & kSTZPracticalModesMask)) {goto RESET;}
     if (!AXIsProcessTrusted()) {goto RESET;}
 
@@ -449,7 +455,9 @@ static void beginWheelTapMutations(void) {
 
 
 typedef OPTION_FLAGS(uint64_t) {
-    kStateSessionIsMagicZoom    = 1 << 0,
+    //  The following two flags are exclusive
+    kStateSessionIsMagicZoom        = 1 << 0,
+    kStateSessionIsTriggeredZoom    = 1 << 1,
 } StateSessionData;
 
 
@@ -473,7 +481,6 @@ typedef struct {
 static void wheelContextDo(void *addr, void *refcon) {
     WheelContext *context = addr;
     WheelContextDoEnv *env = refcon;
-
     if (env->actions & kEmitPeriodicEvents) {
         CGEventRef event = STZStatePeriodicallyUpdate(context->state, env->now);
         if (event != NULL) {
@@ -620,11 +627,16 @@ static CGEventRef flagsTapCallback(CGEventTapProxy proxy, CGEventType type, CGEv
     if (triggerFlagsDown != flagsDown) {
         triggerFlagsDown = flagsDown;
 
-        if (triggerFlagsDown) {
+        if (flagsDown) {
             beginWheelTapMutations();
             reinsertTapsIfNeeded();
+
         } else {
-            forEachStateDo(kTryToEndWheelTapMutations | kDiscardTriggerFlags, event);
+            WheelContextActions actions = kTryToEndWheelTapMutations;
+            if (!continuesTriggeredZoom) {
+                actions |= kDiscardTriggerFlags;
+            }
+            forEachStateDo(actions, event);
         }
     }
 
@@ -651,6 +663,36 @@ static CGEventRef hardWheelTapCallback(CGEventTapProxy proxy, CGEventType type, 
     //  be out-of-date without this fallback value.
     WheelContext *context = wheelContextWithFallback(CGEventGetRegistryID(event));
     context->hardScrollDir = STZStashScrollDirectionIntoEvent(event);
+
+    //  For example with Mos, the event sequence may look like this:
+    //
+    //    trigger down -> hard scroll [1] -> soft scroll × n [1] ->
+    //    trigger up -> soft scroll × n [1] ->
+    //    hard scroll [2] -> soft scroll × n [2]
+    //
+    //  All these scroll events are discrete; Mos doesn’t simulate scroll gestures.
+    //  When `hard scroll [2]` arrives and the session has not yet timed out, terminate it.
+
+    uint64_t data;
+    if (continuesTriggeredZoom && !triggerFlagsDown
+     && STZStateGetSessionData(context->state, &data) && (data & kStateSessionIsTriggeredZoom)
+     && STZIsScrollEventDiscrete(event)) {
+        CGEventRef revertEvent = STZStateRevertToScrollByEvent(context->state, event);
+        if (revertEvent != NULL) {
+            STZDebugLogEvent("\tfollowed by", revertEvent);
+            CGEventPost(kCGSessionEventTap, revertEvent);
+            CFRelease(revertEvent);
+
+            //  The subsequent mutation ending may invalidate the current mutation,
+            //  so we manually emit the modified event.
+            if (wheelTapsMutable) {
+                CGEventTapPostEvent(proxy, event);
+            }
+            forEachStateDo(kTryToEndWheelTapMutations, NULL);
+            return NULL;
+        }
+    }
+
     return event;
 }
 
@@ -683,15 +725,23 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
     context->magicZoomPending = false;
 
     StateSessionData data = 0;
-    STZAppOptions appOptions = 0;
     STZGestureType gesture = kSTZScroll;
     bool inSession = STZStateGetSessionData(context->state, &data);
+    bool underDictatorship = passiveHardWheelTap.port != NULL;
 
     if (inSession && (data & kStateSessionIsMagicZoom)) {
         gesture = kSTZZoom;
+        context->appOptions = 0;
 
     } else if (STZShouldBeginMagicZoom(CGEventGetRegistryID(event))) {
         data = kStateSessionIsMagicZoom;
+        gesture = kSTZZoom;
+        context->appOptions = 0;
+
+    } else if (continuesTriggeredZoom && inSession && (data & kStateSessionIsTriggeredZoom)
+            && (STZScrollEventMayFallIntoMomentum(event) || (underDictatorship && STZIsScrollEventDiscrete(event)))) {
+        //  What if the event is a `kContinuousScrollEnded`?
+        //  It doesn’t matter because the session will soon time out or enter a momentum state.
         gesture = kSTZZoom;
 
     } else if (triggerFlagsDown) {
@@ -703,13 +753,26 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
             context->appOptions = STZGetAppOptionsForBundleIdentifier(bundleID);
         }
 
-        appOptions = context->appOptions;
-        if (!(appOptions & kSTZDisabledForApp)) {
+        if (!(context->appOptions & kSTZDisabledForApp)) {
             gesture = kSTZZoom;
+            if (continuesTriggeredZoom) {
+                data = kStateSessionIsTriggeredZoom;
+            }
         }
     }
 
-    bool underDictatorship = passiveHardWheelTap.port != NULL;
+    if (gesture != kSTZZoom) {
+        //  For example, a event sequence may look like this:
+        //
+        //    trigger down -> continuous scroll × n [1] ->      zoom
+        //    trigger up -> continuous scroll × n [1] ->        revert to scrolls
+        //    momentum scroll × n [1]
+        //
+        //   If the data is kept after reverting to scrolls, the momentum scrolls might
+        //   be misrecognized as a triggered zoom.
+        data = 0;
+    }
+
     uint64_t fallbackScrollDir = underDictatorship ? context->hardScrollDir : 0;
 
     STZEventPlacement auxPlacement;
@@ -732,7 +795,7 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
         }
 
     } else {
-        if (appOptions & kSTZFlagsExcludedForApp) {
+        if (context->appOptions & kSTZFlagsExcludedForApp) {
             clearTriggerFlagsForEvent(auxEvent);
         }
         switch (auxPlacement) {
@@ -778,6 +841,5 @@ static void periodicUpdateCallback(CFRunLoopTimerRef timer, void *refcon) {
     assert(periodicTimer == timer);
     CFRelease(periodicTimer);
     periodicTimer = NULL;
-
     forEachStateDo(kTryToEndWheelTapMutations | kRescheduleTimer | kEmitPeriodicEvents, NULL);
 }

@@ -11,10 +11,10 @@
 #import <Foundation/Foundation.h>
 
 
-STZModes const kSTZModesAll = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled | kSTZWantsDictatorship;
+STZModes const kSTZModesAll = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled | kSTZWantsDictatorship | kSTZRevertsToScrollImmediately;
+STZModes const kSTZModesDefault = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled | kSTZWantsDictatorship;
 
-
-STZModes STZPreferredModes = kSTZModesAll;
+STZModes STZPreferredModes = kSTZModesDefault;
 STZFlags STZTriggerFlags = kSTZModifierOption;
 double STZMagnificationScalar = 0.0025;
 double STZMomentumZoomAttenuation = 0.8;
@@ -59,7 +59,7 @@ static void _loadUserDefaultsIfNeeded(void) {
         STZPreferredModes = [modes intValue] & kSTZModesAll;
     } else if ([userDefaults boolForKey:STZLegacyDisablesMagicZoomKey]) {
         [userDefaults removeObjectForKey:STZLegacyDisablesMagicZoomKey];
-        STZPreferredModes = kSTZModesAll & ~kSTZMagicZoomEnabled;
+        STZPreferredModes = kSTZModesDefault & ~kSTZMagicZoomEnabled;
     }
 
     NSInteger flags = [userDefaults integerForKey:STZTriggerFlagsKey];

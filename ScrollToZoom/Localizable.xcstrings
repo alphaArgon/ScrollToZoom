@@ -1250,6 +1250,58 @@
         }
       }
     },
+    "revert-to-scroll-immediately" : {
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoomen beim Loslassen der Auslösetaste sofort stoppen"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop zooming immediately on trigger release"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Parar el zoom inmediatamente al soltar el activador"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Arrêter le zoom dès le relâchement du déclencheur"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "トリガーを放したらすぐズームを終了"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Сразу завершать масштабирование при отпускании триггера"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "松开触发键时，立即停止缩放"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "放開觸發鍵時，立即停止縮放"
+          }
+        }
+      }
+    },
     "running-apps" : {
       "localizations" : {
         "de" : {

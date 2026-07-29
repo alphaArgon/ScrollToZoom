@@ -15,17 +15,26 @@ CF_ASSUME_NONNULL_BEGIN
 
 
 typedef OPTION_FLAGS(uint32_t) {
-    kSTZMagicZoomEnabled        = 1 << 0,
-    kSTZTriggerFlagsEnabled     = 1 << 1,
+    kSTZMagicZoomEnabled            = 1 << 0,
+    kSTZTriggerFlagsEnabled         = 1 << 1,
 
-    kSTZPracticalModesMask      = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled,
+    kSTZPracticalModesMask          = kSTZMagicZoomEnabled | kSTZTriggerFlagsEnabled,
 
     /// Dictatorship means that ScrollToZoom inspects scroll wheel events during the HID phase
     /// before any other mutating event taps receive them, and modifies the final events during the
     /// annotated session phase after other taps have processed them. This is essential for working
     /// seamlessly with other mouse optimization tools. However, this mode may cause delays in event
     /// delivery and increases power consumption.
-    kSTZWantsDictatorship       = 1 << 2,
+    kSTZWantsDictatorship           = 1 << 2,
+
+    /// Whether to stop a trigger-initiated zoom session active immediately after the trigger flags
+    /// are released, so that trailing smooth or momentum scroll events won’t be recognized as
+    /// part of the zoom gesture.
+    ///
+    /// When this flag is off, non-momentum trailing scrolls are recognized only when
+    /// `kSTZWantsDictatorship` is on. There is no other way to determine if scrolling is made
+    /// smooth externally than checking if multiple soft scrolls follow a hard scroll.
+    kSTZRevertsToScrollImmediately  = 1 << 3,
 } STZModes;
 
 STZModes STZGetPreferredModes(void);

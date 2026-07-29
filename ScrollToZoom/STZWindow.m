@@ -83,13 +83,14 @@ static NSString *trim(NSString *string) {
     NSButton           *_zoomOutRadio;
     NSSlider           *_speedSlider;
     NSSlider           *_inertiaSlider;
+    NSButton           *_revertImmediatelyCheckbox;
     NSButton           *_launchCheckbox;
     NSButton           *_dictatorshipCheckbox;
     NSTextField        *_dictatorshipMessageLabel;
     NSButton           *_optionsButton;
     NSButton           *_consoleButton;
     NSLayoutConstraint *_optionsBelowLaunchConstraint;
-    NSLayoutConstraint *_optionsBelowDictatorshipConstraint;
+    NSLayoutConstraint *_optionsBelowRevertConstraint;
     NSTimer            *_enableRetryTimer;
     STZModes            _pendingModes;
 }
@@ -154,6 +155,9 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     [inertiaMessageLabel setTextColor:[NSColor secondaryLabelColor]];
     [inertiaMessageLabel setSelectable:NO];
 
+    _revertImmediatelyCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"revert-to-scroll-immediately", nil)
+                                                      target:self action:@selector(toggleRevertImmediately:)];
+
     _launchCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"launch-at-login", nil)
                                            target:self action:@selector(toggleLaunchAtLogin:)];
 
@@ -187,7 +191,9 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
     [view setSubviews:@[_triggerFlagsCheckbox, _triggerFlagsField,
                         _magicZoomCheckbox, magicZoomMessageLabel,
-                        box, _launchCheckbox, _dictatorshipCheckbox, _dictatorshipMessageLabel,
+                        box, _launchCheckbox,
+                        _dictatorshipCheckbox, _dictatorshipMessageLabel,
+                        _revertImmediatelyCheckbox,
                         _optionsButton, _consoleButton]];
     [[box contentView] setSubviews:@[directionLabel, _zoomInRadio, _zoomOutRadio,
                                      speedLabel, _speedSlider,
@@ -209,7 +215,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     }
 
     _optionsBelowLaunchConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[(launchMessageLabel ?: _launchCheckbox) bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
-    _optionsBelowDictatorshipConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[_dictatorshipMessageLabel bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
+    _optionsBelowRevertConstraint = [[_optionsButton topAnchor] constraintEqualToAnchor:[_revertImmediatelyCheckbox bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing];
 
     if ([[_triggerFlagsCheckbox title] length]) {
         [[[_triggerFlagsField firstBaselineAnchor] constraintEqualToAnchor:[_triggerFlagsCheckbox firstBaselineAnchor]] setActive:YES];
@@ -274,6 +280,9 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
         [[_dictatorshipMessageLabel leadingAnchor] constraintEqualToAnchor:[_dictatorshipCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
         [[_dictatorshipMessageLabel trailingAnchor] constraintEqualToAnchor:[_inertiaSlider trailingAnchor]],
 
+        [[_revertImmediatelyCheckbox topAnchor] constraintEqualToAnchor:[_dictatorshipMessageLabel bottomAnchor] constant:kSTZUINormalSpacing - kSTZUIInlineSpacing],
+        [[_revertImmediatelyCheckbox leadingAnchor] constraintEqualToAnchor:[_dictatorshipCheckbox leadingAnchor]],
+
         [[_optionsButton trailingAnchor] constraintEqualToAnchor:[view trailingAnchor] constant:-kSTZUINormalSpacing],
         [[_optionsButton bottomAnchor] constraintEqualToAnchor:[view bottomAnchor] constant:-kSTZUINormalSpacing],
 
@@ -307,15 +316,16 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 - (void)updateAdvancedSettingsVisibility {
     [_consoleButton setHidden:!_showsAdvancedSettings];
     [_dictatorshipCheckbox setHidden:!_showsAdvancedSettings];
+    [_dictatorshipMessageLabel setHidden:!_showsAdvancedSettings];
 
     if (_showsAdvancedSettings) {
-        [_dictatorshipMessageLabel setHidden:NO];
+        [_revertImmediatelyCheckbox setHidden:NO];
         [_optionsBelowLaunchConstraint setActive:NO];
-        [_optionsBelowDictatorshipConstraint setActive:YES];
+        [_optionsBelowRevertConstraint setActive:YES];
     } else {
-        [_optionsBelowDictatorshipConstraint setActive:NO];
+        [_optionsBelowRevertConstraint setActive:NO];
         [_optionsBelowLaunchConstraint setActive:YES];
-        [_dictatorshipMessageLabel setHidden:YES];
+        [_revertImmediatelyCheckbox setHidden:YES];
     }
 }
 
@@ -334,6 +344,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     [_inertiaSlider setDoubleValue:1 - STZGetMomentumZoomAttenuation()];
     [_magicZoomCheckbox setState:(modes & kSTZMagicZoomEnabled) != 0];
     [_dictatorshipCheckbox setState:(modes & kSTZWantsDictatorship) != 0];
+    [_revertImmediatelyCheckbox setState:(modes & kSTZRevertsToScrollImmediately) != 0];
     [_launchCheckbox setState:STZGetLaunchAtLoginEnabled()];
 }
 
@@ -350,6 +361,7 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
     [_optionsButton setEnabled:triggerFlagsEnabled];
     [_launchCheckbox setEnabled:[_launchCheckbox tag] != -1];
     [_dictatorshipCheckbox setEnabled:zoomSettingsEnabled];
+    [_revertImmediatelyCheckbox setEnabled:triggerFlagsEnabled];
 }
 
 - (void)openOptionsForApps:(id)sender {
@@ -375,6 +387,10 @@ static double const STZMomentumZoomAttenuationRange[] = {0, 1};
 
 - (void)toggleDictatorship:(id)sender {
     [self toggleMode:kSTZWantsDictatorship byCheckbox:_dictatorshipCheckbox];
+}
+
+- (void)toggleRevertImmediately:(id)sender {
+    [self toggleMode:kSTZRevertsToScrollImmediately byCheckbox:_revertImmediatelyCheckbox];
 }
 
 - (void)toggleMode:(STZModes)mode byCheckbox:(NSButton *)checkbox {
