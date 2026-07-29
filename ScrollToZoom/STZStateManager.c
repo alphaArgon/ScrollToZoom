@@ -776,6 +776,15 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
 //  MARK: - Event Adaptation
 
 
+bool STZIsScrollEventNoOp(CGEventRef event) {
+    if (CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1) != 0) {return false;}
+    if (CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis1) != 0) {return false;}
+    if (CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis2) != 0) {return false;}
+    if (CGEventGetDoubleValueField(event, kCGScrollWheelEventFixedPtDeltaAxis2) != 0) {return false;}
+    return true;
+}
+
+
 bool STZIsScrollEventDiscrete(CGEventRef event) {
     ScrollType scroll = scrollOf(event);
     return scroll == kDiscretelyScrolled;

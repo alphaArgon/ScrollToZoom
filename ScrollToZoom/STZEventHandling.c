@@ -761,46 +761,54 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
         gesture = kSTZZoom;
         context->appOptions = 0;
 
-    } else if (continuesTriggeredZoom && inSession && (data & kStateSessionIsTriggeredZoom)
-            && (STZScrollEventMayFallIntoMomentum(event) || (underDictatorship && STZIsScrollEventDiscrete(event)))) {
-        //  What if the event is a `kContinuousScrollEnded`?
-        //  It doesn’t matter because the session will soon time out or enter a momentum state.
-        gesture = kSTZZoom;
+    } else {
+        bool discreteScroll = STZIsScrollEventDiscrete(event);
 
-    } else if (triggerFlagsDown) {
-        //  Scroll events in the same session are always posted to the same process,
-        //  so we need to check the app options only once per session.
-        if (!inSession) {
-            pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
-            CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
-            context->appOptions = STZGetAppOptionsForBundleIdentifier(bundleID);
-        }
+        if (continuesTriggeredZoom && inSession && (data & kStateSessionIsTriggeredZoom)
+         && (STZScrollEventMayFallIntoMomentum(event) || (underDictatorship && discreteScroll))) {
+            //  What if the event is a `kContinuousScrollEnded`?
+            //  It doesn’t matter because the session will soon time out or enter a momentum state.
 
-        if (!(context->appOptions & kSTZDisabledForApp)) {
-            if (!underDictatorship && (context->appOptions & kSTZUsesCommandBasedZoom)
-             && STZIsScrollEventDiscrete(event)) {
-                STZStashScrollDirectionIntoEvent(event);
-                emitCommandBasedZoomKeyEventPair(event);
-                return NULL;
+            //  Some versions of Mos emit infinite trailing scroll events with zero deltas until a
+            //  mouse button is down. In any case, discrete scrolls with zero deltas are bizarre.
+            if (!discreteScroll || !STZIsScrollEventNoOp(event)) {
+                gesture = kSTZZoom;
             }
 
-            gesture = kSTZZoom;
-            if (continuesTriggeredZoom) {
-                data = kStateSessionIsTriggeredZoom;
+        } else if (triggerFlagsDown && (!discreteScroll || !STZIsScrollEventNoOp(event))) {
+            //  Scroll events in the same session are always posted to the same process,
+            //  so we need to check the app options only once per session.
+            if (!inSession) {
+                pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
+                CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
+                context->appOptions = STZGetAppOptionsForBundleIdentifier(bundleID);
+            }
+
+            if (!(context->appOptions & kSTZDisabledForApp)) {
+                if (!underDictatorship && discreteScroll && (context->appOptions & kSTZUsesCommandBasedZoom)) {
+                    STZStashScrollDirectionIntoEvent(event);
+                    emitCommandBasedZoomKeyEventPair(event);
+                    return NULL;
+                }
+
+                gesture = kSTZZoom;
+                if (continuesTriggeredZoom) {
+                    data = kStateSessionIsTriggeredZoom;
+                }
             }
         }
-    }
 
-    if (gesture != kSTZZoom) {
-        //  For example, a event sequence may look like this:
-        //
-        //    trigger down -> continuous scroll × n [1] ->      zoom
-        //    trigger up -> continuous scroll × n [1] ->        revert to scrolls
-        //    momentum scroll × n [1]
-        //
-        //   If the data is kept after reverting to scrolls, the momentum scrolls might
-        //   be misrecognized as a triggered zoom.
-        data = 0;
+        if (gesture != kSTZZoom) {
+            //  For example, a event sequence may look like this:
+            //
+            //    trigger down -> continuous scroll × n [1] ->      zoom
+            //    trigger up -> continuous scroll × n [1] ->        revert to scrolls
+            //    momentum scroll × n [1]
+            //
+            //   If the data is kept after reverting to scrolls, the momentum scrolls might
+            //   be misrecognized as a triggered zoom.
+            data = 0;
+        }
     }
 
     uint64_t fallbackScrollDir = underDictatorship ? context->hardScrollDir : 0;
