@@ -161,6 +161,7 @@ struct _STZState {
     bool                needsFixScroll;
     double              delayedZoom;
     CGEventRef          refEvent;
+    CGEventTimestamp    refTime;
     CGEventTimestamp    endTimeout;
     CGEventTimestamp    momentumStart;
     CGPoint             zoomCenter;
@@ -178,6 +179,15 @@ static EventResult updateStateScrollMayBegin(STZStateRef state, CGEventRef event
 static EventResult updateStateScrollInProgress(STZStateRef state, CGEventRef event, ScrollType scroll, STZGestureType gesture, uint64_t fallbackScrollDir);
 static EventResult updateStateMomentumScrollInProgress(STZStateRef state, CGEventRef event, ScrollType scroll, STZGestureType gesture, uint64_t fallbackScrollDir);
 static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event, ScrollType scroll, STZGestureType gesture, uint64_t fallbackScrollDir);
+
+
+static void setZoomToEndAfterWaiting(STZStateRef state, CGEventRef event, CGEventTimestamp timeout) {
+    state->type = kStateZoomToEndAfterWaiting;
+    state->refEvent = CGEventCreateCopy(event);
+    //  This value is not read from the event because Mos may not report it accurately.
+    state->refTime = CGEventTimestampNow();
+    state->endTimeout = timeout;
+}
 
 
 static void discardRefEvent(STZStateRef state) {
@@ -355,7 +365,7 @@ CGEventRef STZStateRevertToScrollByEvent(STZStateRef state, CGEventRef event) {
 CGEventRef STZStatePeriodicallyUpdate(STZStateRef state, CGEventTimestamp now) {
     if (state->type != kStateZoomToEndAfterWaiting) {return NULL;}
 
-    CGEventTimestamp then = CGEventGetTimestamp(state->refEvent);
+    CGEventTimestamp then = state->refTime;
     if (state->delayedZoom != 0 && now - then >= kEventDelayDuration) {
         CGEventRef event = createZoomEvent(state->refEvent, kCGGesturePhaseChanged, state->zoomCenter, state->delayedZoom);
         CGEventSetTimestamp(event, now);
@@ -379,7 +389,7 @@ CGEventRef STZStatePeriodicallyUpdate(STZStateRef state, CGEventTimestamp now) {
 CGEventTimestamp STZStateGetNextUpdatePeriod(STZStateRef state, CGEventTimestamp now) {
     if (state->type != kStateZoomToEndAfterWaiting) {return 0;}
 
-    CGEventTimestamp fireAt = CGEventGetTimestamp(state->refEvent);
+    CGEventTimestamp fireAt = state->refTime;
     if (state->delayedZoom != 0) {
         fireAt += kEventDelayDuration;
     } else {
@@ -438,9 +448,7 @@ static EventResult updateStateNotInSession(STZStateRef state, CGEventRef event, 
 
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
-            state->type = kStateZoomToEndAfterWaiting;
-            state->refEvent = CGEventCreateCopy(event);
-            state->endTimeout = kDiscreteScrollTimeout;
+            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
             state->delayedZoom += value;
             return replaceEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -507,9 +515,7 @@ static EventResult updateStateScrollMayBegin(STZStateRef state, CGEventRef event
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kContinuousScrollCancelled);
-            state->type = kStateZoomToEndAfterWaiting;
-            state->refEvent = CGEventCreateCopy(event);
-            state->endTimeout = kDiscreteScrollTimeout;
+            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -576,9 +582,7 @@ static EventResult updateStateScrollInProgress(STZStateRef state, CGEventRef eve
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kContinuousScrollEnded);
-            state->type = kStateZoomToEndAfterWaiting;
-            state->refEvent = CGEventCreateCopy(event);
-            state->endTimeout = kDiscreteScrollTimeout;
+            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -645,9 +649,7 @@ static EventResult updateStateMomentumScrollInProgress(STZStateRef state, CGEven
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture);
             setScrollOf(event, kMomentumScrollEnded);
-            state->type = kStateZoomToEndAfterWaiting;
-            state->refEvent = CGEventCreateCopy(event);
-            state->endTimeout = kDiscreteScrollTimeout;
+            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
             state->delayedZoom += value;
             return appendEvent(createZoomEvent(event, kCGGesturePhaseBegan, state->zoomCenter, 0));
         }
@@ -714,9 +716,7 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
 
         case kSTZZoom:
             value = magnificationFromScroll(event, fallbackScrollDir, kCGEventDistantFuture) + pending;
-            state->type = kStateZoomToEndAfterWaiting;
-            state->refEvent = CGEventCreateCopy(event);
-            state->endTimeout = kDiscreteScrollTimeout;
+            setZoomToEndAfterWaiting(state, event, kDiscreteScrollTimeout);
             return replaceEvent(createZoomEvent(event, kCGGesturePhaseChanged, state->zoomCenter, value));
         }
 
@@ -741,9 +741,7 @@ static EventResult updateStateZoomInProgress(STZStateRef state, CGEventRef event
     case kContinuousScrollEnded:
     case kContinuousScrollCancelled:
         //  Waiting for `kMomentumScrollBegan` to avoid interrupting the zoom session.
-        state->type = kStateZoomToEndAfterWaiting;
-        state->refEvent = CGEventCreateCopy(event);
-        state->endTimeout = kMomentumScrollTimeout;
+        setZoomToEndAfterWaiting(state, event, kMomentumScrollTimeout);
         return discardEvent();
 
     case kMomentumScrollBegan:
