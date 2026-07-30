@@ -17,5 +17,6 @@
 - (IBAction)toggleEnabledForKeyApplication:(nullable id)sender;
 - (IBAction)toggleCommandBasedForKeyApplication:(nullable id)sender;
 - (IBAction)toggleExcludingFlagsForKeyApplication:(nullable id)sender;
+- (IBAction)toggleChromiumZoomFixForKeyApplication:(nullable id)sender;
 
 @end

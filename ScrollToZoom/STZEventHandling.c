@@ -752,6 +752,10 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
     bool inSession = STZStateGetSessionData(context->state, &data);
     bool underDictatorship = passiveHardWheelTap.port != NULL;
 
+    //  Magic Zoom is currently not affected by any per-app option.
+    //  Though we have no idea why Chromium set a zoom threshold, Magic Zoom behaves like
+    //  touchpad zoom, so we don’t fix Chromium zoom stall for it.
+
     if (inSession && (data & kStateSessionIsMagicZoom)) {
         gesture = kSTZZoom;
         context->appOptions = 0;
@@ -805,7 +809,9 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
     uint64_t fallbackScrollDir = underDictatorship ? context->hardScrollDir : 0;
 
     STZEventPlacement auxPlacement;
-    CGEventRef auxEvent = STZStateTransformScrollEvent(context->state, event, gesture, fallbackScrollDir, &data, &auxPlacement);
+    CGEventRef auxEvent = STZStateTransformScrollEvent(context->state, event, gesture,
+                                                       (context->appOptions & kSTZFixesZoomForChromiumApp) != 0,
+                                                       fallbackScrollDir, &data, &auxPlacement);
     if (underDictatorship) {
         STZReadScrollDeltaFromEvent(event, 0, true);
     }

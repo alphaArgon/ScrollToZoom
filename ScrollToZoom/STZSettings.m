@@ -7,6 +7,9 @@
  */
 
 #import "STZSettings.h"
+#include <stdint.h>
+#include <objc/NSObjCRuntime.h>
+#include <CoreFoundation/CoreFoundation.h>
 #import "STZProcessManager.h"
 #import <Foundation/Foundation.h>
 
@@ -32,12 +35,43 @@ static NSString *const STZOptionsForAppsKey = @"STZEventTapOptionsForApps";
 
 static NSString *const STZLegacyDisablesMagicZoomKey = @"STZDisableDotDashDragToZoom";
 
+static NSString *const STZAppOptionsVersionKey = @"STZAppOptionsVersion";
+enum {
+    kSTZAppOptionsVersionInitial = 0,
+    kSTZAppOptionsVersionWithChromiumZoomFixes,
+    kSTZAppOptionsVersionLatest = kSTZAppOptionsVersionWithChromiumZoomFixes,
+};
+
+
+CFDictionaryRef STZDefaultOptionsForApps = NULL;
 
 static struct {
     CFStringRef     bundleID;
     STZAppOptions   options;
-} STZRecommendedAppOptions[] = {
-    {CFSTR("org.mozilla.firefox"), kSTZFlagsExcludedForApp}
+} STZDefaultAppOptionsList[] = {
+    {CFSTR("org.mozilla.firefox"), kSTZFlagsExcludedForApp},
+
+    //  There’re plenty of Chromium-based apps; we can’t list all of them.
+    //  Most Electron apps don’t support zooming.
+    {CFSTR("org.chromium.Chromium"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("org.chromium.Thorium"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.google.Chrome"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.google.Chrome.beta"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.google.Chrome.canary"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.operasoftware.Opera"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.microsoft.edgemac"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.microsoft.edgemac.Beta"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.microsoft.edgemac.Canary"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.microsoft.edgemac.Dev"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.operasoftware.OperaNext"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.operasoftware.OperaDeveloper"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.operasoftware.OperaGX"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.vivaldi.Vivaldi"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.vivaldi.Vivaldi.snapshot"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("company.thebrowser.Browser"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("company.thebrowser.dia"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("com.brave.Browser"), kSTZFixesZoomForChromiumApp},
+    {CFSTR("ai.perplexity.comet"), kSTZFixesZoomForChromiumApp},
 };
 
 
@@ -56,7 +90,7 @@ static void _loadUserDefaultsIfNeeded(void) {
 
     NSNumber *modes = [userDefaults objectForKey:STZModesKey];
     if (modes && [modes isKindOfClass:[NSNumber self]]) {
-        STZPreferredModes = [modes intValue] & kSTZModesAll;
+        STZPreferredModes = [modes integerValue] & kSTZModesAll;
     } else if ([userDefaults boolForKey:STZLegacyDisablesMagicZoomKey]) {
         [userDefaults removeObjectForKey:STZLegacyDisablesMagicZoomKey];
         STZPreferredModes = kSTZModesDefault & ~kSTZMagicZoomEnabled;
@@ -82,6 +116,17 @@ static void _loadUserDefaultsIfNeeded(void) {
         STZScrollMomentumZoomMinValue = clamp([minMomentum doubleValue], 0, 1);
     }
 
+    if (!STZDefaultOptionsForApps) {
+        size_t count = sizeof(STZDefaultAppOptionsList) / sizeof(*STZDefaultAppOptionsList);
+        CFMutableDictionaryRef dict = CFDictionaryCreateMutable(kCFAllocatorDefault, count, &kCFTypeDictionaryKeyCallBacks, NULL);
+        for (size_t i = 0; i < count; ++i) {
+            CFStringRef bundleID = STZDefaultAppOptionsList[i].bundleID;
+            STZAppOptions options = STZDefaultAppOptionsList[i].options;
+            CFDictionarySetValue(dict, bundleID, (void *)(uintptr_t)options);
+        }
+        STZDefaultOptionsForApps = dict;
+    }
+
     if (STZOptionsForApps) {
         CFDictionaryRemoveAllValues(STZOptionsForApps);
         CFDictionaryRemoveAllValues(STZOptionsObjsForApps);
@@ -89,29 +134,25 @@ static void _loadUserDefaultsIfNeeded(void) {
         STZOptionsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, NULL);
         STZOptionsObjsForApps = CFDictionaryCreateMutable(kCFAllocatorDefault, 0, &kCFTypeDictionaryKeyCallBacks, &kCFTypeDictionaryValueCallBacks);
     }
+    NSDictionary *appOptions = [userDefaults objectForKey:STZOptionsForAppsKey];
+    if ([appOptions isKindOfClass:[NSDictionary self]]) {
+        NSInteger version = [userDefaults integerForKey:STZAppOptionsVersionKey];
 
-    NSDictionary *eventTapOptions = [userDefaults objectForKey:STZOptionsForAppsKey];
-    if (eventTapOptions) {
-        for (NSString *key in eventTapOptions) {
-            NSNumber *value = [eventTapOptions objectForKey:key];
-            if ([value isKindOfClass:[NSNumber self]]) {
-                CFDictionarySetValue(STZOptionsForApps, (__bridge void *)key, (void *)(uintptr_t)[value intValue]);
-                CFDictionarySetValue(STZOptionsObjsForApps, (__bridge void *)key, (__bridge void *)value);
+        for (NSString *key in appOptions) {
+            NSNumber *number = [appOptions objectForKey:key];
+            if (![number isKindOfClass:[NSNumber self]]) {continue;}
+
+            NSInteger value = [number integerValue];
+            uintptr_t defaultValue = (uintptr_t)CFDictionaryGetValue(STZDefaultOptionsForApps, (__bridge void *)key);
+
+            if (version < kSTZAppOptionsVersionWithChromiumZoomFixes && (defaultValue & kSTZFixesZoomForChromiumApp)) {
+                value |= kSTZFixesZoomForChromiumApp;
+                number = [NSNumber numberWithInteger:value];
             }
-        }
 
-    } else {
-        size_t count = sizeof(STZRecommendedAppOptions) / sizeof(*STZRecommendedAppOptions);
-        for (size_t i = 0; i < count; ++i) {
-            CFStringRef bundleID = STZRecommendedAppOptions[i].bundleID;
-            if (!STZGetInstalledURLForBundleIdentifier(bundleID)) {continue;}
-
-            STZAppOptions options = STZRecommendedAppOptions[i].options;
-
-            CFNumberRef number = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &options);
-            CFDictionarySetValue(STZOptionsForApps, bundleID, (void *)(uintptr_t)options);
-            CFDictionarySetValue(STZOptionsObjsForApps, bundleID, number);
-            CFRelease(number);
+            if (value == defaultValue) {continue;}
+            CFDictionarySetValue(STZOptionsForApps, (__bridge void *)key, (void *)value);
+            CFDictionarySetValue(STZOptionsObjsForApps, (__bridge void *)key, (__bridge void *)number);
         }
     }
 
@@ -182,14 +223,22 @@ void STZSetMomentumZoomMinValue(double minMagnification) {
 STZAppOptions STZGetAppOptionsForBundleIdentifier(CFStringRef bundleID) {
     if (!bundleID) {return 0;}
     _loadUserDefaultsIfNeeded();
-    return (STZAppOptions)(uintptr_t)CFDictionaryGetValue(STZOptionsForApps, bundleID);
+
+    void const *value;
+    if (!CFDictionaryGetValueIfPresent(STZOptionsForApps, bundleID, &value)) {
+        value = CFDictionaryGetValue(STZDefaultOptionsForApps, bundleID);
+    }
+    return (STZAppOptions)(uintptr_t)value;
 }
 
 void STZSetAppOptionsForBundleIdentifier(CFStringRef bundleID, STZAppOptions options) {
     _loadUserDefaultsIfNeeded();
-    if (options == (uintptr_t)CFDictionaryGetValue(STZOptionsForApps, bundleID)) {return;}
 
-    if (!options) {
+    void const *value;
+    if (CFDictionaryGetValueIfPresent(STZOptionsForApps, bundleID, &value)
+     && (options == (uintptr_t)value)) {return;}
+
+    if (options == (uintptr_t)CFDictionaryGetValue(STZDefaultOptionsForApps, bundleID)) {
         CFDictionaryRemoveValue(STZOptionsForApps, bundleID);
         CFDictionaryRemoveValue(STZOptionsObjsForApps, bundleID);
 
@@ -202,6 +251,8 @@ void STZSetAppOptionsForBundleIdentifier(CFStringRef bundleID, STZAppOptions opt
 
     [[NSUserDefaults standardUserDefaults] setObject:(__bridge id)STZOptionsObjsForApps
                                               forKey:STZOptionsForAppsKey];
+    [[NSUserDefaults standardUserDefaults] setInteger:kSTZAppOptionsVersionLatest
+                                               forKey:STZAppOptionsVersionKey];
 
     CFDictionaryRef userInfo = (__bridge void *)@{@"bundleIdentifier": (__bridge id)bundleID};
     CFNotificationCenterPostNotification(CFNotificationCenterGetLocalCenter(),
@@ -219,11 +270,5 @@ CFDictionaryRef STZCopyOptionsForAllApps(void) {
 
 
 STZAppOptions STZGetRecommendedAppOptionsForBundleIdentifier(CFStringRef bundleID) {
-    size_t count = sizeof(STZRecommendedAppOptions) / sizeof(*STZRecommendedAppOptions);
-    for (size_t i = 0; i < count; ++i) {
-        if (CFEqual(STZRecommendedAppOptions[i].bundleID, bundleID)) {
-            return STZRecommendedAppOptions[i].options;
-        }
-    }
-    return 0;
+    return (STZAppOptions)(uintptr_t)CFDictionaryGetValue(STZDefaultOptionsForApps, bundleID);
 }

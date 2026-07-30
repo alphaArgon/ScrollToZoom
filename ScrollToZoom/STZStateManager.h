@@ -57,6 +57,7 @@ void STZStateReadScrollEvent(STZStateRef, CGEventRef event);
 /// Optionally takes a session data value that will be associated with the session after the call.
 /// However, if the session will end after the call, this value will be ignored.
 CGEventRef __nullable STZStateTransformScrollEvent(STZStateRef, CGEventRef event, STZGestureType gesture,
+                                                   bool fixChromiumZoomStall,
                                                    uint64_t fallbackScrollDir, uint64_t const *sessionData,
                                                    STZEventPlacement *returnEventPlacement) CF_RETURNS_RETAINED;
 CGEventRef __nullable STZStateRevertToScrollByEvent(STZStateRef, CGEventRef event) CF_RETURNS_RETAINED;

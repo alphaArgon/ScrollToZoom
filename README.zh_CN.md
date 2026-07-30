@@ -63,9 +63,9 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 
 ## 已知问题
 
-- Mozilla Firefox：同「简介」中所述。
-- Google Chrome：仅当累加缩放量超过某个阈值时，缩放事件才会生效。这是 Chrome 的设计决定。
-- Sketch：单次缩放量小的缩放事件会被忽略。这是 Sketch 的设计决定。
+- [Firefox](https://www.firefox.com)：同「简介」中所述，仅在擦除修饰键时缩放才有效。
+- [Sketch](https://www.sketch.com)：单次缩放量小的缩放事件会被忽略。这是 Sketch 的设计决定。
+- 采用 [Chromium](https://www.chromium.org) 开发的 app：仅当累加缩放量超过某个阈值时，缩放事件才会生效。不过，对于主流浏览器，比如 Chrome、Microsoft Edge、Opera 等，「滚动来缩放」默认会修复这个问题。对于其他你知道的 Chromium app，则可以在各应用选项中手动启用「视作 Chromium 应用处理」。
 
 欢迎提交 issue 来改进这个项目。
 

@@ -217,6 +217,60 @@
         }
       }
     },
+    "IK6-ji-KfX.title" : {
+      "comment" : "Class = \"NSMenuItem\"; title = \"Treat as Chromium App\"; ObjectID = \"IK6-ji-KfX\";",
+      "extractionState" : "extracted_with_value",
+      "localizations" : {
+        "de" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als Chromium-App behandeln"
+          }
+        },
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Treat as Chromium App"
+          }
+        },
+        "es" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tratar como app de Chromium"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traiter comme une app Chromium"
+          }
+        },
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chromiumアプリとして扱う"
+          }
+        },
+        "ru" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Обрабатывать как приложение Chromium"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "视作 Chromium 应用处理"
+          }
+        },
+        "zh-Hant" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "視為 Chromium 應用處理"
+          }
+        }
+      }
+    },
     "iw4-v8-n2x.title" : {
       "comment" : "Class = \"NSMenuItem\"; title = \"Use Command-Based Zoom\"; ObjectID = \"iw4-v8-n2x\";",
       "extractionState" : "extracted_with_value",

@@ -45,6 +45,12 @@
                         <action selector="toggleExcludingFlagsForKeyApplication:" target="-1" id="cjw-Lx-QdN"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Treat as Chromium App" id="IK6-ji-KfX">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="toggleChromiumZoomFixForKeyApplication:" target="-1" id="kKb-Xh-28A"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="i47-VC-lqf"/>
                 <menuItem title="About" id="d9u-sO-yUM">
                     <modifierMask key="keyEquivalentModifierMask"/>

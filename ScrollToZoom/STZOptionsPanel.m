@@ -106,7 +106,11 @@ static STZOptionsPanel __weak *STZSharedOptionsPanel = nil;
     NSButton           *_enabledCheckbox;
     NSButton           *_commandBasedCheckbox;
     NSButton           *_excludingFlagsCheckBox;
-    NSTextField        *_recommendedLabel;
+    NSTextField        *_excludingFlagsLabel;
+    NSButton           *_chromiumZoomFixCheckbox;
+    NSTextField        *_chromiumZoomFixLabel;
+    BOOL                _excludingFlagsRecommended;
+    BOOL                _chromiumZoomFixRecommended;
     BOOL                _changesMadeBySelf;
 }
 
@@ -162,15 +166,18 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 
     _excludingFlagsCheckBox = [NSButton checkboxWithTitle:NSLocalizedString(@"exclude-flags", nil)
                                                    target:self action:@selector(toggleExcludingFlags:)];
-    NSTextField *excludingFlagsLabel = STZMessageLabel(NSLocalizedString(@"exclude-flags-message", nil));
+    _excludingFlagsLabel = STZMessageLabel(NSLocalizedString(@"exclude-flags-message", nil));
 
-    _recommendedLabel = STZMessageLabel(@"");
+    _chromiumZoomFixCheckbox = [NSButton checkboxWithTitle:NSLocalizedString(@"fix-chromium-zoom-stall", nil)
+                                                    target:self action:@selector(toggleChromiumZoomFix:)];
+    _chromiumZoomFixLabel = STZMessageLabel(NSLocalizedString(@"fix-chromium-zoom-stall-message", nil));
 
     NSView *panelView = [[NSView alloc] init];
     [panelView setSubviews:@[
         _enabledCheckbox,
         _commandBasedCheckbox, commandBasedLabel,
-        _excludingFlagsCheckBox, excludingFlagsLabel, _recommendedLabel]];
+        _excludingFlagsCheckBox, _excludingFlagsLabel,
+        _chromiumZoomFixCheckbox, _chromiumZoomFixLabel]];
 
     for (NSView *subviews in [panelView subviews]) {
         [subviews setTranslatesAutoresizingMaskIntoConstraints:NO];
@@ -208,16 +215,20 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
         [[_excludingFlagsCheckBox leadingAnchor] constraintEqualToAnchor:[_enabledCheckbox leadingAnchor]],
         [[_excludingFlagsCheckBox trailingAnchor] constraintLessThanOrEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[excludingFlagsLabel topAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox bottomAnchor] constant:kSTZUIInlineSpacing],
-        [[excludingFlagsLabel leadingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox leadingAnchor] constant:kSTZUICheckboxWidth],
-        [[excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox trailingAnchor]],
-        [[excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
+        [[_excludingFlagsLabel topAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[_excludingFlagsLabel leadingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[_excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[_excludingFlagsCheckBox trailingAnchor]],
+        [[_excludingFlagsLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[_recommendedLabel topAnchor] constraintEqualToAnchor:[excludingFlagsLabel bottomAnchor] constant:kSTZUIInlineSpacing],
-        [[_recommendedLabel leadingAnchor] constraintEqualToAnchor:[excludingFlagsLabel leadingAnchor]],
-        [[_recommendedLabel trailingAnchor] constraintEqualToAnchor:[excludingFlagsLabel trailingAnchor]],
+        [[_chromiumZoomFixCheckbox topAnchor] constraintEqualToAnchor:[_excludingFlagsLabel bottomAnchor] constant:kSTZUISmallSpacing],
+        [[_chromiumZoomFixCheckbox leadingAnchor] constraintEqualToAnchor:[_enabledCheckbox leadingAnchor]],
+        [[_chromiumZoomFixCheckbox trailingAnchor] constraintLessThanOrEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
 
-        [[panelView bottomAnchor] constraintGreaterThanOrEqualToAnchor:[_recommendedLabel bottomAnchor] constant:kSTZUINormalSpacing],
+        [[_chromiumZoomFixLabel topAnchor] constraintEqualToAnchor:[_chromiumZoomFixCheckbox bottomAnchor] constant:kSTZUIInlineSpacing],
+        [[_chromiumZoomFixLabel leadingAnchor] constraintEqualToAnchor:[_chromiumZoomFixCheckbox leadingAnchor] constant:kSTZUICheckboxWidth],
+        [[_chromiumZoomFixLabel trailingAnchor] constraintEqualToAnchor:[panelView trailingAnchor] constant:-kSTZUINormalSpacing],
+
+        [[panelView bottomAnchor] constraintGreaterThanOrEqualToAnchor:[_chromiumZoomFixLabel bottomAnchor] constant:kSTZUINormalSpacing],
         [[panelView heightAnchor] constraintGreaterThanOrEqualToConstant:300],
         [[panelView widthAnchor] constraintGreaterThanOrEqualToConstant:250],
     ]];
@@ -424,14 +435,26 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [_commandBasedCheckbox setEnabled:enabled];
     [_excludingFlagsCheckBox setState:!!(options & kSTZFlagsExcludedForApp)];
     [_excludingFlagsCheckBox setEnabled:enabled];
+    [_chromiumZoomFixCheckbox setState:!!(options & kSTZFixesZoomForChromiumApp)];
+    [_chromiumZoomFixCheckbox setEnabled:enabled];
 
-    if (STZGetRecommendedAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier])
-        & kSTZFlagsExcludedForApp) {
-        [_recommendedLabel setHidden:NO];
-        [_recommendedLabel setStringValue:NSLocalizedString(@"recommended-for-this-app", nil)];
+    STZAppOptions recommendedOptions = STZGetRecommendedAppOptionsForBundleIdentifier((__bridge void *)[entry bundleIdentifier]);
+    if (!(recommendedOptions & kSTZFlagsExcludedForApp) != !_excludingFlagsRecommended) {
+        _excludingFlagsRecommended = !_excludingFlagsRecommended;
+        NSString *message = NSLocalizedString(@"exclude-flags-message", nil);
+        if (_excludingFlagsRecommended) {
+            message = [NSString stringWithFormat:NSLocalizedString(@"%@-recommended-for-this-app", nil), message];
+        }
+        [_excludingFlagsLabel setStringValue:message];
+    }
 
-    } else {
-        [_recommendedLabel setHidden:YES];
+    if (!(recommendedOptions & kSTZFixesZoomForChromiumApp) != !_chromiumZoomFixRecommended) {
+        _chromiumZoomFixRecommended = !_chromiumZoomFixRecommended;
+        NSString *message = NSLocalizedString(@"fix-chromium-zoom-stall-message", nil);
+        if (_chromiumZoomFixRecommended) {
+            message = [NSString stringWithFormat:NSLocalizedString(@"%@-recommended-for-this-app", nil), message];
+        }
+        [_chromiumZoomFixLabel setStringValue:message];
     }
 }
 
@@ -441,6 +464,7 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     BOOL enabled = [_enabledCheckbox state] == NSControlStateValueOn;
     [_commandBasedCheckbox setEnabled:enabled];
     [_excludingFlagsCheckBox setEnabled:enabled];
+    [_chromiumZoomFixCheckbox setEnabled:enabled];
 }
 
 - (void)toggleCommandBased:(id)sender {
@@ -449,6 +473,10 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
 
 - (void)toggleExcludingFlags:(id)sender {
     [self toggleOption:kSTZFlagsExcludedForApp byCheckbox:_excludingFlagsCheckBox flipped:NO];
+}
+
+- (void)toggleChromiumZoomFix:(id)sender {
+    [self toggleOption:kSTZFixesZoomForChromiumApp byCheckbox:_chromiumZoomFixCheckbox flipped:NO];
 }
 
 - (void)toggleOption:(STZAppOptions)option byCheckbox:(NSButton *)checkbox flipped:(BOOL)flipped {

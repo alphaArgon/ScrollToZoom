@@ -7,6 +7,7 @@
  */
 
 #import "AppDelegate.h"
+#include "STZSettings.h"
 #import "STZEventHandling.h"
 #import "STZProcessManager.h"
 #import "STZWindow.h"
@@ -92,7 +93,8 @@ static NSUInteger const HEADER_ITEM_TAG = 110105;
         if ([item tag] == HEADER_ITEM_TAG
          || (action = [item action]) == @selector(toggleEnabledForKeyApplication:)
          || action == @selector(toggleCommandBasedForKeyApplication:)
-         || action == @selector(toggleExcludingFlagsForKeyApplication:)) {
+         || action == @selector(toggleExcludingFlagsForKeyApplication:)
+         || action == @selector(toggleChromiumZoomFixForKeyApplication:)) {
             [item setHidden:hideItems];
         }
     }
@@ -145,35 +147,38 @@ static void toggleOptionsForKeyApplication(STZAppOptions flag) {
     toggleOptionsForKeyApplication(kSTZFlagsExcludedForApp);
 }
 
+- (void)toggleChromiumZoomFixForKeyApplication:(id)sender {
+    toggleOptionsForKeyApplication(kSTZFixesZoomForChromiumApp);
+}
+
 - (BOOL)validateMenuItem:(NSMenuItem *)menuItem {
-    if ([menuItem action] == @selector(toggleEnabledForKeyApplication:)) {
-        NSRunningApplication *app = keyApplication();
+    SEL action = [menuItem action];
+    STZAppOptions option = 0;
+
+    if (action == @selector(toggleEnabledForKeyApplication:)) {
+        option = kSTZDisabledForApp;
+    } else if (action == @selector(toggleCommandBasedForKeyApplication:)) {
+        option = kSTZUsesCommandBasedZoom;
+    } else if (action == @selector(toggleExcludingFlagsForKeyApplication:)) {
+        option = kSTZFlagsExcludedForApp;
+    } else if (action == @selector(toggleChromiumZoomFixForKeyApplication:)) {
+        option = kSTZFixesZoomForChromiumApp;
+    }
+
+    if (option == 0) {return YES;}
+
+    NSRunningApplication *app = keyApplication();
+    CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
+    STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
+
+    if (option == kSTZDisabledForApp) {
         [menuItem setTitle:[NSString stringWithFormat:NSLocalizedString(@"enabled-for-app-name-%@", nil), [app localizedName]]];
-        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
         [menuItem setState:!(options & kSTZDisabledForApp)];
         return YES;
-    }
-
-    if ([menuItem action] == @selector(toggleCommandBasedForKeyApplication:)) {
-        NSRunningApplication *app = keyApplication();
-        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
-        [menuItem setEnabled:!(options & kSTZDisabledForApp)];
-        [menuItem setState:!!(options & kSTZUsesCommandBasedZoom)];
+    } else {
+        [menuItem setState:!!(options & option)];
         return !(options & kSTZDisabledForApp);
     }
-
-    if ([menuItem action] == @selector(toggleExcludingFlagsForKeyApplication:)) {
-        NSRunningApplication *app = keyApplication();
-        CFStringRef bundleID = (__bridge void *)[app bundleIdentifier];
-        STZAppOptions options = STZGetAppOptionsForBundleIdentifier(bundleID);
-        [menuItem setEnabled:!(options & kSTZDisabledForApp)];
-        [menuItem setState:!!(options & kSTZFlagsExcludedForApp)];
-        return !(options & kSTZDisabledForApp);
-    }
-
-    return YES;
 }
 
 @end

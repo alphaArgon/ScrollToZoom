@@ -82,6 +82,8 @@ typedef OPTION_FLAGS(uint32_t) {
     ///
     /// This option might be promoted to a global mode in the future.
     kSTZUsesCommandBasedZoom    = 1 << 2,
+
+    kSTZFixesZoomForChromiumApp = 1 << 3,
 } STZAppOptions;
 
 STZAppOptions STZGetAppOptionsForBundleIdentifier(CFStringRef __nullable bundleID);

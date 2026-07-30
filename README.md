@@ -19,7 +19,7 @@ Previously, a specialized app, Magic Zoom, was developed solely for this feature
 
 ## Overview
 
-With the specified modifier keys held or an auxiliary mouse button pressed, you can perform precise zooming in any app with your mouse wheel. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
+With the specified modifier keys held or a side or middle mouse button pressed, you can perform precise zooming in any app with your mouse wheel. Scroll to Zoom converts mouse wheel events into simulated zoom gestures. The app is lightweight (~1 MB) and runs efficiently in the background.
 
 <img src="images/window_v2.png" width="485" title="Screenshot of the main window">
 
@@ -27,7 +27,7 @@ Scroll to Zoom works seamlessly with other tools like [Mos](https://github.com/C
 
 Regardless of how these tools configure the direction of scrolling, the zooming is always based on your finger movements. You can configure whether “fingers up” means zooming in or out in the app.
 
-You can choose which apps Scroll to Zoom is enabled for. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase Modifier Keys” for it in the settings.
+You can choose which apps Scroll to Zoom is enabled for. Additionally, if modifier keys break the normal zooming behavior, you can choose to remove them from the simulated events for that specific app. For example, Firefox won’t zoom with any modifier key down, so you can enable “Erase modifier keys” for it in the settings.
 
 For apps that don’t support zoom gestures well, you can enable “Use command-based zoom” in the per-app options. When enabled, each wheel step will be converted to the standard Command-Plus or Command-Minus command. Note that this option only applies to mice with a physical scroll wheel.
 
@@ -62,12 +62,12 @@ This app has a built-in logging panel. Open the settings window while holding th
 
 ## Known Issues
 
-- Mozilla Firefox: Described in Overview.
-- Google Chrome: Zoom events only take effect after the accumulated scale exceeds a certain threshold. This is a design decision of Chrome.
-- Sketch: Zoom events with a small scale are ignored. This is a design decision of Sketch.
+- [Firefox](https://www.firefox.com): As described in Overview, zooming works only when modifier keys are erased.
+- [Sketch](https://www.sketch.com): Zoom events with a small scale are ignored. This is a design decision of Sketch.
+- Apps built on [Chromium](https://www.chromium.org): Zoom events only take effect after the accumulated zoom level exceeds a certain threshold. However, Scroll to Zoom fixes this issue by default for major browsers such as Chrome, Microsoft Edge, and Opera. For other Chromium apps you know of, you can manually enable “Treat as Chromium app” in the per-app options.
 
-You are welcome to report issues and contribute to this project
+You are welcome to report issues and contribute to this project.
 
 ## License
 
-The source code of Scroll to Zoom is released under the MIT license. See [LICENSE](LICENSE) for details. The app icon and status bar image are created from glyphs of the font *Zapfino* shipped with macOS, which may have a different license. Other assets (images, fonts, etc.) are copyrighted by the owner of this repository, which means you cannot use them in your own distribution without permission.
+The source code of Scroll to Zoom is released under the MIT license. See [LICENSE](LICENSE) for details. The app icon and status bar image are created from a glyph of the font *Zapfino* shipped with macOS, which may have a different license. Other assets (images, fonts, etc.) are copyrighted by the owner of this repository, which means you cannot use them in your own distribution without permission.
