@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <CoreGraphics/CGEvent.h>
 #include "STZCommon.h"
 
 CF_IMPLICIT_BRIDGING_ENABLED
@@ -45,6 +44,8 @@ typedef struct _STZState *STZStateRef;
 
 STZStateRef STZStateCreate(void);
 void STZStateRelease(STZStateRef);
+
+bool STZStateIsZooming(STZStateRef);
 
 /// Session data are an arbitrary 64-bit value that is preserved during a wheel session and
 /// automatically reset to zero when the session ends. Returns whether the state is in a session.

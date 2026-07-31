@@ -7,9 +7,6 @@
  */
 
 #import "STZSettings.h"
-#include <stdint.h>
-#include <objc/NSObjCRuntime.h>
-#include <CoreFoundation/CoreFoundation.h>
 #import "STZProcessManager.h"
 #import <Foundation/Foundation.h>
 

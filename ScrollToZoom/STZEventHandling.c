@@ -8,7 +8,6 @@
 
 #include "STZEventHandling.h"
 #include <ApplicationServices/ApplicationServices.h>
-#include <CoreFoundation/CoreFoundation.h>
 #include "CGEventSPI.h"
 #include "STZMagicZoom.h"
 #include "STZStateManager.h"
@@ -406,6 +405,7 @@ RESET:
 static void eventTapTimeout(void) {
     STZDebugLog("Event tap disabled due to timeout");
     STZSetWorkingModes(0);
+    STZDidStopWorkingDueToEventTapTimeout();
 }
 
 
@@ -771,10 +771,13 @@ static CGEventRef mutableSoftWheelTapCallback(CGEventTapProxy proxy, CGEventType
         //  It doesn’t matter because the session will soon time out or enter a momentum state.
         gesture = kSTZZoom;
 
-    } else if (triggerFlagsDown) {
+    } else if (triggerFlagsDown && (!continuesTriggeredZoom || !STZScrollEventMayFallIntoMomentum(event))) {
+        //  With `continuesTriggeredZoom`, momentum scrolls in zoom session are handled in the
+        //  previous, and we don’t transform momentum scrolls eagerly.
+
         //  Scroll events in the same session are always posted to the same process,
         //  so we need to check the app options only once per session.
-        if (!inSession) {
+        if (!STZStateIsZooming(context->state)) {
             pid_t pid = (int32_t)CGEventGetIntegerValueField(event, kCGEventTargetUnixProcessID);
             CFStringRef bundleID = STZGetBundleIdentifierForProcessID(pid);
             context->appOptions = STZGetAppOptionsForBundleIdentifier(bundleID);

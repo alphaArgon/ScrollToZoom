@@ -9,7 +9,6 @@
 #include "STZStateManager.h"
 #include "STZSettings.h"
 #include "CGEventSPI.h"
-#include <CoreGraphics/CoreGraphics.h>
 
 
 typedef struct {
@@ -267,9 +266,16 @@ STZStateRef STZStateCreate(void){
     return state;
 }
 
+
 void STZStateRelease(STZStateRef state) {
     discardRefEvent(state);
     free(state);
+}
+
+
+bool STZStateIsZooming(STZStateRef state) {
+    //  `kStateZoomStoppedByAttenuation` is still zooming; it just discard events.
+    return state->type >= kStateZoomInProgress && state->type <= kStateZoomStoppedByAttenuation;
 }
 
 

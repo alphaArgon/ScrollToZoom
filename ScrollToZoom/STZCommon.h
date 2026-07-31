@@ -65,6 +65,8 @@ void STZCacheEnumerateValues(STZCacheRef, void (*valueEnumerateCallback)(void *v
 bool STZIsLoggingEnabled(void);
 void STZDebugLog(char const *message, ...) CF_FORMAT_FUNCTION(1, 2);
 
+void STZDidStopWorkingDueToEventTapTimeout(void);
+
 void STZUnknownEnumCase(char const *type, int64_t value);
 void STZDebugLogEvent(char const *prefix, CGEventRef event);
 

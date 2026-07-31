@@ -283,9 +283,9 @@ static void *STZRunningApplicationsKVO = &STZRunningApplicationsKVO;
     [met addObject:[[STZApplicationEntry finderEntry] bundleIdentifier]];
 
     for (NSRunningApplication *app in [[NSWorkspace sharedWorkspace] runningApplications]) {
-        if (![met containsObject:[app bundleIdentifier]]
-         && [app activationPolicy] == NSApplicationActivationPolicyRegular) {
-            [met addObject:[app bundleIdentifier]];
+        NSString *bundleID = [app bundleIdentifier];
+        if (![met containsObject:bundleID] && [app activationPolicy] == NSApplicationActivationPolicyRegular) {
+            [met addObject:bundleID];
             [_runningBundleIDs addObject:[STZApplicationEntry entryWithApplication:app]];
         }
     }

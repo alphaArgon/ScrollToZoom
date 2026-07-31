@@ -13,8 +13,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface STZWindow : NSWindow
 
-@property(nonatomic, class, readonly) STZWindow *sharedWindow;
-
 + (void)orderFrontSharedWindowWithAdvancedSettings:(BOOL)advanced;
 
 @end

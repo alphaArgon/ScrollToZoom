@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <CoreGraphics/CGEvent.h>
 #include "STZCommon.h"
 
 CF_IMPLICIT_BRIDGING_ENABLED

@@ -21,6 +21,7 @@
 @interface STZConfigViewController : NSViewController
 
 @property(nonatomic) BOOL showsAdvancedSettings;
+- (void)reloadData;
 
 @end
 
@@ -56,6 +57,10 @@ static NSString *trim(NSString *string) {
             NSRect frame = [sharedWindow frame];
             [sharedWindow setFrame:NSMakeRect(NSMinX(frame), NSMaxY(frame) - 200, NSWidth(frame), 200) display:NO];
         }
+    }
+
+    if ([sharedWindow isVisible]) {
+        [(STZConfigViewController *)[sharedWindow contentViewController] reloadData];
     }
 
     [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];

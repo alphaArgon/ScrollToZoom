@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <CoreFoundation/CoreFoundation.h>
 #include <IOKit/IOKitLib.h>
 
 CF_IMPLICIT_BRIDGING_ENABLED

@@ -7,7 +7,6 @@
  */
 
 #pragma once
-#include <CoreFoundation/CoreFoundation.h>
 #include "STZCommon.h"
 
 CF_ASSUME_NONNULL_BEGIN

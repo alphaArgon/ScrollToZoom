@@ -7,7 +7,6 @@
  */
 
 #import "AppDelegate.h"
-#include "STZSettings.h"
 #import "STZEventHandling.h"
 #import "STZProcessManager.h"
 #import "STZWindow.h"
@@ -17,6 +16,36 @@
 
 static NSString *const REPO_URL_PATH = @"https://github.com/alphaArgon/ScrollToZoom";
 static NSUInteger const HEADER_ITEM_TAG = 110105;
+
+
+void STZDidStopWorkingDueToEventTapTimeout(void) {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert setAlertStyle:NSAlertStyleCritical];
+    [alert setMessageText:NSLocalizedString(@"event-tap-timeout-message", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"re-enable", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"quit-app", nil)];
+    [alert addButtonWithTitle:NSLocalizedString(@"open-settings", nil)];
+
+    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+
+    BOOL optionDown;
+    switch ([alert runModal]) {
+    case NSAlertFirstButtonReturn:
+        if (!STZSetWorkingModes(STZGetPreferredModes())) {
+            [STZWindow orderFrontSharedWindowWithAdvancedSettings:NO];
+        }
+        break;
+    case NSAlertSecondButtonReturn:
+        [[NSApplication sharedApplication] terminate:nil];
+        break;
+    case NSAlertThirdButtonReturn:
+        optionDown = !!([NSEvent modifierFlags] & NSEventModifierFlagOption);
+        [STZWindow orderFrontSharedWindowWithAdvancedSettings:optionDown];
+        break;
+    default:
+        break;
+    }
+}
 
 
 @implementation AppDelegate {
