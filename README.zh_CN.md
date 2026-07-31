@@ -53,7 +53,7 @@ xattr -dr com.apple.quarantine /Applications/Scroll\ to\ Zoom.app
 
 由于此 app 使用了一些受保护的技术，它不能运行在 App Sandbox 里，也不能上架 Mac App Store。
 
-如果你更喜欢「妙控鼠标特供」一节的抽象老鼠图标，可以在访达中右键点击该 app > 显示包内容 > Contents > Resources > AppIconMagic.icns 来找到它，然后替换掉「滚动来缩放」的默认图标。
+如果你更喜欢「妙控鼠标特供」一节的抽象老鼠图标，可以在 [images/magic_zoom.icns](images/magic_zoom.icns) 找到它，然后替换掉「滚动来缩放」的默认图标。
 
 ## 技术使用
 

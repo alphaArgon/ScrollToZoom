@@ -52,7 +52,7 @@ Make sure the path (/Applications/Scroll to Zoom.app) matches the actual locatio
 
 Because this app uses some protected technologies, it cannot be sandboxed and distributed on the Mac App Store.
 
-If you like the abstract mouse icon in the Bonus for Magic Mouse Users section better, you can find it by right-clicking the app in Finder > Show Package Contents > Contents > Resources > AppIconMagic.icns, and use it to replace the default icon of Scroll to Zoom.
+If you like the abstract mouse icon in the Bonus for Magic Mouse Users section better, you can find it at [images/magic_zoom.icns](images/magic_zoom.icns), and use it to replace the default icon of Scroll to Zoom.
 
 ## Technologies
 
