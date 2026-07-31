@@ -334,14 +334,6 @@ CGEventRef STZStateTransformScrollEvent(STZStateRef state, CGEventRef event, STZ
                                         bool fixChromiumZoomStall,
                                         uint64_t fallbackScrollDir, uint64_t const *sessionData,
                                         STZEventPlacement *returnEventPlacement) {
-    discardRefEvent(state);
-    state->needsFixScroll = false;
-
-    StateType oldType = state->type;
-    if (gesture == kSTZZoom && oldType < kStateZoomInProgress) {
-        state->zoomCenter = CGEventGetLocation(event);
-    }
-
     ScrollType scroll = scrollOf(event);
     if (gesture == kSTZZoom && scroll == kDiscretelyScrolled && STZIsScrollEventNoOp(event)) {
         //  Some versions of Mos emit endless trailing scroll events with zero deltas until the
@@ -349,6 +341,14 @@ CGEventRef STZStateTransformScrollEvent(STZStateRef state, CGEventRef event, STZ
         //  Discard the event so that the session will terminate due to timeout.
         *returnEventPlacement = kSTZReplaceEvent;
         return NULL;
+    }
+
+    discardRefEvent(state);
+    state->needsFixScroll = false;
+
+    StateType oldType = state->type;
+    if (gesture == kSTZZoom && oldType < kStateZoomInProgress) {
+        state->zoomCenter = CGEventGetLocation(event);
     }
 
     checkMomentumStart(state, event, scroll);
